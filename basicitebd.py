@@ -8,7 +8,6 @@ import random
 import copy
 import time
 import Move
-import Move1
 
 def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D):
 
@@ -68,26 +67,6 @@ def z_value(a,b,c,d,az,bz,cz,dz,chi,D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta
  print abs(norm1[0])/abs(1.00*norm[0]), abs(norm2[0])/abs(1.00*norm[0])
  
  return abs(norm1[0]+norm2[0]+norm3[0]+norm4[0])/abs(4.00*norm[0])
-
-
-
-def corner_transfer_matrix_onesite(a, az,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
-
- z=copy.copy(az)
- for q in xrange(40):
-  c1, c4, Ta4= Move1.left(c1,c4,Ta4,Ta1,Ta3,chi,a)
-  c3, c4 , Ta3= Move1.down(c4,c3,Ta3,Ta4,Ta2,chi,a)
-  c2, c3 , Ta2= Move1.right(c3,c2,Ta2,Ta1,Ta3,chi,a)
-  c1, c2 , Ta1= Move1.up(c1,c2,Ta1,Ta4,Ta2,chi,a)
-
- norm0=Move1.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,a)
- norm1=Move1.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,z)
- #print 'norm',norm0[0]
- return norm1[0]/norm0[0]
-
-
-
-
 
 
 
