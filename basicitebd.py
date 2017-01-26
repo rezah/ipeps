@@ -23,29 +23,42 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
   c1, Ta4, Tb4, c4=Move.add_left(c1,Tb4,Ta4,c4,Tb1,Ta3,a,c,chi,D)
   c1, Ta4, Tb4, c4=Move.add_left(c1,Tb4,Ta4,c4,Ta1,Tb3,b,d,chi,D)
 
+
   c2, Ta2, Tb2, c3=Move.add_right(c2,Ta2,Tb2,c3,Ta1,Tb3,b,d,chi,D)
   c2, Ta2, Tb2, c3=Move.add_right(c2,Ta2,Tb2,c3,Tb1,Ta3,a,c,chi,D)
 
-  c1, Ta1, Tb1, c2=Move.add_up(c1,Tb1,Ta1,c2,Tb4,Ta2,a,b,chi,D)
-  c1, Ta1, Tb1, c2=Move.add_up(c1,Tb1,Ta1,c2,Ta4,Tb2,c,d,chi,D)
+  Move.permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
-  c4, Ta3, Tb3, c3=Move.add_down(c4,Ta3,Tb3,c3,Ta4,Tb2,c,d,chi,D)
-  c4, Ta3, Tb3, c3=Move.add_down(c4,Ta3,Tb3,c3,Tb4,Ta2,a,b,chi,D)
+  c1, Ta1, Tb1, c2=Move.add_left(c1,Tb1,Ta1,c2,Tb4,Ta2,a,b,chi,D)
+  c1, Ta1, Tb1, c2=Move.add_left(c1,Tb1,Ta1,c2,Ta4,Tb2,c,d,chi,D)
+
+  c4, Ta3, Tb3, c3=Move.add_right(c4,Ta3,Tb3,c3,Ta4,Tb2,c,d,chi,D)
+  c4, Ta3, Tb3, c3=Move.add_right(c4,Ta3,Tb3,c3,Tb4,Ta2,a,b,chi,D)
+
+  Move.permute( a, b, c, d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
+  c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=Move.test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
+
 
   norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
   norm1=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
   E0=E1
-  E1=abs(norm1[0])/abs(norm[0])
-  if (abs((E0-E1)/E1) < Accuracy) and ( count > 15):Loop_iter=1;
+  if (abs(norm[0]) > 1.00e-10):
+   E1=abs(norm1[0])/abs(norm[0])
+   if (abs((E0-E1)/E0) < Accuracy):Loop_iter=1;
+  else:
+   E1=abs(norm1[0])
+   if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
-  #print E1,abs((E0-E1)/E1), count
+  if (count > 20 ): print 'break! CTM'; break;
+  #print E1, abs((E0-E1)/E1), count
+  #print E1, Truncation[0], abs((E0-E1)/E1)
+  #print a.norm(), b.norm(), c.norm(), d.norm()
 
 
   #print abs(norm1[0]+norm2[0]+norm3[0]+norm4[0])/abs(4.00*norm[0]), Truncation[0]
  #print 'hi', Tb1
  return c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4
-
-
 
 
 def z_value(a,b,c,d,az,bz,cz,dz,chi,D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):

@@ -8,117 +8,6 @@ import random
 import copy
 import time
 
-def add_up(c1,Tb1,Ta1,c2,Tb4,Ta2,a,b,chi,D):
- bdo = uni10.Bond(uni10.BD_OUT, chi)
- c1.setLabel([0,1])
- Tb4.setLabel([3,2,0])
- c1bar=c1*Tb4
- c1bar.permute([1,2,3],2)
-
- c2.setLabel([0,1])
- Ta2.setLabel([3,2,1])
- c2bar=c2*Ta2
- c2bar.permute([3,0,2],1)
-
- Mc1=c1bar.getBlock()
- Mc1_trans=copy.copy(Mc1)
- Mc1_trans.transpose()
-
- Mc2=c2bar.getBlock()
- Mc2_trans=copy.copy(Mc2)
- Mc2_trans.transpose()
- 
- Mfinal=Mc1*Mc1_trans+Mc2_trans*Mc2
- svd=Mfinal.svd()
- Z=uni10.UniTensor([c1bar.bond()[0],c1bar.bond()[1] ,bdo] )
- Z.putBlock(svd[0].resize(svd[0].row(), chi))
-
- Z_trans=copy.copy(Z)
- Z_trans.transpose()
-
-
- c1.setLabel([0,1])
- Tb1.setLabel([1,2,3])
- Tb4.setLabel([4,5,0])
- a.setLabel([5,6,7,2])
- Q=((c1*Tb1)*(Tb4))*a
- Q.permute([3,7,4,6],2)
-
-
-
- c2.setLabel([0,1])
- Ta2.setLabel([3,2,1])
- Ta1.setLabel([4,5,0])
- b.setLabel([6,7,2,5])
- Q1=((c2*Ta2)*(Ta1))*b
- Q1.permute([3,7,4,6],2)
-
- Mc1=Q.getBlock()
- Mc1_trans=copy.copy(Mc1)
- Mc1_trans.transpose()
-
- Mc4=Q1.getBlock()
- Mc4_trans=copy.copy(Mc4)
- Mc4_trans.transpose()
- Mfinal=Mc1*Mc1_trans+Mc4_trans*Mc4
-
- svd=Mfinal.svd()
- W=uni10.UniTensor([Q.bond()[0],Q.bond()[1] ,bdo] )
- W.putBlock(svd[0].resize(svd[0].row(), chi))
-
- W_trans=copy.copy(W)
- W_trans.transpose()
- Sum=0
-
-
- ##############################
- Z_trans.setLabel([4,1,2])
- c1bar=c1bar*Z_trans
- c1bar.permute([3,4],1)
- ############################
- Z.setLabel([0,2,4])
- c2bar=c2bar*Z
- c2bar.permute([4,3],1)
- #############################
- Tb1.setLabel([0,1,2])
- a.setLabel([3,4,5,1])
- Z.setLabel([0,3,7])
- W_trans.setLabel([6,2,5])
- Tb1bar=((Tb1*a)*Z)*W_trans
- Tb1bar.permute([7,4,6],2)
-#####################################
- Ta1.setLabel([0,1,2])
- b.setLabel([3,4,5,1])
- Z_trans.setLabel([7,2,5])
- W.setLabel([0,3,6])
- Ta1bar=((Ta1*b)*Z_trans)*W
- Ta1bar.permute([6,4,7],2)
-##############################################3
- if ( (abs(c1bar.getBlock().absMax()) < 0.50e-1) or (abs(c1bar.getBlock().absMax()) > 0.50e+1)   ):
-  c1=c1bar*(1.00/c1bar.getBlock().absMax()); 
- else: c1=c1bar;
- #print 'norm0000', c1.norm(), c1.getBlock().absMax()
- 
- if ( (abs(c2bar.getBlock().absMax()) < 0.50e-1) or (abs(c2bar.getBlock().absMax()) > 0.50e+1) ):
-  c2=c2bar*(1.00/c2bar.getBlock().absMax()); 
- else: c2=c2bar;
- #print 'norm1111', c2.norm(), c2.getBlock().absMax()
- 
- if ( (abs(Ta1bar.getBlock().absMax()) < 0.50e-1) or (abs(Ta1bar.getBlock().absMax()) > 0.50e+1) ):
-  Ta1=Ta1bar*(1.00/Ta1bar.getBlock().absMax()); 
- else: Ta1=Ta1bar;
- #print 'norm2222', Ta1.norm(), Ta1.getBlock().absMax()
-
- if ( (abs(Tb1bar.getBlock().absMax()) < 0.50e-1) or (abs(Tb1bar.getBlock().absMax()) > 0.50e+1) ):
-  Tb1=Tb1bar*(1.00/Tb1bar.getBlock().absMax()); 
- else: Tb1=Tb1bar;
- #print 'norm3333', Tb1.norm(), Tb1.getBlock().absMax()
- 
- 
- 
- return  c1, Ta1, Tb1, c2
- 
-
 def  add_right(c2,Ta2,Tb2,c3,Ta1,Tb3,b,d,chi,D):
  bdo = uni10.Bond(uni10.BD_OUT, chi)
  #################3################################
@@ -225,119 +114,6 @@ def  add_right(c2,Ta2,Tb2,c3,Ta1,Tb3,b,d,chi,D):
  
  return c2, Ta2, Tb2, c3
 
-def  add_down(c4,Ta3,Tb3,c3,Ta4,Tb2,c,d,chi,D):
-#################################################
- bdo = uni10.Bond(uni10.BD_OUT, chi)
- c4.setLabel([0,1])
- Ta4.setLabel([0,2,3])
- c4bar=c4*Ta4
- c4bar.permute([1,2,3],2)
- 
- c3.setLabel([0,1])
- Tb2.setLabel([0,2,3])
- c3bar=c3*Tb2
- c3bar.permute([3,1,2],1)
- 
- Mc4=c4bar.getBlock()
- Mc4_trans=copy.copy(Mc4)
- Mc4_trans.transpose()
-
- Mc3=c3bar.getBlock()
- Mc3_trans=copy.copy(Mc3)
- Mc3_trans.transpose()
- 
- 
- Mfinal=Mc4*Mc4_trans+Mc3_trans*Mc3
- svd=Mfinal.svd()
- Z=uni10.UniTensor([c4bar.bond()[0],c4bar.bond()[1] ,bdo] )
- Z.putBlock(svd[0].resize(svd[0].row(), chi))
-
- Z_trans=copy.copy(Z)
- Z_trans.transpose()
- Sum=0
- for i in xrange(svd[1].row()):
-   if (i>=chi):
-    Sum=svd[1][i]+Sum
- #print 'truncation1=', Sum
-#############################
- 
- c4.setLabel([0,1])
- Ta4.setLabel([0,4,5])
- Ta3.setLabel([1,2,3])
- c.setLabel([4,2,6,7])
- Q=((c4*Ta4)*(Ta3))*c
- Q.permute([3,6,5,7],2)
- 
- c3.setLabel([0,1])
- Tb2.setLabel([0,2,3])
- Tb3.setLabel([7,4,1])
- d.setLabel([5,4,2,6])
- Q1=((c3*Tb2)*(Tb3))*d
- Q1.permute([3,6,7,5],2)
- 
- 
- Mc1=Q.getBlock()
- Mc1_trans=copy.copy(Mc1)
- Mc1_trans.transpose()
-
- Mc4=Q1.getBlock()
- Mc4_trans=copy.copy(Mc4)
- Mc4_trans.transpose()
-
- Mfinal=Mc1*Mc1_trans+Mc4_trans*Mc4
-
- svd=Mfinal.svd()
- W=uni10.UniTensor([Q.bond()[0],Q.bond()[1] ,bdo] )
- W.putBlock(svd[0].resize(svd[0].row(), chi))
-
- W_trans=copy.copy(W)
- W_trans.transpose()
-
- ##############################
- Z_trans.setLabel([4,1,2])
- c4bar=c4bar*Z_trans
- c4bar.permute([3,4],1)
- ############################
- Z.setLabel([1,2,4])
- c3bar=c3bar*Z
- c3bar.permute([3,4],1)
- #############################
- Ta3.setLabel([0,1,2])
- c.setLabel([3,1,4,5])
- Z.setLabel([0,3,7])
- W_trans.setLabel([6,2,4])
- Ta3bar=((Ta3*c)*Z)*W_trans
- Ta3bar.permute([7,5,6],2)
- ###########################
- Tb3.setLabel([0,1,2])
- d.setLabel([3,1,4,5])
- W.setLabel([0,3,6])
- Z_trans.setLabel([7,2,4])
- Tb3bar=((Tb3*d)*Z_trans)*W
- Tb3bar.permute([6,5,7],2)
- ###########################
- if ( (abs(c3bar.getBlock().absMax()) < 0.50e-1) or (abs(c3bar.getBlock().absMax()) > 0.50e+1)   ):
-  c3=c3bar*(1.00/c3bar.getBlock().absMax()); 
- else: c3=c3bar;
- #print 'norm00', c3.norm(), c3.getBlock().absMax()
- 
- if ( (abs(c4bar.getBlock().absMax()) < 0.50e-1) or (abs(c4bar.getBlock().absMax()) > 0.50e+1) ):
-  c4=c4bar*(1.00/c4bar.getBlock().absMax()); 
- else: c4=c4bar;
- #print 'norm11', c4.norm(), c4.getBlock().absMax()
- 
- if ( (abs(Ta3bar.getBlock().absMax()) < 0.50e-1) or (abs(Ta3bar.getBlock().absMax()) > 0.50e+1) ):
-  Ta3=Ta3bar*(1.00/Ta3bar.getBlock().absMax()); 
- else: Ta3=Ta3bar;
- #print 'norm22', Ta3.norm(), Ta3.getBlock().absMax()
-
- if ( (abs(Tb3bar.getBlock().absMax()) < 0.50e-1) or (abs(Tb3bar.getBlock().absMax()) > 0.50e+1) ):
-  Tb3=Tb3bar*(1.00/Tb3bar.getBlock().absMax()); 
- else: Tb3=Tb3bar;
- #print 'norm33', Tb3.norm(), Tb3.getBlock().absMax()
- 
-
- return c4, Ta3, Tb3, c3
 
 
 def  add_left(c1,Tb4,Ta4,c4,Tb1,Ta3,a,c,chi,D,Truncation):
@@ -467,8 +243,6 @@ def  add_left(c1,Tb4,Ta4,c4,Tb1,Ta3,a,c,chi,D,Truncation):
  
  
 def  magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
-
-
  c1.setLabel([0,1])
  c2.setLabel([5,6])
  c3.setLabel([7,8])
@@ -493,7 +267,126 @@ def  magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
  norm=((((((c4*Ta4)*Ta3)*c)*(((c3*Tb3)*Tb2)*d)))*((((c2*Ta2)*Ta1)*b)*(((c1*Tb1)*Tb4)*a)))
  #print 'hi1', '\n',norm,
  return norm
+def permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  
+ ##print'a', a
+ a.setLabel([0,1,2,3])
+ a.permute([3,2,1,0],2)
+ a.setLabel([0,1,2,3])
+ ##print'a', a
+ b.setLabel([0,1,2,3])
+ b.permute([3,2,1,0],2)
+ b.setLabel([0,1,2,3])
+
+ c.setLabel([0,1,2,3])
+ c.permute([3,2,1,0],2)
+ c.setLabel([0,1,2,3])
+
+ d.setLabel([0,1,2,3])
+ d.permute([3,2,1,0],2)
+ d.setLabel([0,1,2,3])
+
  
+ c1.setLabel([0,1])
+ c1.permute([1,0],1)
+ c1.setLabel([0,1])
+
+# c2.setLabel([0,1])
+# c2.permute([1,0],1)
+# c2.setLabel([0,1])
  
+ c3.setLabel([0,1])
+ c3.permute([1,0],1)
+ c3.setLabel([0,1])
+
+# c4.setLabel([0,1])
+# c4.permute([1,0],1)
+# c4.setLabel([0,1])
+
+
+ Ta1.setLabel([0,1,2])
+ Ta1.permute([2,1,0],2)
+ Ta1.setLabel([0,1,2])
+ 
+ Ta2.setLabel([0,1,2])
+ Ta2.permute([2,1,0],2)
+ Ta2.setLabel([0,1,2])
+ 
+ Ta3.setLabel([0,1,2])
+ Ta3.permute([2,1,0],2)
+ Ta3.setLabel([0,1,2])
+
+ Ta4.setLabel([0,1,2])
+ Ta4.permute([2,1,0],2)
+ Ta4.setLabel([0,1,2])
+
+ Tb1.setLabel([0,1,2])
+ Tb1.permute([2,1,0],2)
+ Tb1.setLabel([0,1,2])
+ 
+ Tb2.setLabel([0,1,2])
+ Tb2.permute([2,1,0],2)
+ Tb2.setLabel([0,1,2])
+ 
+ Tb3.setLabel([0,1,2])
+ Tb3.permute([2,1,0],2)
+ Tb3.setLabel([0,1,2])
+
+ Tb4.setLabel([0,1,2])
+ Tb4.permute([2,1,0],2)
+ Tb4.setLabel([0,1,2])
+
+def test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4):
+ Rand_ten=copy.copy(c1)
+ Rand_ten.randomize()
+ if ( c1.getBlock().norm()  < 1.0e-5 ) or ( c1.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, c1', c1.getBlock().norm()
+  c1=c1*(1.00/c1.getBlock().norm())+(0.001)*Rand_ten(); 
+ if ( c2.getBlock().norm()  < 1.0e-5 ) or ( c2.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, c2', c2.getBlock().norm()
+  c2=c2*(1.00/c2.getBlock().norm())+(0.001)*Rand_ten(); 
+ if ( c3.getBlock().norm()  < 1.0e-5 ) or ( c3.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, c3', c3.getBlock().norm()
+  c3=c3*(1.00/c3.getBlock().norm())+(0.001)*Rand_ten(); 
+ if ( c4.getBlock().norm()  < 1.0e-5 ) or ( c4.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, c4', c4.getBlock().norm()
+  c4=c4*(1.00/c4.getBlock().norm())+(0.001)*Rand_ten(); 
+ Rand_ten=copy.copy(Ta1)
+ Rand_ten.randomize()
+ if ( Ta1.getBlock().norm()  < 1.0e-5 ) or ( Ta1.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, Ta1', Ta1.getBlock().norm()
+  Ta1=Ta1*(1.00/Ta1.getBlock().norm())+(0.001)*Rand_ten(); 
+ if ( Ta2.getBlock().norm()  < 1.0e-5 ) or ( Ta2.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, Ta2', Ta2.getBlock().norm()
+  Ta2=Ta2*(1.00/Ta2.getBlock().norm())+(0.001)*Rand_ten(); 
+ if ( Ta3.getBlock().norm()  < 1.0e-5 ) or ( Ta3.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, Ta3', Ta3.getBlock().norm()
+  Ta3=Ta3*(1.00/Ta3.getBlock().norm())+(0.001)*Rand_ten(); 
+ if ( Ta4.getBlock().norm()  < 1.0e-5 ) or ( Ta4.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, Ta4', Ta4.getBlock().norm()
+  Ta4=Ta4*(1.00/Ta4.getBlock().norm())+(0.001)*Rand_ten(); 
+
+
+ if ( Tb1.getBlock().norm()  < 1.0e-5 ) or ( Tb1.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, Tb1', Tb1.getBlock().norm()
+  Tb1=Tb1*(1.00/Tb1.getBlock().norm())+(0.001)*Rand_ten(); 
+ if ( Tb2.getBlock().norm()  < 1.0e-5 ) or ( Tb2.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, Tb2', Tb2.getBlock().norm()
+  Tb2=Tb2*(1.00/Tb2.getBlock().norm())+(0.001)*Rand_ten(); 
+ if ( Tb3.getBlock().norm()  < 1.0e-5 ) or ( Tb3.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, Tb3', Tb3.getBlock().norm()
+  Tb3=Tb3*(1.00/Tb3.getBlock().norm())+(0.001)*Rand_ten(); 
+ if ( Tb4.getBlock().norm()  < 1.0e-5 ) or ( Tb4.getBlock().norm()  > 1.0e+5 )   :
+  print 'Warning, norm, Tb4', Tb4.getBlock().norm()
+  Tb4=Tb4*(1.00/Tb4.getBlock().norm())+(0.001)*Rand_ten(); 
+
+ return c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4
+
+
+
+
+
+
+
+
  

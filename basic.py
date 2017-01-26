@@ -11,8 +11,9 @@ import Move
 import basic_FU
 
 
-def Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi):
+def Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive):
  Truncation=[0]
+ 
  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
  #print 'Truncation', Truncation[0]
 
@@ -28,9 +29,12 @@ def Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
 
  #basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,a_u,b_u)
 
+ 
  lp, rp, lp_d, rp_d=basic_FU.initialize_lrprime(l, r, l_d, r_d, N_uni)
  lp, rp, lp_d, rp_d=basic_FU.initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys)
- #lp, rp, lp_d, rp_d, N_uni, l, r, l_d, r_d,q_u, qq_u, a_u, b_u=basic_FU.initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_u,b_u)
+ 
+ if Gauge is 'Fixed':
+  lp, rp, lp_d, rp_d, N_uni, l, r, l_d, r_d,q_u, qq_u, a_u, b_u=basic_FU.initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_u,b_u,Positive)
 
  #basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,a_u,b_u)
 
@@ -64,7 +68,7 @@ def Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
 
 
 
-def Var_V(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi):
+def Var_V(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive):
  
  Truncation=[0]
  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
@@ -77,6 +81,8 @@ def Var_V(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
 
  E1, E2, E3, E4, E5,E6=reorder_env(E1, E2, E3, E4, E5,E6)
 
+ c_u.setLabel([0,1,2,3,4])
+ a_u.setLabel([0,1,2,3,4])
  c_u.permute([0,2,3,4,1],3)
  a_u.permute([0,2,3,4,1],3)
  c_u.setLabel([0,1,2,3,4])
@@ -96,7 +102,9 @@ def Var_V(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
 
  lp, rp, lp_d, rp_d=basic_FU.initialize_lrprime(l, r, l_d, r_d, N_uni)
  lp, rp, lp_d, rp_d=basic_FU.initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys)
- #lp, rp, lp_d, rp_d, N_uni, l, r, l_d, r_d,q_u, qq_u, c_u, a_u=basic_FU.initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,c_u,a_u)
+
+ if Gauge is 'Fixed':
+  lp, rp, lp_d, rp_d, N_uni, l, r, l_d, r_d,q_u, qq_u, c_u, a_u=basic_FU.initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,c_u,a_u,Positive)
 
  #basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,c_u,a_u)
 
@@ -334,11 +342,12 @@ def make_ab(a_u):
 
 
 def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation):
-
  z1=copy.copy(a)
- z1.randomize()
+ z2=copy.copy(b)
+ z2.randomize()
  z1.identity()
- Accuracy=1.00e-9
+ z1=z1+(1.00e-5)*z2
+ Accuracy=1.00e-8
  Truncation=[0]
  E0=20.00
  E1=10.00
@@ -346,30 +355,43 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
  count=0
  #print  '\n', '\n', 'CTM'
  while Loop_iter is 0: 
+
   c1, Ta4, Tb4, c4=Move.add_left(c1,Tb4,Ta4,c4,Tb1,Ta3,a,c,chi,D,Truncation)
   c1, Ta4, Tb4, c4=Move.add_left(c1,Tb4,Ta4,c4,Ta1,Tb3,b,d,chi,D,Truncation)
+
 
   c2, Ta2, Tb2, c3=Move.add_right(c2,Ta2,Tb2,c3,Ta1,Tb3,b,d,chi,D)
   c2, Ta2, Tb2, c3=Move.add_right(c2,Ta2,Tb2,c3,Tb1,Ta3,a,c,chi,D)
 
-  c1, Ta1, Tb1, c2=Move.add_up(c1,Tb1,Ta1,c2,Tb4,Ta2,a,b,chi,D)
-  c1, Ta1, Tb1, c2=Move.add_up(c1,Tb1,Ta1,c2,Ta4,Tb2,c,d,chi,D)
+  Move.permute(a, b,c,d ,c1, c2, c3, c4, Ta1, Tb1, Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
-  c4, Ta3, Tb3, c3=Move.add_down(c4,Ta3,Tb3,c3,Ta4,Tb2,c,d,chi,D)
-  c4, Ta3, Tb3, c3=Move.add_down(c4,Ta3,Tb3,c3,Tb4,Ta2,a,b,chi,D)
+  c1, Ta1, Tb1, c2=Move.add_left(c1,Tb1,Ta1,c2,Tb4,Ta2,a,b,chi,D,Truncation)
+  c1, Ta1, Tb1, c2=Move.add_left(c1,Tb1,Ta1,c2,Ta4,Tb2,c,d,chi,D,Truncation)
 
+  c4, Ta3, Tb3, c3=Move.add_right(c4,Ta3,Tb3,c3,Ta4,Tb2,c,d,chi,D)
+  c4, Ta3, Tb3, c3=Move.add_right(c4,Ta3,Tb3,c3,Tb4,Ta2,a,b,chi,D)
+
+  Move.permute( a, b, c, d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
+  c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=Move.test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
+  
+  
   norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
   norm1=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
   E0=E1
-  E1=abs(norm1[0])/abs(norm[0])
-  if (abs((E0-E1)/E1) < Accuracy) and ( count > 2):Loop_iter=1;
+  if (abs(norm[0]) > 1.00e-10):
+   E1=abs(norm1[0])/abs(norm[0])
+   if (abs((E0-E1)/E0) < Accuracy):Loop_iter=1;
+  else:
+   E1=abs(norm1[0])
+   if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
   if (count > 20 ): print 'break! CTM'; break;
-  #print E1,abs((E0-E1)/E1), count
-  #print abs(norm1[0])/abs(norm[0]), Truncation[0], abs((E0-E1)/E1)
+  #print E1, abs((E0-E1)/E1), count
+  #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
  
- print 'CTM', norm[0], Truncation[0], '\n', '\n' 
+ #print 'CTM', norm[0], Truncation[0]
  return c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4, Truncation
 
 
@@ -395,21 +417,21 @@ def z_value(a,b,c,d,az,bz,cz,dz,chi,D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta
  
  return abs(norm1[0]+norm2[0]+norm3[0]+norm4[0])/abs(4.00*norm[0])
 def E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi):
+
  E_ab=Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
- E_cd=Energy_h(c_u,d_u,c,d,a,b,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
- E_ba=Energy_h(b_u,a_u,b,a,d,c,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
- E_dc=Energy_h(d_u,c_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
-
-
- #print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00
-
- #print '\n','\n','\n'  
-
  E_ca=Energy_v(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
+
+ E_cd=Energy_h(c_u,d_u,c,d,a,b,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
  E_ac=Energy_v(a_u,c_u,c,d,a,b,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
+
+ E_ba=Energy_h(b_u,a_u,b,a,d,c,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
  E_db=Energy_v(d_u,b_u,b,a,d,c,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
+
+ E_dc=Energy_h(d_u,c_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
  E_bd=Energy_v(b_u,d_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
 
+ #print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00
+ #print '\n','\n','\n'  
  #print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
 
  return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)
@@ -499,6 +521,7 @@ def produce_Env_Hab(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d
  E3.combineBond([13,16])
  E3.permute([13,19,18],2)
  E3.setLabel([11,1,12])
+ 
  return E1, E2, E3, E4, E5,E6
 def  proper_bond(E1, E2, E3, E4, E5,E6,D,d_phys):
  bd=uni10.Bond(E1.bond()[1].type(), D)
@@ -576,8 +599,8 @@ def test_env(E1, E2, E3, E4, E5,E6, a, b, c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb
  b.setLabel([2,4,5,6])
  A=(((E2*a)*E1)*E3)*((((b*E5)*E6)*E4))
  print 'norm=', A[0]
-def produce_Env_Hac(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys):
 
+def produce_Env_Hac(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys):
 
  c1.setLabel([0,1])
  Tb4.setLabel([3,2,0])
@@ -653,5 +676,56 @@ def make_ab(a_u):
  result.permute([1,2,3,4], 2)
 
  return result
+def Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file):
+ Length=len(zlist)-1
+ file.write( str(hlist[Length]) + " " + str(zlist[Length]) +  " "+str(zlist1[Length])+" "+str(zlist2[Length])+" "+ str(Elist[Length])+" "+ str(Elist1[Length]) +" "+ str(Elist2[Length]) +  "\n")
+ file.flush()
 
+def Def_deltaNiter(i):
+  delta=int(0.00)
+  N_iter=int(0.00)
+  if i is 1:
+   delta=1.00e-1
+   N_iter=50
+  if i is 2:
+   delta=0.500e-1
+   N_iter=50
+  if i is 3:
+   delta=1.00e-2
+   N_iter=50
+  if i is 4:
+   delta=0.500e-2
+   N_iter=50
+  if i is 5:
+   delta=1.00e-3
+   N_iter=50
+  if i is 6:
+   delta=0.500e-3
+   N_iter=50
+  if i is 7:
+   delta=1.00e-4
+   N_iter=50
+  if i is 8:
+   delta=0.500e-4
+   N_iter=50
 
+  return delta, N_iter
+  
+def Def_deltaNiter_less(i):
+  delta=int(0.00)
+  N_iter=int(0.00)
+  if i is 1:
+   delta=1.00e-1
+   N_iter=50
+  if i is 2:
+   delta=1.00e-2
+   N_iter=50
+  if i is 3:
+   delta=1.00e-3
+   N_iter=50
+  if i is 4:
+   delta=1.00e-4
+   N_iter=50
+
+  return delta, N_iter
+  

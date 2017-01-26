@@ -10,23 +10,27 @@ import time
 import Move
 import basic
 def  Do_optimization(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U):
- 
  Res=1
  Res1=2
  count=0
  Distance_val=[0]
  for q in xrange(20):
-  print 'Dis', Distance_val[0], abs(Res1-Res) / abs(Res)
+  #print 'Dis', Distance_val[0], abs(Res1-Res) / abs(Res)
   rp, rp_d=r_optimum(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
   lp, lp_d=l_optimum(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
   Distance_val=Distance(l, r, lp, rp ,N_uni,U)
   Res=Res1
   Res1=Distance_val[0]
   count+=1
-  if count > 100: break;
-  if (abs(Distance_val[0]) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
-   print 'break, Dis', Distance_val[0], (abs(Res1-Res) / abs(Res))
-   break
+  if count > 50: print 'Num_Opt > 50'; break;
+  if abs(Res) > 1.00e-10:
+   if (abs(Distance_val[0]) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < 8.00e-9): 
+    #print 'break, Dis', Distance_val[0], (abs(Res1-Res) / abs(Res)), count
+    break
+  else:
+    if (abs(Distance_val[0]) < 1.00e-7) or (  abs(Res1-Res) < 1.00e-11  ): 
+     #print 'break, Dis', Distance_val[0], abs(Res1-Res)
+     break
 
  return rp, rp_d, lp, lp_d
 
@@ -44,10 +48,15 @@ def  Do_optimization_Full(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U):
   Res=Res1
   Res1=Distance_val[0]
   count+=1
-  if count > 100: break;
-  if (abs(Distance_val[0]) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
-   #print 'break, Dis', Distance_val[0], (abs(Res1-Res) / abs(Res))
-   break
+  if count > 50: print 'Num_Opt > 50'; break;
+  if abs(Res) > 1.00e-10:
+   if (abs(Distance_val[0]) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < 8.00e-9): 
+    #print 'break, Dis', Distance_val[0], (abs(Res1-Res) / abs(Res)), count
+    break
+  else:
+    if (abs(Distance_val[0]) < 1.00e-7) or (  abs(Res1-Res) < 1.00e-11  ): 
+     #print 'break, Dis', Distance_val[0], abs(Res1-Res)
+     break
 
  return rp, rp_d, lp, lp_d
 
@@ -60,15 +69,15 @@ def  Do_optimization_Grad(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U):
   E2=[0.0]
   lp_first=copy.copy(lp)
   rp_first=copy.copy(rp)
-  print '\n', '\n', '\n', '\n'
+  #print '\n', '\n', '\n', '\n'
   Gamma=1.0
   E_previous=[0]
   count=0
-  for i in xrange(10):
+  for i in xrange(60):
    count+=1
    E1=Distance(l, r, lp, rp ,N_uni,U)
    Ef=E1
-   print 'E=', E1[0], count
+   #print 'E=', E1[0], count
    #print lp, lp_d
    D_r, D_l=Obtain_grad(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
    D_r=(-1.00)*D_r
@@ -82,20 +91,20 @@ def  Do_optimization_Grad(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U):
    
    Norm_Z=A[0]+B[0]
    
-   print 'Norm hi', Norm_Z
-   if E1[0]<E_previous[0] or i is 0 and (i>=4):
+   #print 'Norm', Norm_Z
+   if (E1[0]<E_previous[0]) or (i is 0):
     if (abs(E1[0]) > 1.0e-10):
      if abs((E_previous[0]-E1[0])/E1[0]) < 1.0e-11:
-      print E_previous[0], E1[0], abs((E_previous[0]-E1[0])/E1[0]), i
+      print 'Differnance Satisfied!', E_previous[0], E1[0], abs((E_previous[0]-E1[0])/E1[0]), i
       break
      else: 
       if abs((E_previous[0]-E1[0])) < 1.0e-11:
-       print E_previous[0], E1[0], abs((E_previous[0]-E1[0])), i
+       print 'Differnance Satisfied!', E_previous[0], E1[0], abs((E_previous[0]-E1[0])), i
        break
       
    E_previous[0]=E1[0]
    
-   if  ( i>=4 ) and Norm_Z < 1.0e-7:
+   if Norm_Z < 1.0e-8:
     print 'Break Norm=', Norm_Z
     break
    Break_loop=1
@@ -126,6 +135,7 @@ def  Do_optimization_Grad(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U):
      rp_d.setLabel([-3,-20,-1])
      lp_d.setLabel([-2,-40,-3])
      break
+     
     if E1[0]-E2[0] < (0.50)*Norm_Z*Gamma:
      Gamma*=0.5
     else:
@@ -565,7 +575,7 @@ def initialize_lrprime(l, r, l_d, r_d, N_uni):
  
  return  lp, rp, lp_d, rp_d
 
-def initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_u,b_u):
+def initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_u,b_u,Positive):
  U.setLabel([-20,-40,20,40])
  bdiB=uni10.Bond(uni10.BD_IN, d_phys*D)
  bdoB=uni10.Bond(uni10.BD_OUT, d_phys*D)
@@ -584,13 +594,26 @@ def initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_
  N1=copy.copy(N)
  N1.transpose()
  N=(N+N1)*(1.00/2.00)
+ if Positive is 'Restrict':
+  M=N.getBlock()
+  N_2=M*M 
+  eig=N_2.eigh()
+  #print eig[0]
+  e=Sqrt(eig[0])
+  #print e
+  U_trans=copy.copy(eig[1])
+  U_trans.transpose()
+  M=U_trans*e*eig[1]
+  N.putBlock(M)
+
  eig=N.getBlock()
- eig=eig.eigh()
+ eig=eig.eigh() 
  e=Positiv(eig[0])
  
- #for i1 in xrange(int(e.row())):
-  #print e[i1]
- 
+# print '\n','\n'
+# for i1 in xrange(int(e.row())):
+#  print e[i1]
+# print '\n','\n'
  for q in xrange(int(eig[0].row())):
     e[q]=(e[q]**(1.00/2.00)) 
  X=e*eig[1]
@@ -604,8 +627,10 @@ def initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_
 
 #################################################
  X_u.permute([1,0,2],1)
+ #print X_u
  lq1=X_u.getBlock().lq()
  l1=lq1[0]
+ #print l1, l1[0] 
  l1_inv=l1.inverse()
  #print l1*l1_inv
  
@@ -755,14 +780,34 @@ def initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_
 
 def Positiv(e):
  d=int(e.row())
+ if (e[0] > 0) and (e[d-1] > 0):
+  return e
+
+ if (e[0] < 0) and (e[d-1] < 0):
+  return (-1.00)*e
+
+ if abs(e[0]) >  abs(e[d-1]) :
+   print 'e_small > e_large',  e, e[0],  e[d-1]
+   e=(-1.00)*e
+
+
  for q in xrange(d):
   if e[q] < 0: e[q]=0;
  return e
 
+
+
+
+
+
 def Sqrt(e):
  d=int(e.row())
+ 
  for q in xrange(d):
-   e[q]=((e[q])**(1.00/2.00))
+   if e[q] > 0:  
+    e[q]=((e[q])**(1.00/2.00))
+   else:  
+    e[q]=0.0 
  return e
 
 
