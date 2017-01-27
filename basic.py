@@ -728,4 +728,39 @@ def Def_deltaNiter_less(i):
    N_iter=50
 
   return delta, N_iter
-  
+
+def Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file):
+ Length=len(zlist)-1
+ file.write( str(hlist[Length]) + " " + str(zlist[Length]) +  " "+str(zlist1[Length])+" "+str(zlist2[Length])+" "+ str(Elist[Length])+" "+ str(Elist1[Length]) +" "+ str(Elist2[Length]) +  "\n")
+ file.flush()
+
+def Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8):
+ Gamma_a.save("Store/Gamma_a")
+ Gamma_b.save("Store/Gamma_b")
+ Gamma_c.save("Store/Gamma_c")
+ Gamma_d.save("Store/Gamma_d")
+ Landa_1.save("Store/Landa_1")
+ Landa_2.save("Store/Landa_2")
+ Landa_3.save("Store/Landa_3")
+ Landa_4.save("Store/Landa_4")
+ Landa_5.save("Store/Landa_5")
+ Landa_6.save("Store/Landa_6")
+ Landa_7.save("Store/Landa_7")
+ Landa_8.save("Store/Landa_8")
+
+def Reload_itebd():
+ Gamma_a=uni10.UniTensor("Store/Gamma_a")
+ Gamma_b=uni10.UniTensor("Store/Gamma_b")
+ Gamma_c=uni10.UniTensor("Store/Gamma_c")
+ Gamma_d=uni10.UniTensor("Store/Gamma_d")
+ Landa_1=uni10.UniTensor("Store/Landa_1")
+ Landa_2=uni10.UniTensor("Store/Landa_2")
+ Landa_3=uni10.UniTensor("Store/Landa_3")
+ Landa_4=uni10.UniTensor("Store/Landa_4")
+ Landa_5=uni10.UniTensor("Store/Landa_5")
+ Landa_6=uni10.UniTensor("Store/Landa_6")
+ Landa_7=uni10.UniTensor("Store/Landa_7")
+ Landa_8=uni10.UniTensor("Store/Landa_8")
+ return Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8
+
+

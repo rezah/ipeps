@@ -4,3 +4,4 @@
 *.pyc
 *.pdf
 Data/*.txt
+Store/*
