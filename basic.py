@@ -9,6 +9,7 @@ import copy
 import time
 import Move
 import MoveCorbz
+import MoveFull
 import basic_FU
 
 
@@ -18,6 +19,8 @@ def Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
  if Corner_method is'CTMRG':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
+ if Corner_method is'CTMFull':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
 
 
 
@@ -83,6 +86,10 @@ def Var_V(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
 
  if Corner_method is 'CTMRG':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
+
+ if Corner_method is 'CTMFull':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
+
  
  #print 'Truncation', Truncation[0]
  #norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
@@ -366,6 +373,11 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
  count=0
  #print  '\n', '\n', 'CTM'
  while Loop_iter is 0: 
+  c1_f=copy.copy(c1)
+  c2_f=copy.copy(c2)
+  c3_f=copy.copy(c3)
+  c4_f=copy.copy(c4)
+
 
   c1, Ta4, Tb4, c4=Move.add_left(c1,Tb4,Ta4,c4,Tb1,Ta3,a,c,chi,D,Truncation)
   c1, Ta4, Tb4, c4=Move.add_left(c1,Tb4,Ta4,c4,Ta1,Tb3,b,d,chi,D,Truncation)
@@ -386,6 +398,8 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
 
   c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=Move.test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
   
+  criteria_val=Move.distance(c1, c2, c3, c4, c1_f, c2_f, c3_f, c4_f)
+
   
   norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
   norm1=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
@@ -398,7 +412,7 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
   if (count > 20 ): print 'break! CTM'; break;
-  #print E1, abs((E0-E1)/E1), count
+  print E1, abs((E0-E1)/E1), criteria_val,  count
   #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
  
@@ -421,6 +435,10 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
  count=0
  #print  '\n', '\n', 'CTM'
  while Loop_iter is 0: 
+  c1_f=copy.copy(c1)
+  c2_f=copy.copy(c2)
+  c3_f=copy.copy(c3)
+  c4_f=copy.copy(c4)
 
   c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveCorbz.add_left(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D)
   
@@ -438,7 +456,8 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
   MoveCorbz.permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
   c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=Move.test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
-  
+  criteria_val=Move.distance(c1, c2, c3, c4, c1_f, c2_f, c3_f, c4_f)
+
   
   norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
   norm1=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
@@ -451,7 +470,7 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
   if (count > 20 ): print 'break! CTM'; break;
-  #print E1, abs((E0-E1)/E1), count
+  #print E1, abs((E0-E1)/E1),criteria_val, count
   #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
  
@@ -459,6 +478,58 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
  return c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4, Truncation
 
 
+def corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation):
+ z1=copy.copy(a)
+ z2=copy.copy(b)
+ z2.randomize()
+ z1.identity()
+ z1=z1+(1.00e-5)*z2
+ Accuracy=1.00e-8
+ Truncation=[0]
+ E0=20.00
+ E1=10.00
+ Loop_iter=0
+ count=0
+ #print  '\n', '\n', 'CTM'
+ while Loop_iter is 0: 
+  c1_f=copy.copy(c1)
+  c2_f=copy.copy(c2)
+  c3_f=copy.copy(c3)
+  c4_f=copy.copy(c4)
+
+  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveFull.add_left(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D)
+  
+  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveFull.add_left (c1,c2,c3,c4,Tb1,Ta2,Tb3,Ta4,Ta1,Tb2,Ta3,Tb4,b,a,d,c,chi,D)
+  MoveFull.permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
+  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveFull.add_left(c1,c4,c3,c2,Ta4,Ta3,Ta2,Ta1,Tb4,Tb3,Tb2,Tb1,a,c,b,d,chi,D)
+  
+  
+  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveFull.add_left (c1,c4,c3,c2,Tb4,Ta3,Tb2,Ta1,Ta4,Tb3,Ta2,Tb1,c,a,d,b,chi,D)
+
+  MoveFull.permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
+  c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=Move.test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
+  
+  criteria_val=Move.distance(c1, c2, c3, c4, c1_f, c2_f, c3_f, c4_f)
+  
+  norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+  norm1=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
+  E0=E1
+  if (abs(norm[0]) > 1.00e-10):
+   E1=abs(norm1[0])/abs(norm[0])
+   if (abs((E0-E1)/E0) < Accuracy):Loop_iter=1;
+  else:
+   E1=abs(norm1[0])
+   if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
+  count+=1
+  if (count > 20 ): print 'break! CTM'; break;
+  print E1, abs((E0-E1)/E1), criteria_val, count
+  #print E1, Truncation[0], abs((E0-E1)/E1)
+  #print a.norm(), b.norm(), c.norm(), d.norm()
+ 
+ #print 'CTM', norm[0]
+ return c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4, Truncation
 
 
 
@@ -477,6 +548,9 @@ def z_value(a,b,c,d,a_u,b_u,c_u,d_u,chi,D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
  if Corner_method is 'CTMRG':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
+ if Corner_method is 'CTMFull':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
+
 
 
 
@@ -499,7 +573,7 @@ def z_value(a,b,c,d,a_u,b_u,c_u,d_u,chi,D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb
  norm4=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,z4)
  #print abs(norm1[0])/abs(1.00*norm[0]), abs(norm2[0])/abs(1.00*norm[0])
  
- return abs(norm1[0]+norm2[0]+norm3[0]+norm4[0])/abs(4.00*norm[0])
+ return (abs(norm1[0])+abs(norm2[0])+abs(norm3[0])+abs(norm4[0]))/abs(4.00*norm[0])
 def E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method):
 
  E_ab=Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
@@ -545,6 +619,8 @@ def Energy_v(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
  if Corner_method is 'CTMRG':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
+ if Corner_method is 'CTMFull':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
 
 
 
@@ -585,6 +661,8 @@ def Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
  if Corner_method is 'CTMRG':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
+ if Corner_method is 'CTMFull':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
 
 
 
@@ -797,53 +875,82 @@ def Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file):
  file.write( str(hlist[Length]) + " " + str(zlist[Length]) +  " "+str(zlist1[Length])+" "+str(zlist2[Length])+" "+ str(Elist[Length])+" "+ str(Elist1[Length]) +" "+ str(Elist2[Length]) +  "\n")
  file.flush()
 
-def Def_deltaNiter(i):
+def Def_deltaNiter(i,N_iterF):
   delta=int(0.00)
   N_iter=int(0.00)
   if i is 1:
    delta=1.00e-1
-   N_iter=50
+   N_iter=N_iterF
   if i is 2:
    delta=0.500e-1
-   N_iter=50
+   N_iter=N_iterF
   if i is 3:
    delta=1.00e-2
-   N_iter=50
+   N_iter=N_iterF
   if i is 4:
    delta=0.500e-2
-   N_iter=50
+   N_iter=N_iterF
   if i is 5:
    delta=1.00e-3
-   N_iter=50
+   N_iter=N_iterF
   if i is 6:
    delta=0.500e-3
-   N_iter=50
+   N_iter=N_iterF
   if i is 7:
    delta=1.00e-4
-   N_iter=50
+   N_iter=N_iterF
   if i is 8:
    delta=0.500e-4
-   N_iter=50
+   N_iter=N_iterF
 
   return delta, N_iter
   
-def Def_deltaNiter_less(i):
+def Def_deltaNiter_less(i,N_iterF):
   delta=int(0.00)
   N_iter=int(0.00)
   if i is 1:
    delta=1.00e-1
-   N_iter=50
+   N_iter=N_iterF
   if i is 2:
    delta=1.00e-2
-   N_iter=50
+   N_iter=N_iterF
   if i is 3:
    delta=1.00e-3
-   N_iter=50
+   N_iter=N_iterF
   if i is 4:
    delta=1.00e-4
-   N_iter=50
+   N_iter=N_iterF
 
   return delta, N_iter
+
+
+
+def Def_deltaNiter_more(i,N_iterF):
+  delta=int(0.00)
+  N_iter=int(0.00)
+
+  delta=1.00/pow(2.00,i)
+  if delta>1.0e-1:
+   N_iter=N_iterF
+  if delta<1.0e-1 and delta>1.0e-4:
+   N_iter=N_iterF
+  if delta<1.0e-4  and delta>1.0e-5:
+   N_iter=N_iterF
+  if delta<1.0e-5:
+   delta=int(0.00)
+   N_iter=int(0.00)
+    
+
+  return delta, N_iter
+
+
+
+
+
+
+
+
+
 
 def Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file):
  Length=len(zlist)-1
@@ -879,4 +986,27 @@ def Reload_itebd():
  Landa_8=uni10.UniTensor("Store/Landa_8")
  return Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8
 
+def Store_Full(a_u,b_u,c_u,d_u,a,b,c,d):
+ a_u.save("Store/a_u")
+ b_u.save("Store/b_u")
+ c_u.save("Store/c_u")
+ d_u.save("Store/d_u")
+ a.save("Store/a")
+ b.save("Store/b")
+ c.save("Store/c")
+ d.save("Store/d")
+
+
+
+
+def Reload_Full():
+ a_u=uni10.UniTensor("Store/a_u")
+ b_u=uni10.UniTensor("Store/b_u")
+ c_u=uni10.UniTensor("Store/c_u")
+ d_u=uni10.UniTensor("Store/d_u")
+ a=uni10.UniTensor("Store/a")
+ b=uni10.UniTensor("Store/b")
+ c=uni10.UniTensor("Store/c")
+ d=uni10.UniTensor("Store/d")
+ return a_u,b_u,c_u,d_u,a,b,c,d
 

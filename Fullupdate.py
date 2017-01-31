@@ -10,7 +10,7 @@ import time
 import basic
 import Move
 
-def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,N_iter,delta,h,Env,Gauge,Positive,Corner_method):
+def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E):
 
  Truncation=[0]
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
@@ -26,8 +26,10 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,N_iter,delta,h,Env,Gauge,Po
  E_1=2.0
  for i in xrange(1,800):
 
-  delta, N_iter=basic.Def_deltaNiter(i)
-  #delta, N_iter=basic.Def_deltaNiter_less(i)
+  delta, N_iter=basic.Def_deltaNiter(i,N_iterF)
+  #delta, N_iter=basic.Def_deltaNiter_less(i,N_iterF)
+  #delta, N_iter=basic.Def_deltaNiter_more(i,N_iterF)
+
   if delta is 0: break;
   print 'delta =', delta
   print "N_iter=", N_iter
@@ -80,7 +82,7 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,N_iter,delta,h,Env,Gauge,Po
    E_0=E_1
    E_1=E_value
    print 'E_diff=', abs((E_0-E_1) / E_0) , 'Num_iter=', q , z_value 
-   if ( abs((E_0-E_1) / E_0) ) < 1.00e-7: 
+   if (( abs((E_0-E_1) / E_0) ) < Acc_E) or ( q is int(N_iter-1)): 
     print 'break', E_0, E_1, abs((E_0-E_1) / E_0)
     E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
     print 'E_toal=', E_value   

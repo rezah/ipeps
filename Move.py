@@ -385,6 +385,33 @@ def test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4):
 
 
 
+def  distance(c1,c2,c3,c4,c1_f,c2_f,c3_f,c4_f):
+
+ s1=c1.getBlock().svd()
+ s1_f=c1_f.getBlock().svd()
+ dis_val1=dis(s1[1],s1_f[1] )
+ #print dis_val1
+ s1=c2.getBlock().svd()
+ s1_f=c2_f.getBlock().svd()
+ dis_val2=dis(s1[1],s1_f[1] )
+ #print dis_val2
+ s1=c3.getBlock().svd()
+ s1_f=c3_f.getBlock().svd()
+ dis_val3=dis(s1[1],s1_f[1] )
+ #print dis_val3
+ s1=c4.getBlock().svd()
+ s1_f=c4_f.getBlock().svd()
+ dis_val4=dis(s1[1],s1_f[1] )
+ #print dis_val4
+ return (dis_val1+dis_val2+dis_val3+dis_val4) / 4.00
+
+
+
+def dis(s1,s2):
+ sum=0
+ for q in xrange(int(s1.row())):
+  sum=sum+abs(s1[q]-s2[q])
+ return sum
 
 
 

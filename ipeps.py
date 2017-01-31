@@ -15,12 +15,13 @@ import Move
 ###################### Initialize parameters ###########################
 chi=20
 d_phys=2
-D=3
-N_iter=400
+D=2
+N_iterF=100
 delta=0.001
 Gauge='Fixed'
 Positive='Restrict'
-Corner_method='CTMRG'   #CTM, CTMRG
+Corner_method='CTMRG'   #CTM, CTMRG, CTMFull
+Acc_E=1.00e-7
 ###################################################################
 zlist=[]
 Elist=[]
@@ -71,7 +72,7 @@ Env=[c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4]
 
 zlist=[]
 hlist=[h*0.0200 for h in range(100,200)]
-hlist=[2.5,3.05,3.08, 3.10,3.12, 3.15]
+hlist=[3.080, 3.090,3.10, 3.11]
 
 for h in hlist:
  print h
@@ -112,18 +113,25 @@ for h in hlist:
 # Gauge='Fixed'
 
 
- a_u,b_u,c_u,d_u,a,b,c,d,Env=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,N_iter,delta,h,Env,Gauge,Positive,Corner_method)
+# basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
+ a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
+
+
+
+ a_u,b_u,c_u,d_u,a,b,c,d,Env=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E)
 
  E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
  z_value=basic.z_value(a,b,c,d,a_u,b_u,c_u,d_u,chi,D*D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Corner_method)
  zlist1.append(z_value)
  Elist1.append(E_value)
 
+ basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
+
  print 'E_toal=', E_value
  print 'z_value=', z_value
 # Gauge='Fixed'
 
-# a_u,b_u,c_u,d_u,a,b,c,d,Env=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,N_iter,delta,h,Env,Gauge,Positive)
+# a_u,b_u,c_u,d_u,a,b,c,d,Env=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E)
 
 # az=basic.magnetization(a_u)
 # bz=basic.magnetization(b_u)
