@@ -365,7 +365,7 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
  z2.randomize()
  z1.identity()
  z1=z1+(1.00e-5)*z2
- Accuracy=1.00e-8
+ Accuracy=1.00e-7
  Truncation=[0]
  E0=20.00
  E1=10.00
@@ -412,7 +412,7 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
   if (count > 20 ): print 'break! CTM'; break;
-  print E1, abs((E0-E1)/E1), criteria_val,  count
+  #print E1, abs((E0-E1)/E1), criteria_val,  count
   #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
  
@@ -427,7 +427,7 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
  z2.randomize()
  z1.identity()
  z1=z1+(1.00e-5)*z2
- Accuracy=1.00e-8
+ Accuracy=1.00e-7
  Truncation=[0]
  E0=20.00
  E1=10.00
@@ -484,7 +484,7 @@ def corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2
  z2.randomize()
  z1.identity()
  z1=z1+(1.00e-5)*z2
- Accuracy=1.00e-8
+ Accuracy=1.00e-7
  Truncation=[0]
  E0=20.00
  E1=10.00
@@ -904,6 +904,69 @@ def Def_deltaNiter(i,N_iterF):
    N_iter=N_iterF
 
   return delta, N_iter
+
+def Def_deltaNiter_25(i,N_iterF):
+  delta=int(0.00)
+  N_iter=int(0.00)
+
+  if i is 1:
+   delta=0.7500e-1
+   N_iter=N_iterF
+  if i is 2:
+   delta=0.500e-1
+   N_iter=N_iterF
+  if i is 3:
+   delta=0.2500e-1
+   N_iter=N_iterF
+  if i is 4:
+   delta=1.00e-2
+   N_iter=N_iterF
+  if i is 5:
+   delta=0.7500e-2
+   N_iter=N_iterF
+  if i is 6:
+   delta=0.500e-2
+   N_iter=N_iterF
+  if i is 7:
+   delta=0.2500e-2
+   N_iter=N_iterF
+  if i is 8:
+   delta=1.00e-3
+   N_iter=N_iterF
+  if i is 9:
+   delta=0.7500e-3
+   N_iter=N_iterF
+  if i is 10:
+   delta=0.500e-3
+   N_iter=N_iterF
+  if i is 11:
+   delta=0.2500e-3
+   N_iter=N_iterF
+  if i is 12:
+   delta=1.00e-4
+   N_iter=N_iterF
+  if i is 13:
+   delta=0.7500e-4
+   N_iter=N_iterF
+  if i is 14:
+   delta=0.500e-4
+   N_iter=N_iterF
+  if i is 15:
+   delta=0.2500e-4
+   N_iter=N_iterF
+  if i is 16:
+   delta=1.00e-5
+   N_iter=N_iterF
+  return delta, N_iter
+
+
+
+
+
+
+
+
+
   
 def Def_deltaNiter_less(i,N_iterF):
   delta=int(0.00)
@@ -929,7 +992,7 @@ def Def_deltaNiter_more(i,N_iterF):
   delta=int(0.00)
   N_iter=int(0.00)
 
-  delta=1.00/pow(2.00,i)
+  delta=0.050/pow(2.00,i)
   if delta>1.0e-1:
    N_iter=N_iterF
   if delta<1.0e-1 and delta>1.0e-4:
@@ -942,10 +1005,6 @@ def Def_deltaNiter_more(i,N_iterF):
     
 
   return delta, N_iter
-
-
-
-
 
 
 
@@ -996,7 +1055,26 @@ def Store_Full(a_u,b_u,c_u,d_u,a,b,c,d):
  c.save("Store/c")
  d.save("Store/d")
 
+def Store_Fullp(a_u,b_u,c_u,d_u,a,b,c,d):
+ a_u.save("Store/ap_u")
+ b_u.save("Store/bp_u")
+ c_u.save("Store/cp_u")
+ d_u.save("Store/dp_u")
+ a.save("Store/ap")
+ b.save("Store/bp")
+ c.save("Store/cp")
+ d.save("Store/dp")
 
+def Reload_Fullp():
+ ap_u=uni10.UniTensor("Store/ap_u")
+ bp_u=uni10.UniTensor("Store/bp_u")
+ cp_u=uni10.UniTensor("Store/cp_u")
+ dp_u=uni10.UniTensor("Store/dp_u")
+ ap=uni10.UniTensor("Store/ap")
+ bp=uni10.UniTensor("Store/bp")
+ cp=uni10.UniTensor("Store/cp")
+ dp=uni10.UniTensor("Store/dp")
+ return ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp
 
 
 def Reload_Full():

@@ -26,7 +26,8 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,
  E_1=2.0
  for i in xrange(1,800):
 
-  delta, N_iter=basic.Def_deltaNiter(i,N_iterF)
+  #delta, N_iter=basic.Def_deltaNiter(i,N_iterF)
+  delta, N_iter=basic.Def_deltaNiter_25(i,N_iterF)
   #delta, N_iter=basic.Def_deltaNiter_less(i,N_iterF)
   #delta, N_iter=basic.Def_deltaNiter_more(i,N_iterF)
 

@@ -963,7 +963,7 @@ def Qr_lQ_decom(a_u,b_u, E1, E2, E3, E4, E5,E6,D,d_phys):
  q_uni_d.setLabel([-3,-13,-1,-100])
  qq_uni_d=copy.copy(qq_uni)
  qq_uni_d.setLabel([-200,-4,-5,-6])
- N=(((E2*(q_uni*q_uni_d))*E1)*E3)*(((((qq_uni*qq_uni_d)*E5)*E6)*E4))
+ N=((((E1*q_uni)*E2)*q_uni_d)*E3)*((((E6*qq_uni)*E5)*qq_uni_d)*E4)
  N.permute([100,-100,200,-200],2)
 
  N.setLabel([1,-1,2,-2])

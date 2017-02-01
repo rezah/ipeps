@@ -16,12 +16,12 @@ import Move
 chi=20
 d_phys=2
 D=2
-N_iterF=100
+N_iterF=200
 delta=0.001
-Gauge='Fixed'
+Gauge='Non-Fixed'
 Positive='Restrict'
-Corner_method='CTMRG'   #CTM, CTMRG, CTMFull
-Acc_E=1.00e-7
+Corner_method='CTM'   #CTM, CTMRG, CTMFull
+Acc_E=1.00e-6
 ###################################################################
 zlist=[]
 Elist=[]
@@ -63,6 +63,18 @@ c_u,c=basic.makeab(Landa,Gamma_c)
 Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
 d_u,d=basic.makeab(Landa,Gamma_d)
 
+
+
+ap_u,ap=basic.makeab(Landa,Gamma_a)
+Landa=[Landa_1,Landa_7,Landa_3,Landa_8]
+bp_u,bp=basic.makeab(Landa,Gamma_b)
+Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
+cp_u,cp=basic.makeab(Landa,Gamma_c)
+Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
+dp_u,dp=basic.makeab(Landa,Gamma_d)
+
+
+
 c1, c2,c3,c4=basic.makec1(chi,D*D)
 Ta1, Tb1=basic.makeTab(chi,D*D)
 Ta2, Tb2=basic.makeTab(chi,D*D)
@@ -71,8 +83,8 @@ Ta4, Tb4=basic.makeTab( chi,D*D)
 Env=[c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4]
 
 zlist=[]
-hlist=[h*0.0200 for h in range(100,200)]
-hlist=[3.080, 3.090,3.10, 3.11]
+hlist=[h*0.0100 for h in range(270,400)]
+#hlist=[3.10]
 
 for h in hlist:
  print h
@@ -94,23 +106,7 @@ for h in hlist:
 # c_u,c=basic.makeab(Landa,Gamma_c)
 # Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
 # d_u,d=basic.makeab(Landa,Gamma_d)
-# az=basic.magnetization(a_u)
-# bz=basic.magnetization(b_u)
-# cz=basic.magnetization(c_u)
-# dz=basic.magnetization(d_u)
-# az=basic.magnetization(a_u)
-# bz=basic.magnetization(b_u)
-# cz=basic.magnetization(c_u)
-# dz=basic.magnetization(d_u)
-# c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4, Truncation=basic.corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
-# E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
-# z_value=basic.z_value(a,b,c,d,az,bz,cz,dz,chi,D*D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
-# 
-# print 'E_toal=', E_value
-# print 'z_value=', z_value
-# zlist.append(z_value)
-# Elist.append(E_value)
-# Gauge='Fixed'
+ Gauge='Fixed'
 
 
 # basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
@@ -126,29 +122,32 @@ for h in hlist:
  Elist1.append(E_value)
 
  basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
+###########################################################################################
+
+
+ ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp=basic.Reload_Fullp()
 
  print 'E_toal=', E_value
  print 'z_value=', z_value
-# Gauge='Fixed'
+ Gauge='Non-Fixed'
 
-# a_u,b_u,c_u,d_u,a,b,c,d,Env=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E)
+ ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp,Env=Fullupdate.Full_Update(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E)
 
-# az=basic.magnetization(a_u)
-# bz=basic.magnetization(b_u)
-# cz=basic.magnetization(c_u)
-# dz=basic.magnetization(d_u)
-# c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4, Truncation=basic.corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,Truncation)
-# E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi)
-# z_value=basic.z_value(a,b,c,d,az,bz,cz,dz,chi,D*D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
-# print 'E_toal=', E_value
-# print 'z_value=', z_value
-# zlist2.append(z_value)
-# Elist2.append(E_value)
-# basic.Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file)
+ E_value=basic.E_total(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
+ z_value=basic.z_value(ap,bp,cp,dp,ap_u,bp_u,cp_u,dp_u,chi,D*D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Corner_method)
 
+ print 'E_toal=', E_value
+ print 'z_value=', z_value
+
+ zlist2.append(z_value)
+ Elist2.append(E_value)
+ basic.Store_Fullp(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp)
+
+ basic.Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file)
 
 
-plt.plot( hlist, zlist,'b*',label='Ising, D=2, simple',markersize=np.sqrt(200.))
+
+#plt.plot( hlist, zlist,'b*',label='Ising, D=2, simple',markersize=np.sqrt(200.))
 plt.plot( hlist, zlist1,'g>',label='Ising, D=2, FU',markersize=np.sqrt(200.))
 plt.plot( hlist, zlist2,'r<',label='Ising, D=2, FU, Guage',markersize=np.sqrt(200.))
 #plt.plot( hlist, zlist4,'m^',label='Ising, D=5',markersize=np.sqrt(200.))
@@ -160,7 +159,7 @@ plt.savefig('Z.pdf')
 plt.show()
 plt.clf()
 
-plt.plot( hlist, Elist,'b*',label='Ising, D=2, simple',markersize=np.sqrt(200.))
+#plt.plot( hlist, Elist,'b*',label='Ising, D=2, simple',markersize=np.sqrt(200.))
 plt.plot( hlist, Elist1,'g>',label='Ising, D=2, FU',markersize=np.sqrt(200.))
 plt.plot( hlist, Elist2,'r<',label='Ising, D=2, FU, Guage',markersize=np.sqrt(200.))
 #plt.plot( hlist, Elist4,'m^',label='Ising, D=5',markersize=np.sqrt(200.))
