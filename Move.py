@@ -147,10 +147,15 @@ def  add_left(c1,Tb4,Ta4,c4,Tb1,Ta3,a,c,chi,D,Truncation):
  Z_trans=copy.copy(Z)
  Z_trans.transpose()
  Sum=0
+ norm_trace=svd[1].trace()
+ 
+ #s=svd[1]*(1.00/norm_trace)
+ 
  for i in xrange(svd[1].row()):
    if (i>=chi):
     Sum=svd[1][i]+Sum
  #print'truncation0=', Sum
+ 
  Truncation[0]=Sum
 ####################################
  
@@ -387,23 +392,41 @@ def test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4):
 
 def  distance(c1,c2,c3,c4,c1_f,c2_f,c3_f,c4_f):
 
+ c1=c1*(1.00/c1.norm())
+ c2=c2*(1.00/c2.norm())
+ c3=c3*(1.00/c3.norm())
+ c4=c4*(1.00/c4.norm())
+
+ c1_f=c1_f*(1.00/c1_f.norm())
+ c2_f=c2_f*(1.00/c2_f.norm())
+ c3_f=c3_f*(1.00/c3_f.norm())
+ c4_f=c4_f*(1.00/c4_f.norm())
+
+ sum=0.0
  s1=c1.getBlock().svd()
  s1_f=c1_f.getBlock().svd()
  dis_val1=dis(s1[1],s1_f[1] )
- #print dis_val1
+ sum+=s1[1].trace()+s1_f[1].trace()
+
+ #print dis_val1, s1[1].trace(),s1_f[1].trace()
  s1=c2.getBlock().svd()
  s1_f=c2_f.getBlock().svd()
  dis_val2=dis(s1[1],s1_f[1] )
- #print dis_val2
+ sum+=s1[1].trace()+s1_f[1].trace()
+
+ #print dis_val2, s1[1].trace(),s1_f[1].trace()
  s1=c3.getBlock().svd()
  s1_f=c3_f.getBlock().svd()
  dis_val3=dis(s1[1],s1_f[1] )
- #print dis_val3
+ sum+=s1[1].trace()+s1_f[1].trace()
+
+ #print dis_val3, s1[1].trace(),s1_f[1].trace()
  s1=c4.getBlock().svd()
  s1_f=c4_f.getBlock().svd()
  dis_val4=dis(s1[1],s1_f[1] )
- #print dis_val4
- return (dis_val1+dis_val2+dis_val3+dis_val4) / 4.00
+ sum+=s1[1].trace()+s1_f[1].trace()
+ #print dis_val4, s1[1].trace(),s1_f[1].trace()
+ return (dis_val1+dis_val2+dis_val3+dis_val4) / (4.00)
 
 
 

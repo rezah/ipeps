@@ -15,18 +15,22 @@ import basic_FU
 
 def Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method):
  Truncation=[0]
+ 
+ t0=time.time()
  if Corner_method is 'CTM':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
  if Corner_method is'CTMRG':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
  if Corner_method is'CTMFull':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
+ print time.time() - t0, "CTM-H, Left"
 
 
 
  #print 'Truncation', Truncation[0]
-
+ #t0=time.time()
  E1, E2, E3, E4, E5,E6=basic_FU.produce_Env_Hab(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+ #print time.time() - t0, "Env, Left"
 
  #basic_FU.test_env(E1, E2, E3, E4, E5,E6, a, b, c1,c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
@@ -41,15 +45,19 @@ def Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
  
  lp, rp, lp_d, rp_d=basic_FU.initialize_lrprime(l, r, l_d, r_d, N_uni)
  lp, rp, lp_d, rp_d=basic_FU.initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys)
- 
+
+ #t0=time.time() 
  if Gauge is 'Fixed':
   lp, rp, lp_d, rp_d, N_uni, l, r, l_d, r_d,q_u, qq_u, a_u, b_u=basic_FU.initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_u,b_u,Positive)
+ #print time.time() - t0, "N, Left"
 
  #basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,a_u,b_u)
+ #t0=time.time() 
 
  #rp, rp_d, lp, lp_d=basic_FU.Do_optimization(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
  rp, rp_d, lp, lp_d=basic_FU.Do_optimization_Full(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
  #rp, rp_d, lp, lp_d=basic_FU.Do_optimization_Grad(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
+ #print time.time() - t0, "Optimization-Full, Left"
  
  
  lp, rp, lp_d, rp_d=basic_FU.Equall_Dist(lp, rp,D,d_phys)
@@ -79,8 +87,7 @@ def Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
 
 def Var_V(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method):
  Truncation=[0]
-
- 
+ t0=time.time()
  if Corner_method is 'CTM':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
 
@@ -90,7 +97,8 @@ def Var_V(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
  if Corner_method is 'CTMFull':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
 
- 
+ print time.time() - t0, "CTM-V, Left"
+
  #print 'Truncation', Truncation[0]
  #norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
  #print 'norm=', norm[0] 
@@ -365,6 +373,7 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
  z2.randomize()
  z1.identity()
  z1=z1+(1.00e-5)*z2
+ criteria_val=0
  Accuracy=1.00e-7
  Truncation=[0]
  E0=20.00
@@ -372,12 +381,16 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
  Loop_iter=0
  count=0
  #print  '\n', '\n', 'CTM'
- while Loop_iter is 0: 
+ t0=time.time()
+
+ while Loop_iter is 0:
+  count+=1
   c1_f=copy.copy(c1)
   c2_f=copy.copy(c2)
   c3_f=copy.copy(c3)
   c4_f=copy.copy(c4)
 
+  #t0=time.time()
 
   c1, Ta4, Tb4, c4=Move.add_left(c1,Tb4,Ta4,c4,Tb1,Ta3,a,c,chi,D,Truncation)
   c1, Ta4, Tb4, c4=Move.add_left(c1,Tb4,Ta4,c4,Ta1,Tb3,b,d,chi,D,Truncation)
@@ -398,25 +411,33 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
 
   c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=Move.test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
   
-  criteria_val=Move.distance(c1, c2, c3, c4, c1_f, c2_f, c3_f, c4_f)
+  #criteria_val=Move.distance(c1, c2, c3, c4, c1_f, c2_f, c3_f, c4_f)
+  #print time.time() - t0, count, "CTM-Full, Left"
+  #t0=time.time()
 
-  
-  norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
-  norm1=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
-  E0=E1
-  if (abs(norm[0]) > 1.00e-10):
-   E1=abs(norm1[0])/abs(norm[0])
-   if (abs((E0-E1)/E0) < Accuracy):Loop_iter=1;
-  else:
-   E1=abs(norm1[0])
-   if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
-  count+=1
-  if (count > 20 ): print 'break! CTM'; break;
-  #print E1, abs((E0-E1)/E1), criteria_val,  count
-  #print E1, Truncation[0], abs((E0-E1)/E1)
-  #print a.norm(), b.norm(), c.norm(), d.norm()
+  if (count > 2 )  :
+
+   norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+   norm1=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
+   #print time.time() - t0, count, "CTM-Norm, Left"
+
+   E0=E1
+   if (abs(norm[0]) > 1.00e-10):
+    E1=abs(norm1[0])/abs(norm[0])
+    if (abs((E0-E1)/E0) < Accuracy) :Loop_iter=1;
+   else:
+    E1=abs(norm1[0])
+    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
+   if (count > 20 ): print 'break! CTM'; break;
+   #print E1, abs((E0-E1)/E1),Truncation[0], criteria_val,  count
+   #print E1, Truncation[0], abs((E0-E1)/E1)
+   #print a.norm(), b.norm(), c.norm(), d.norm()
  
- #print 'CTM', norm[0], Truncation[0]
+ print 'CTM', norm[0], count
+ print time.time() - t0, count, "CTM, Left"
+
+
+
  return c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4, Truncation
 
 

@@ -13,9 +13,9 @@ import itebd
 import Fullupdate
 import Move
 ###################### Initialize parameters ###########################
-chi=20
+chi=40
 d_phys=2
-D=2
+D=4
 N_iterF=200
 delta=0.001
 Gauge='Non-Fixed'
@@ -109,8 +109,8 @@ for h in hlist:
  Gauge='Fixed'
 
 
-# basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
- a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
+ #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
+ #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
 
 
 
@@ -143,7 +143,7 @@ for h in hlist:
  Elist2.append(E_value)
  basic.Store_Fullp(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp)
 
- basic.Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file)
+ basic.Store(hlist,zlist1, zlist1,zlist2,Elist1, Elist1 , Elist2 , file)
 
 
 

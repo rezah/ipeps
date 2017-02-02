@@ -39,31 +39,41 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,
 
   for q in xrange(N_iter):
 
+   t0=time.time()
    a_u, b_u, a, b=basic.Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   print time.time() - t0, "Seconds, Left"
 
 
 
-
+   t0=time.time()
    c_u, a_u, c, a=basic.Var_V(c_u,a_u,a,b,c,d,c1,c2,c3,c4,Ta1,Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   print time.time() - t0, "Seconds, Left"
 
 
+   t0=time.time()
    c_u, d_u, c, d=basic.Var_H(c_u,d_u,c,d,a,b,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   print time.time() - t0, "Seconds, Left"
 
+   t0=time.time()
    a_u, c_u, a, c=basic.Var_V(a_u,c_u,c,d,a,b,c1,c2,c3,c4,Ta1,Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   print time.time() - t0, "Seconds, Left"
 
-
+   t0=time.time()
    b_u, a_u, b, a=basic.Var_H(b_u,a_u,b,a,d,c,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method)
-   
+   print time.time() - t0, "Seconds, Left"
 
+   t0=time.time()
    d_u, b_u, d, b=basic.Var_V(d_u,b_u,b,a,d,c,c1,c2,c3,c4,Ta1,Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   print time.time() - t0, "Seconds, Left"
    
-
+   t0=time.time()
    d_u, c_u, d, c=basic.Var_H(d_u,c_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   print time.time() - t0, "Seconds, Left"
 
-   
 
-
+   t0=time.time()
    b_u, d_u, b, d=basic.Var_V(b_u,d_u,d,c,b,a,c1,c2,c3,c4,Ta1,Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   print time.time() - t0, "Seconds, Left"
 
 
 #   print  a.norm(), b.norm(), c.norm(), d.norm()
