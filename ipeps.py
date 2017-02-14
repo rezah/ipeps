@@ -13,18 +13,18 @@ import itebd
 import Fullupdate
 import Move
 ###################### Initialize parameters ###########################
+Model="Heisenberg"         #Heisenberg, Ising
+D=2
 chi=20
 d_phys=2
-D=2
 N_iteritebd=500
 N_iterF=2
-delta=0.001
 Gauge='Non-Fixed'
 Positive='Restrict'
 Corner_method='CTM'   #CTM, CTMRG, CTMFull
 Acc_E=1.00e-6
 Steps=[1.0e-1,1.0e-2,1.0e-3,1.0e-4,1.0e-5,6.0e-6] #,[Start,steps,End] 
-Model="Heisenberg"                                     #Heisenberg
+delta=0.001
 ###################################################################
 zlist=[]
 Elist=[]
