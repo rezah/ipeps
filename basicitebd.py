@@ -201,26 +201,25 @@ def Initialize_function(Gamma,Landa):
  for i in xrange(len(Landa)):
   Landa[i].putBlock(matrix_Iden)
 
-
- 
-def matSp():
+def matSx():
   spin = 0.5
   dim = int(spin * 2 + 1)
-  return uni10.Matrix(dim, dim, [0, 1, 0, 0]);
-
-def matSm():
-  spin = 0.5
-  dim = int(spin * 2 + 1)
-  return uni10.Matrix(dim, dim, [0, 0, 1, 0]);
+  return uni10.Matrix(dim, dim, [0.0, 1.0, 1.00, 0.0]);
 
 def matSz():
   spin = 0.5
   dim = int(spin * 2 + 1)
   return uni10.Matrix(dim, dim, [1.0, 0, 0, -1.0]);
 
+def matSy():
+  spin = 0.5
+  dim = int(spin * 2 + 1)
+  return uni10.Matrix(dim, dim, [0.0, -1.00, 1.00, 0.00]);
+
 def transverseIsing(h):
     spin = 0.5
-    sx = (matSp()+matSm())
+    sx = matSx()
+    sy = matSy()
     sz = matSz()
     iden = uni10.Matrix(2,2, [1, 0, 0, 1])
     ham =uni10.otimes(sz,sz)*(-1)+(-0.2500)*float(h)*(uni10.otimes(iden,sx)+uni10.otimes(sx,iden))
@@ -230,6 +229,29 @@ def transverseIsing(h):
     H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "TFIM");
     H.putBlock(ham)
     return H
+
+
+def Heisenberg(h):
+    spin = 0.5
+    sx = matSx()
+    sy = matSy()
+    sz = matSz()
+    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+    ham =(float(h)*uni10.otimes(sz,sz)*(1.00/4.00)+(1.00/4.00)*uni10.otimes(sx,sx)+(-1.00/4.00)*uni10.otimes(sy,sy))
+    dim = int(spin * 2 + 1)
+    bdi = uni10.Bond(uni10.BD_IN, dim);
+    bdo = uni10.Bond(uni10.BD_OUT, dim);
+    H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg");
+    H.putBlock(ham)
+    return H
+
+
+
+
+
+
+
+
 
 
 def Ham(h):

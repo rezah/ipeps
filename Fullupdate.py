@@ -10,14 +10,20 @@ import time
 import basic
 import Move
 
-def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E,Steps):
+def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E,Steps,Model):
  Steps_copy=copy.copy(Steps)
  Truncation=[0]
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
 
 
  print 'Ham field=', h
- H0=basic.transverseIsing(h);
+ if Model is "Ising":
+   H0=basic.transverseIsing(h)
+ if Model is "Heisenberg":
+   H0=basic.Heisenberg(h)
+
+
+
  U = uni10.UniTensor(H0.bond(), "U");
  U.putBlock(uni10.takeExp(-delta, H0.getBlock()))
  #print U
@@ -84,7 +90,7 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,
    z_value=basic.z_value(a,b,c,d,a_u,b_u,c_u,d_u,chi,D*D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Corner_method)
    #print 'z_value=', z_value
 
-   E_value=basic.E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
+   E_value=basic.E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
    #print 'E_toal=', E_value
    
    E_0=E_1
@@ -92,7 +98,7 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,
    print 'E_diff=', abs((E_0-E_1) / E_0) , 'Num_iter=', q , z_value 
    if (( abs((E_0-E_1) / E_0) ) < Acc_E) or ( q is int(N_iter-1)): 
     print 'break', E_0, E_1, abs((E_0-E_1) / E_0)
-    E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
+    E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
     print 'E_toal=', E_value   
     break;
  

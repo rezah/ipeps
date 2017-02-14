@@ -201,24 +201,25 @@ def Initialize_function(Gamma,Landa):
 
 
  
-def matSp():
+def matSx():
   spin = 0.5
   dim = int(spin * 2 + 1)
-  return uni10.Matrix(dim, dim, [0, 1, 0, 0]);
-
-def matSm():
-  spin = 0.5
-  dim = int(spin * 2 + 1)
-  return uni10.Matrix(dim, dim, [0, 0, 1, 0]);
+  return uni10.Matrix(dim, dim, [0.0, 1.0, 1.00, 0.0]);
 
 def matSz():
   spin = 0.5
   dim = int(spin * 2 + 1)
   return uni10.Matrix(dim, dim, [1.0, 0, 0, -1.0]);
 
+def matSy():
+  spin = 0.5
+  dim = int(spin * 2 + 1)
+  return uni10.Matrix(dim, dim, [0.0, -1.00, 1.00, 0.00]);
+
 def transverseIsing(h):
     spin = 0.5
-    sx = (matSp()+matSm())
+    sx = matSx()
+    sy = matSy()
     sz = matSz()
     iden = uni10.Matrix(2,2, [1, 0, 0, 1])
     ham =uni10.otimes(sz,sz)*(-1)+(-0.2500)*float(h)*(uni10.otimes(iden,sx)+uni10.otimes(sx,iden))
@@ -230,18 +231,24 @@ def transverseIsing(h):
     return H
 
 
-def Ham(h):
+def Heisenberg(h):
     spin = 0.5
-    sx = (matSp()+matSm())
+    sx = matSx()
+    sy = matSy()
     sz = matSz()
     iden = uni10.Matrix(2,2, [1, 0, 0, 1])
-    ham =uni10.otimes(sz,sz)*(-2.00)+(-0.500)*float(h)*(uni10.otimes(iden,sx)+uni10.otimes(sx,iden))
+    ham =(float(h)*uni10.otimes(sz,sz)*(1.00/4.00)+(1.00/4.00)*uni10.otimes(sx,sx)+(-1.00/4.00)*uni10.otimes(sy,sy))
     dim = int(spin * 2 + 1)
     bdi = uni10.Bond(uni10.BD_IN, dim);
     bdo = uni10.Bond(uni10.BD_OUT, dim);
-    H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "TFIM");
+    H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg");
     H.putBlock(ham)
     return H
+
+
+
+
+
 
 def makeTab(chi,D):
  bdi = uni10.Bond(uni10.BD_IN, chi)
@@ -595,19 +602,19 @@ def z_value(a,b,c,d,a_u,b_u,c_u,d_u,chi,D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb
  #print abs(norm1[0])/abs(1.00*norm[0]), abs(norm2[0])/abs(1.00*norm[0])
  
  return (abs(norm1[0])+abs(norm2[0])+abs(norm3[0])+abs(norm4[0]))/abs(4.00*norm[0])
-def E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method):
+def E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model):
 
- E_ab=Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
- E_ca=Energy_v(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
+ E_ab=Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
+ E_ca=Energy_v(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
 
- E_cd=Energy_h(c_u,d_u,c,d,a,b,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
- E_ac=Energy_v(a_u,c_u,c,d,a,b,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
+ E_cd=Energy_h(c_u,d_u,c,d,a,b,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
+ E_ac=Energy_v(a_u,c_u,c,d,a,b,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
 
- E_ba=Energy_h(b_u,a_u,b,a,d,c,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
- E_db=Energy_v(d_u,b_u,b,a,d,c,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
+ E_ba=Energy_h(b_u,a_u,b,a,d,c,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
+ E_db=Energy_v(d_u,b_u,b,a,d,c,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
 
- E_dc=Energy_h(d_u,c_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
- E_bd=Energy_v(b_u,d_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
+ E_dc=Energy_h(d_u,c_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
+ E_bd=Energy_v(b_u,d_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
 
  #print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00
  #print '\n','\n','\n'  
@@ -616,10 +623,10 @@ def E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4,
  return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)
 
 
-def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method):
+def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model):
 
- E_ab=Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
- E_ca=Energy_v(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method)
+ E_ab=Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
+ E_ca=Energy_v(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
 
  #print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00
  #print '\n','\n','\n'  
@@ -632,7 +639,7 @@ def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3
 
 
 
-def Energy_v(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method):
+def Energy_v(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model):
  Truncation=[0]
 
 
@@ -666,15 +673,18 @@ def Energy_v(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,
  #test_env(E1, E2, E3, E4, E5,E6, cp, ap, c1,c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
  
  E1, E2, E3, E4, E5,E6=proper_bond(E1, E2, E3, E4, E5,E6,D,d_phys)
- U=transverseIsing(h)
- #U=Heisenberg(h)
+ if Model is "Ising":
+   U=transverseIsing(h)
+ if Model is "Heisenberg":
+   U=Heisenberg(h)
+
  
  
  E_ca=test_energy(E1, E2, E3, E4, E5,E6, cp, ap, c1, c2, c3, c4, Ta1, Tb1, Ta2, Tb2, Ta3, Tb3, Ta4, Tb4, cp_u, ap_u, U)
 
  return E_ca
 
-def Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method):
+def Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model):
  Truncation=[0]
  
  
@@ -691,9 +701,12 @@ def Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,
  #test_env(E1, E2, E3, E4, E5,E6, a, b, c1,c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
  E1, E2, E3, E4, E5,E6=proper_bond(E1, E2, E3, E4, E5,E6,D,d_phys)
- U=transverseIsing(h)
- #U=Heisenberg(h)
  
+ if Model is "Ising":
+   U=transverseIsing(h)
+ if Model is "Heisenberg":
+   U=Heisenberg(h)
+  
  E_ab=test_energy(E1, E2, E3, E4, E5,E6, a, b, c1, c2, c3, c4, Ta1, Tb1, Ta2, Tb2, Ta3, Tb3, Ta4, Tb4, a_u, b_u, U)
  
 ########################################################################3 

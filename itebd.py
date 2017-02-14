@@ -12,9 +12,14 @@ import basicitebd
 
 def itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,
 Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF,
-delta, h,Steps):
+delta, h,Steps,Model):
+  
+  
+  if Model is "Ising":
+   H0=basicitebd.transverseIsing(h)
+  if Model is "Heisenberg":
+   H0=basicitebd.Heisenberg(h)
 
-  H0=basicitebd.transverseIsing(h)
   U = uni10.UniTensor(H0.bond(), "U");
   Steps_copy=copy.copy(Steps)
   for i in xrange(1,1000):
