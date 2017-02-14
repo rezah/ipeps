@@ -1168,4 +1168,49 @@ def Energy_V(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4
  A=((((E3*E4)*(E2*a_d*a_u))*(c_u*c_d*E5))*(E1*E6))
  print B[0]/A[0]
 
+def Def_deltaNiter(i,N_iterF,Steps):
+  delta=int(0.00)
+  N_iter=int(0.00)
+
+
+#  if 1.00e0>=Steps[0]>1.00e-1:
+#   Steps[0]=Steps[0]-Steps[1]
+#   N_iter=N_iterF
+#   if Steps[0] <= 0 :Steps[0]=1.00e-1;
+
+  if 1.00e-1>=Steps[0]>1.00e-2: 
+    Steps[0]=Steps[0]-Steps[1]
+    if Steps[0] < 1.00e-12:Steps[0]=1.00e-2;    
+    N_iter=N_iterF
+
+  if 1.00e-2>=Steps[0]>1.00e-3:
+    Steps[0]=Steps[0]-Steps[2]
+    #print "hi", Steps[0], Steps[2]
+    N_iter=N_iterF
+    if Steps[0] < 1.00e-12:Steps[0]=1.00e-3;    
+
+  if 1.00e-3>=Steps[0]>1.00e-4:
+    Steps[0]=Steps[0]-Steps[3]
+    N_iter=N_iterF
+    if Steps[0] < 1.00e-12:Steps[0]=1.00e-4;    
+
+  if 1.00e-4>=Steps[0]>1.00e-5:
+    Steps[0]=Steps[0]-Steps[4]
+    N_iter=N_iterF
+    if Steps[0] < 1.00e-12:Steps[0]=1.00e-5;    
+
+  if 1.00e-5>=Steps[0]>1.00e-6:
+    Steps[0]=Steps[0]-Steps[5]
+    N_iter=N_iterF
+    #print "hi0", Steps[0] 
+    if Steps[0] <1.00e-12:Steps[0]=1.00e-6;    
+
+  #print "hi1", Steps[0], Steps[len(Steps)-1], Steps[0] < Steps[len(Steps)-1]
+  if Steps[0] < Steps[len(Steps)-1] or (Steps[0] < 1.00e-12):
+   Steps[0]=int(0.00)
+   N_iter=int(0.00)
+
+  return Steps[0], N_iter
+
+
 

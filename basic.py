@@ -16,14 +16,14 @@ import basic_FU
 def Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method):
  Truncation=[0]
  
- t0=time.time()
+ #t0=time.time()
  if Corner_method is 'CTM':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
  if Corner_method is'CTMRG':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
  if Corner_method is'CTMFull':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
- print time.time() - t0, "CTM-H, Left"
+ #print time.time() - t0, "CTM-H, Left"
 
 
 
@@ -87,7 +87,7 @@ def Var_H(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
 
 def Var_V(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d_phys,chi,Gauge,Positive,Corner_method):
  Truncation=[0]
- t0=time.time()
+ #t0=time.time()
  if Corner_method is 'CTM':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
 
@@ -97,7 +97,7 @@ def Var_V(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,U,d
  if Corner_method is 'CTMFull':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
 
- print time.time() - t0, "CTM-V, Left"
+ #print time.time() - t0, "CTM-V, Left"
 
  #print 'Truncation', Truncation[0]
  #norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
@@ -381,7 +381,7 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
  Loop_iter=0
  count=0
  #print  '\n', '\n', 'CTM'
- t0=time.time()
+ #t0=time.time()
 
  while Loop_iter is 0:
   count+=1
@@ -433,8 +433,8 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
    #print E1, Truncation[0], abs((E0-E1)/E1)
    #print a.norm(), b.norm(), c.norm(), d.norm()
  
- print 'CTM', norm[0], count
- print time.time() - t0, count, "CTM, Left"
+ #print 'CTM', norm[0], count
+ #print time.time() - t0, count, "CTM, Left"
 
 
 
@@ -896,89 +896,50 @@ def Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file):
  file.write( str(hlist[Length]) + " " + str(zlist[Length]) +  " "+str(zlist1[Length])+" "+str(zlist2[Length])+" "+ str(Elist[Length])+" "+ str(Elist1[Length]) +" "+ str(Elist2[Length]) +  "\n")
  file.flush()
 
-def Def_deltaNiter(i,N_iterF):
-  delta=int(0.00)
-  N_iter=int(0.00)
-  if i is 1:
-   delta=1.00e-1
-   N_iter=N_iterF
-  if i is 2:
-   delta=0.500e-1
-   N_iter=N_iterF
-  if i is 3:
-   delta=1.00e-2
-   N_iter=N_iterF
-  if i is 4:
-   delta=0.500e-2
-   N_iter=N_iterF
-  if i is 5:
-   delta=1.00e-3
-   N_iter=N_iterF
-  if i is 6:
-   delta=0.500e-3
-   N_iter=N_iterF
-  if i is 7:
-   delta=1.00e-4
-   N_iter=N_iterF
-  if i is 8:
-   delta=0.500e-4
-   N_iter=N_iterF
 
-  return delta, N_iter
-
-def Def_deltaNiter_25(i,N_iterF):
+def Def_deltaNiter(i,N_iterF,Steps):
   delta=int(0.00)
   N_iter=int(0.00)
 
-  if i is 1:
-   delta=0.7500e-1
-   N_iter=N_iterF
-  if i is 2:
-   delta=0.500e-1
-   N_iter=N_iterF
-  if i is 3:
-   delta=0.2500e-1
-   N_iter=N_iterF
-  if i is 4:
-   delta=1.00e-2
-   N_iter=N_iterF
-  if i is 5:
-   delta=0.7500e-2
-   N_iter=N_iterF
-  if i is 6:
-   delta=0.500e-2
-   N_iter=N_iterF
-  if i is 7:
-   delta=0.2500e-2
-   N_iter=N_iterF
-  if i is 8:
-   delta=1.00e-3
-   N_iter=N_iterF
-  if i is 9:
-   delta=0.7500e-3
-   N_iter=N_iterF
-  if i is 10:
-   delta=0.500e-3
-   N_iter=N_iterF
-  if i is 11:
-   delta=0.2500e-3
-   N_iter=N_iterF
-  if i is 12:
-   delta=1.00e-4
-   N_iter=N_iterF
-  if i is 13:
-   delta=0.7500e-4
-   N_iter=N_iterF
-  if i is 14:
-   delta=0.500e-4
-   N_iter=N_iterF
-  if i is 15:
-   delta=0.2500e-4
-   N_iter=N_iterF
-  if i is 16:
-   delta=1.00e-5
-   N_iter=N_iterF
-  return delta, N_iter
+
+#  if 1.00e0>=Steps[0]>1.00e-1:
+#   Steps[0]=Steps[0]-Steps[1]
+#   N_iter=N_iterF
+#   if Steps[0] <= 0 :Steps[0]=1.00e-1;
+
+  if 1.00e-1>=Steps[0]>1.00e-2: 
+    Steps[0]=Steps[0]-Steps[1]
+    if Steps[0] < 1.00e-12:Steps[0]=1.00e-2;    
+    N_iter=N_iterF
+
+  if 1.00e-2>=Steps[0]>1.00e-3:
+    Steps[0]=Steps[0]-Steps[2]
+    #print "hi", Steps[0], Steps[2]
+    N_iter=N_iterF
+    if Steps[0] < 1.00e-12:Steps[0]=1.00e-3;    
+
+  if 1.00e-3>=Steps[0]>1.00e-4:
+    Steps[0]=Steps[0]-Steps[3]
+    N_iter=N_iterF
+    if Steps[0] < 1.00e-12:Steps[0]=1.00e-4;    
+
+  if 1.00e-4>=Steps[0]>1.00e-5:
+    Steps[0]=Steps[0]-Steps[4]
+    N_iter=N_iterF
+    if Steps[0] < 1.00e-12:Steps[0]=1.00e-5;    
+
+  if 1.00e-5>=Steps[0]>1.00e-6:
+    Steps[0]=Steps[0]-Steps[5]
+    N_iter=N_iterF
+    #print "hi0", Steps[0] 
+    if Steps[0] <1.00e-12:Steps[0]=1.00e-6;    
+
+  #print "hi1", Steps[0], Steps[len(Steps)-1], Steps[0] < Steps[len(Steps)-1]
+  if Steps[0] < Steps[len(Steps)-1] or (Steps[0] < 1.00e-12):
+   Steps[0]=int(0.00)
+   N_iter=int(0.00)
+
+  return Steps[0], N_iter
 
 
 
@@ -989,43 +950,7 @@ def Def_deltaNiter_25(i,N_iterF):
 
 
   
-def Def_deltaNiter_less(i,N_iterF):
-  delta=int(0.00)
-  N_iter=int(0.00)
-  if i is 1:
-   delta=1.00e-1
-   N_iter=N_iterF
-  if i is 2:
-   delta=1.00e-2
-   N_iter=N_iterF
-  if i is 3:
-   delta=1.00e-3
-   N_iter=N_iterF
-  if i is 4:
-   delta=1.00e-4
-   N_iter=N_iterF
 
-  return delta, N_iter
-
-
-
-def Def_deltaNiter_more(i,N_iterF):
-  delta=int(0.00)
-  N_iter=int(0.00)
-
-  delta=0.050/pow(2.00,i)
-  if delta>1.0e-1:
-   N_iter=N_iterF
-  if delta<1.0e-1 and delta>1.0e-4:
-   N_iter=N_iterF
-  if delta<1.0e-4  and delta>1.0e-5:
-   N_iter=N_iterF
-  if delta<1.0e-5:
-   delta=int(0.00)
-   N_iter=int(0.00)
-    
-
-  return delta, N_iter
 
 
 
