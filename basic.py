@@ -193,11 +193,9 @@ def Initialize_function(Gamma,Landa):
   Gamma[i].randomize()
   Gamma[i]=Gamma[i]*(1.00/Gamma[i].norm())
   
- D=Gamma[0].bond(1).dim()
- matrix_Iden=uni10.Matrix(D, D)
- matrix_Iden.identity()
  for i in xrange(len(Landa)):
-  Landa[i].putBlock(matrix_Iden)
+  Landa[i].identity()
+  Landa[i]=Landa[i]*(1.00/Landa[i].norm())
 
 
  
@@ -262,28 +260,43 @@ def makeTab(chi,D):
  Tem1*=(1.00/Tem1.norm())
  return Tem0, Tem1
 
+def makeTab1(chi,D):
+ bdi = uni10.Bond(uni10.BD_IN, chi)
+ bdi1 = uni10.Bond(uni10.BD_OUT, D)
+ bdo = uni10.Bond(uni10.BD_OUT, chi)
+ Tem0=uni10.UniTensor([bdi, bdi1, bdo])
+ Tem0.randomize()
+ Tem0*=(1.00/Tem0.norm())
+ Tem1=uni10.UniTensor([bdi, bdi1, bdo])
+ Tem1.randomize()
+ Tem1*=(1.00/Tem1.norm())
+ return Tem0, Tem1
+
+
 
 def makec1(chi,D):
  bdi = uni10.Bond(uni10.BD_IN, chi)
  bdo = uni10.Bond(uni10.BD_OUT, chi)
  
- Tem0=uni10.UniTensor([bdi, bdo])
- Tem0.randomize()
- Tem0*=(1.00/Tem0.norm())
- Tem1=uni10.UniTensor([bdi, bdo])
- Tem1.randomize()
- Tem1*=(1.00/Tem1.norm())
- Tem2=uni10.UniTensor([bdi, bdo])
- Tem2.randomize()
- Tem2*=(1.00/Tem2.norm())
- Tem3=uni10.UniTensor([bdi, bdo])
- Tem3.randomize()
- Tem3*=(1.00/Tem3.norm())
- return Tem0,Tem1,Tem2,Tem3
+ 
+ c1=uni10.UniTensor([bdi, bdo])
+ c2=uni10.UniTensor([bdi, bdi])
+ c3=uni10.UniTensor([bdi, bdo])
+ c4=uni10.UniTensor([bdo, bdo])
+ c1.randomize()
+ c2.randomize()
+ c3.randomize()
+ c4.randomize()
+ c1*=(1.00/c1.norm())
+ c2*=(1.00/c2.norm())
+ c3*=(1.00/c3.norm())
+ c4*=(1.00/c4.norm())
+ return c1,c2,c3,c4
  
 def makeab(Landa,Gamma):
 
  Landa_cp=[ copy.copy(Landa[i]) for i in xrange(len(Landa)) ]
+
  Landa_sq=sqrt(Landa_cp)
 
 
@@ -319,25 +332,35 @@ def makeab(Landa,Gamma):
 def   sqrt(Landa):
  Landa_cp=[ copy.copy(Landa[i]) for i in xrange(len(Landa))   ]
  for q in xrange(len(Landa_cp)): 
-  D=Landa_cp[q].bond()[0].dim()
-  Landa_cpm=Landa_cp[q].getBlock()
-  Landam=Landa[q].getBlock()
-  for i in xrange(D):
-   for j in xrange(D):
-    Landa_cpm[i*D+j]=Landam[i*D+j]**(1.00/2.00)
-  Landa_cp[q].putBlock(Landa_cpm)
+  blk_qnums=Landa_cp[q].blockQnum()
+  for qnum in blk_qnums:
+   D=int(Landa_cp[q].getBlock(qnum).col())
+   Landa_cpm=Landa_cp[q].getBlock(qnum)
+   Landam=Landa[q].getBlock(qnum)
+   for i in xrange(D):
+    for j in xrange(D):
+     Landa_cpm[i*D+j]=Landam[i*D+j]**(1.00/2.00)
+   Landa_cp[q].putBlock(qnum,Landa_cpm)
  return Landa_cp
 
  
 def inverse(Landa2):
  invLanda2=uni10.UniTensor(Landa2.bond())
- invL2 = uni10.Matrix(Landa2.bond()[0].dim(), Landa2.bond()[1].dim())
- D=Landa2.bond()[0].dim()
- for i in xrange(Landa2.bond()[0].dim()):
-   for j in xrange(Landa2.bond()[0].dim()):
-    invL2[i*D+j] = 0 if ((Landa2[i*D+j].real) < 1.0e-12) else (1.00 / (Landa2[i*D+j].real))
- invLanda2.putBlock(invL2)
+ blk_qnums=Landa2.blockQnum()
+ for qnum in blk_qnums:
+  D=int(Landa2.getBlock(qnum).row())
+  D1=int(Landa2.getBlock(qnum).col())
+  invL2 = uni10.Matrix(D, D1)
+  invLt = uni10.Matrix(D, D1)
+  invLt=Landa2.getBlock(qnum)
+  for i in xrange(D):
+    for j in xrange(D1):
+     invL2[i*D1+j] = 0 if ((invLt[i*D1+j].real) < 1.0e-12) else (1.00 / (invLt[i*D1+j].real))
+  invLanda2.putBlock(qnum,invL2)
  return invLanda2
+ 
+ 
+ 
 def magnetization(a_u):
  a_u.setLabel([0,1,2,3,4])
  a_uc=copy.copy(a_u)

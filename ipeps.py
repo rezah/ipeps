@@ -13,11 +13,11 @@ import itebd
 import Fullupdate
 import Move
 ###################### Initialize parameters ###########################
-Model="Heisenberg"         #Heisenberg, Ising
-D=2
-chi=20
-d_phys=2
-N_iteritebd=500
+Model="Ising"         #Heisenberg, Ising
+D=[2,2]
+chi=[20,20]
+d_phys=[1,1]
+N_iteritebd=200
 N_iterF=2
 Gauge='Non-Fixed'
 Positive='Restrict'
@@ -32,13 +32,46 @@ zlist1=[]
 Elist1=[]
 zlist2=[]
 Elist2=[]
+q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+q0_odd = uni10.Qnum(0,uni10.PRT_ODD);
+q_list=[q0_even,q0_odd]
+qchi_list=[q0_even,q0_odd]
+
+q_D=[]
+q_D2=[]
+q_chi=[]
+q_phys=[q0_even,q0_odd]
+
+for i in xrange(len(D)):
+ for q in xrange(D[i]):
+  q_D.append(q_list[i])
+
+for i in xrange(len(D)):
+ for q in xrange(D[i]*D[i]):
+  q_D2.append(q_list[i])
+
+
+print 'q_D',q_D,'\n','\n', q_D2
+
+
+
+
+for i in xrange(len(chi)):
+ for q in xrange(chi[i]):
+  q_chi.append(qchi_list[i])
 
 file = open("Data/varianceAll.txt", "w")
 
-bdi = uni10.Bond(uni10.BD_IN, D)
-bdo = uni10.Bond(uni10.BD_OUT, D)
-bdi_pys = uni10.Bond(uni10.BD_IN, d_phys)
+bdi = uni10.Bond(uni10.BD_IN, q_D)
+bdo = uni10.Bond(uni10.BD_OUT, q_D)
+bdi_pys = uni10.Bond(uni10.BD_IN, q_phys)
 Truncation=[0]
+
+
+
+#print '\n','\n',bdi_pys.combine(bdi_pys.combine(bdi_pys))
+
+
 
 Gamma_a=uni10.UniTensor([bdi_pys,bdi,bdi,bdo,bdo], "Gamma_a")
 Gamma_b=uni10.UniTensor([bdi_pys,bdi,bdi,bdo,bdo], "Gamma_b")
@@ -78,11 +111,11 @@ dp_u,dp=basic.makeab(Landa,Gamma_d)
 
 
 
-c1, c2,c3,c4=basic.makec1(chi,D*D)
-Ta1, Tb1=basic.makeTab(chi,D*D)
-Ta2, Tb2=basic.makeTab(chi,D*D)
-Ta3, Tb3=basic.makeTab(chi,D*D)
-Ta4, Tb4=basic.makeTab( chi,D*D)
+c1, c2,c3,c4=basic.makec1(q_chi,q_D)
+Ta1, Tb1=basic.makeTab(q_chi,q_D2)
+Ta2, Tb2=basic.makeTab(q_chi,q_D2)
+Ta3, Tb3=basic.makeTab1(q_chi,q_D2)
+Ta4, Tb4=basic.makeTab1(q_chi,q_D2)
 Env=[c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4]
 
 zlist=[]
@@ -93,7 +126,8 @@ for h in hlist:
  print h
 
 #########################################################################################
- Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa6, Landa7,Landa8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iteritebd,delta,h,Steps,Model)
+ Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa6, Landa7,Landa8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,
+Landa_8,chi,q_phys,D,N_iteritebd,delta,h,Steps,Model,q_D)
 
  basic.Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8)
 
