@@ -14,10 +14,10 @@ import Fullupdate
 import Move
 ###################### Initialize parameters ###########################
 Model="Ising"         #Heisenberg, Ising
-D=[2,2]
-chi=[20,20]
+D=[2,3]
+chi=[10,10]
 d_phys=[1,1]
-N_iteritebd=200
+N_iteritebd=100
 N_iterF=2
 Gauge='Non-Fixed'
 Positive='Restrict'
@@ -45,13 +45,6 @@ q_phys=[q0_even,q0_odd]
 for i in xrange(len(D)):
  for q in xrange(D[i]):
   q_D.append(q_list[i])
-
-for i in xrange(len(D)):
- for q in xrange(D[i]*D[i]):
-  q_D2.append(q_list[i])
-
-
-print 'q_D',q_D,'\n','\n', q_D2
 
 
 
@@ -112,10 +105,10 @@ dp_u,dp=basic.makeab(Landa,Gamma_d)
 
 
 c1, c2,c3,c4=basic.makec1(q_chi,q_D)
-Ta1, Tb1=basic.makeTab(q_chi,q_D2)
-Ta2, Tb2=basic.makeTab(q_chi,q_D2)
-Ta3, Tb3=basic.makeTab1(q_chi,q_D2)
-Ta4, Tb4=basic.makeTab1(q_chi,q_D2)
+Ta1, Tb1=basic.makeTab(q_chi,q_D)
+Ta2, Tb2=basic.makeTab(q_chi,q_D)
+Ta3, Tb3=basic.makeTab1(q_chi,q_D)
+Ta4, Tb4=basic.makeTab1(q_chi,q_D)
 Env=[c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4]
 
 zlist=[]
@@ -126,11 +119,13 @@ for h in hlist:
  print h
 
 #########################################################################################
+ 
+
  Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa6, Landa7,Landa8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,
 Landa_8,chi,q_phys,D,N_iteritebd,delta,h,Steps,Model,q_D)
 
  basic.Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8)
-
+ print Landa_7,Landa_8,Landa_1
  Landa=[Landa_3,Landa_2,Landa_1,Landa_4]
  a_u,a=basic.makeab(Landa,Gamma_a)
  Landa=[Landa_1,Landa_7,Landa_3,Landa_8]
@@ -140,11 +135,9 @@ Landa_8,chi,q_phys,D,N_iteritebd,delta,h,Steps,Model,q_D)
  Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
  d_u,d=basic.makeab(Landa,Gamma_d)
 
- E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
- z_value=basic.z_value(a,b,c,d,a_u,b_u,c_u,d_u,chi,D*D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Corner_method)
+ E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,q_phys,chi,Corner_method,Model)
 
  print 'E_toal=', E_value
- print 'z_value=', z_value
 #########################################################################################
 
 ############################################################################
@@ -155,7 +148,7 @@ Landa_8,chi,q_phys,D,N_iteritebd,delta,h,Steps,Model,q_D)
  a_u,b_u,c_u,d_u,a,b,c,d,Env=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E,Steps,Model)
 
  E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
- z_value=basic.z_value(a,b,c,d,a_u,b_u,c_u,d_u,chi,D*D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Corner_method)
+ z_value=basic.z_value(a,b,c,d,a_u,b_u,c_u,d_u,chi,D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Corner_method)
  zlist1.append(z_value)
  Elist1.append(E_value)
  basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
