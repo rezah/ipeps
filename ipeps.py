@@ -13,11 +13,11 @@ import itebd
 import Fullupdate
 import Move
 ###################### Initialize parameters ###########################
-Model="Heisenberg"         #Heisenberg, Ising
-D=2
+Model="Ising"         #Heisenberg, Ising
+D=3
 chi=20
 d_phys=2
-N_iteritebd=500
+N_iteritebd=100
 N_iterF=2
 Gauge='Non-Fixed'
 Positive='Restrict'
@@ -63,7 +63,7 @@ Landa=[Landa_1,Landa_7,Landa_3,Landa_8]
 b_u,b=basic.makeab(Landa,Gamma_b)
 Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
 c_u,c=basic.makeab(Landa,Gamma_c)
-Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
+Landa=[Landa_6,Landa_8,Landa_5,Landa_7]
 d_u,d=basic.makeab(Landa,Gamma_d)
 
 
@@ -73,7 +73,7 @@ Landa=[Landa_1,Landa_7,Landa_3,Landa_8]
 bp_u,bp=basic.makeab(Landa,Gamma_b)
 Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
 cp_u,cp=basic.makeab(Landa,Gamma_c)
-Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
+Landa=[Landa_6,Landa_8,Landa_5,Landa_7]
 dp_u,dp=basic.makeab(Landa,Gamma_d)
 
 
@@ -87,25 +87,25 @@ Env=[c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4]
 
 zlist=[]
 hlist=[h*0.0100 for h in range(270,400)]
-hlist=[1.00]
+hlist=[03.00]
 
 for h in hlist:
  print h
 
 #########################################################################################
- Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa6, Landa7,Landa8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iteritebd,delta,h,Steps,Model)
+ Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iteritebd,delta,h,Steps,Model)
 
  basic.Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8)
-
+ print Landa_1
  Landa=[Landa_3,Landa_2,Landa_1,Landa_4]
  a_u,a=basic.makeab(Landa,Gamma_a)
  Landa=[Landa_1,Landa_7,Landa_3,Landa_8]
  b_u,b=basic.makeab(Landa,Gamma_b)
  Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
  c_u,c=basic.makeab(Landa,Gamma_c)
- Landa=[Landa_5,Landa_4,Landa_6,Landa_2]
+ Landa=[Landa_6,Landa_8,Landa_5,Landa_7]
  d_u,d=basic.makeab(Landa,Gamma_d)
-
+ 
  E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
  z_value=basic.z_value(a,b,c,d,a_u,b_u,c_u,d_u,chi,D*D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Corner_method)
 
