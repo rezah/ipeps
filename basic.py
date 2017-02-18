@@ -189,6 +189,7 @@ def reorder_env(E1, E2, E3, E4, E5,E6):
 
 
 def Initialize_function(Gamma,Landa):
+
  for i in xrange(len(Gamma)):
   Gamma[i].randomize()
   Gamma[i]=Gamma[i]*(1.00/Gamma[i].norm())
@@ -214,19 +215,6 @@ def matSy():
   dim = int(spin * 2 + 1)
   return uni10.Matrix(dim, dim, [0.0, -1.00, 1.00, 0.00]);
 
-def transverseIsing(h):
-    spin = 0.5
-    sx = matSx()
-    sy = matSy()
-    sz = matSz()
-    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
-    ham =uni10.otimes(sz,sz)*(-1)+(-0.2500)*float(h)*(uni10.otimes(iden,sx)+uni10.otimes(sx,iden))
-    dim = int(spin * 2 + 1)
-    bdi = uni10.Bond(uni10.BD_IN, dim);
-    bdo = uni10.Bond(uni10.BD_OUT, dim);
-    H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "TFIM");
-    H.putBlock(ham)
-    return H
 def transverseIsing_Z2(h,d_phys):
     bdi = uni10.Bond(uni10.BD_IN, d_phys)
     bdo = uni10.Bond(uni10.BD_OUT, d_phys)
@@ -238,15 +226,15 @@ def transverseIsing_Z2(h,d_phys):
     blk_qnums=H.blockQnum()
     M=H.getBlock(blk_qnums[0])
     M[0]=-2.0*h*(0.25)
-    M[1]=-1.0
-    M[2]=-1.0
-    M[3]=+2.0*h*(0.25)
+    M[1]=-1.0*(0)
+    M[2]=-1.0*(0)
+    M[3]=+2.0*h*(0.25)*(1.0)
     H.putBlock(blk_qnums[0],M)
 
     M=H.getBlock(blk_qnums[1])
     M[0]=-0.0*h
-    M[1]=-1.0
-    M[2]=-1.0
+    M[1]=-1.0*(0)
+    M[2]=-1.0*(0)
     M[3]=+0.0*h
     H.putBlock(blk_qnums[1],M)
 
@@ -335,7 +323,7 @@ def makeab(Landa,Gamma):
  Landa_sq[1].setLabel([2,-2])
  Landa_sq[2].setLabel([3,-3])
  Landa_sq[3].setLabel([4,-4])
- 
+# print Landa_sq[0].printDiagram(),Landa_sq[1].printDiagram(),Landa_sq[2].printDiagram(),Landa_sq[3].printDiagram(),a_u.printDiagram()
  a_u.setLabel([0,1,2,3,4])
  a_d.setLabel([0,1,2,3,4])
  
@@ -347,6 +335,7 @@ def makeab(Landa,Gamma):
  a_u.setLabel([0,1,2,3,4])
  a_d.setLabel([0,-1,-2,-3,-4])
  a=a_u*a_d
+ 
  a.combineBond([1,-1])
  a.combineBond([2,-2])
  a.combineBond([3,-3])
@@ -415,7 +404,7 @@ def make_ab(a_u):
 
 def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D):
  z1=copy.copy(a)
- z2=copy.copy(b)
+ z2=copy.copy(a)
  z2.randomize()
  z1.identity()
  z1=z1+(1.00e-5)*z2
@@ -610,20 +599,24 @@ def corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2
 def E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model):
 
  E_ab=Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
+ 
  E_ca=Energy_v(c_u,a_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
 
  E_cd=Energy_h(c_u,d_u,c,d,a,b,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
+ 
  E_ac=Energy_v(a_u,c_u,c,d,a,b,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
 
  E_ba=Energy_h(b_u,a_u,b,a,d,c,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
+ 
  E_db=Energy_v(d_u,b_u,b,a,d,c,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
 
  E_dc=Energy_h(d_u,c_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
+ 
  E_bd=Energy_v(b_u,d_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
 
- #print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00
- #print '\n','\n','\n'  
- #print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
+ print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00
+ print '\n','\n','\n'  
+ print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
 
  return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)
 
@@ -701,7 +694,7 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  else:
   bd=a.bond(0)
   bd.change(uni10.BD_OUT)
-  Tb4=uni10.UniTensor([Tb4.bond(0),bd,Tb4.bond(1)])
+  Tb4=uni10.UniTensor([Tb4.bond(0),bd,Tb4.bond(2)])
   Tb4.randomize()
 
  bd=Ta4.bond(1)
@@ -712,7 +705,7 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  else:
   bd=c.bond(0)
   bd.change(uni10.BD_OUT)
-  Ta4=uni10.UniTensor([Ta4.bond(0),bd,Ta4.bond(1)])
+  Ta4=uni10.UniTensor([Ta4.bond(0),bd,Ta4.bond(2)])
   Ta4.randomize()
 
 ##################################################################
@@ -726,7 +719,7 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  else:
   bd=b.bond(2)
   bd.change(uni10.BD_IN)
-  Ta2=uni10.UniTensor([Ta2.bond(0),bd,Ta2.bond(1)])
+  Ta2=uni10.UniTensor([Ta2.bond(0),bd,Ta2.bond(2)])
   Ta2.randomize()
 
  bd=Tb2.bond(1)
@@ -738,7 +731,7 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  else:
   bd=d.bond(2)
   bd.change(uni10.BD_IN)
-  Tb2=uni10.UniTensor([Tb2.bond(0),bd,Tb2.bond(1)])
+  Tb2=uni10.UniTensor([Tb2.bond(0),bd,Tb2.bond(2)])
   Tb2.randomize()
 ################################################################3
 
@@ -753,7 +746,7 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
   bd=a.bond(3)
   bd.change(uni10.BD_IN)
 
-  Tb1=uni10.UniTensor([Tb1.bond(0),bd,Tb1.bond(1)])
+  Tb1=uni10.UniTensor([Tb1.bond(0),bd,Tb1.bond(2)])
   Tb1.randomize()
 
 
@@ -765,7 +758,7 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  else:
   bd=b.bond(3)
   bd.change(uni10.BD_IN)
-  Ta1=uni10.UniTensor([Ta1.bond(0),bd,Ta1.bond(1)])
+  Ta1=uni10.UniTensor([Ta1.bond(0),bd,Ta1.bond(2)])
   Ta1.randomize()
 ##############################################################
 
@@ -778,7 +771,7 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  else:
   bd=c.bond(1)
   bd.change(uni10.BD_OUT)
-  Ta3=uni10.UniTensor([Ta3.bond(0),bd,Ta3.bond(1)])
+  Ta3=uni10.UniTensor([Ta3.bond(0),bd,Ta3.bond(2)])
   Ta3.randomize()
 
  bd=Tb3.bond(1)
@@ -790,7 +783,7 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  else:
   bd=d.bond(1)
   bd.change(uni10.BD_OUT)
-  Tb3=uni10.UniTensor([Tb3.bond(0),bd,Tb3.bond(1)])
+  Tb3=uni10.UniTensor([Tb3.bond(0),bd,Tb3.bond(2)])
   Tb3.randomize()
 ##############################################################
 
@@ -815,6 +808,8 @@ def Energy_h(a_u,b_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,
  
  
  test_env(E1, E2, E3, E4, E5,E6, a, b, c1,c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
+
 
  E1, E2, E3, E4, E5,E6=proper_bond(E1, E2, E3, E4, E5,E6,D,d_phys,a_u,b_u)
  
@@ -858,7 +853,6 @@ def produce_Env_Hab(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d
  Tb3.setLabel([13,14,8])
  d.setLabel([16,14,15,23])
  E4=(((c3*Tb3)*Tb2)*d)
- #E4.combineBond([13,16])
  E4.permute([13,16,23,22],1)
  E4.setLabel([11,-11,4,10])
  E4.permute([11,-11,4,10],2)
@@ -869,11 +863,10 @@ def produce_Env_Hab(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d
  Ta3.setLabel([10,12,13])
  c.setLabel([17,12,16,19])
  E3=(((c4*Ta4)*Ta3)*c)
- #E3.combineBond([13,16])
+ E3.randomize()
  E3.permute([13,16,19,18],0)
  E3.setLabel([11,-11,1,12])
  E3.permute([11,-11,1,12],0)
-
 
  return E1, E2, E3, E4, E5,E6
  
@@ -1039,13 +1032,13 @@ def make_ab(a_u):
  a_uc=copy.copy(a_u)
  a_uc.setLabel([0,-1,-2,-3,-4])
  result=a_uc*a_u
+
  result.combineBond([1,-1])
  result.combineBond([2,-2])
  result.combineBond([3,-3])
  result.combineBond([4,-4])
  result.permute([1,2,3,4], 2)
 
- return result
 def Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file):
  Length=len(zlist)-1
  file.write( str(hlist[Length]) + " " + str(zlist[Length]) +  " "+str(zlist1[Length])+" "+str(zlist2[Length])+" "+ str(Elist[Length])+" "+ str(Elist1[Length]) +" "+ str(Elist2[Length]) +  "\n")

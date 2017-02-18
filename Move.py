@@ -631,6 +631,7 @@ def  add_left1(c1,Tb4,Ta4,c4,Tb1,Ta3,a,c,chi,D):
  Tb1.setLabel([1,2,3])
  Tb4.setLabel([4,5,0])
  a.setLabel([5,6,7,2])
+ #print a.printDiagram(),Tb4.printDiagram(),Tb1.printDiagram()
  Q=((c1*Tb1)*(Tb4))*a
  Q.permute([4,6,3,7],2)
  Q.combineBond([3,7])

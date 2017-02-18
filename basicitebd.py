@@ -249,15 +249,15 @@ def transverseIsing_Z2(h,d_phys):
     blk_qnums=H.blockQnum()
     M=H.getBlock(blk_qnums[0])
     M[0]=-2.0*h*(0.25)
-    M[1]=-1.0
-    M[2]=-1.0
-    M[3]=+2.0*h*(0.25)
+    M[1]=-1.0*(0)
+    M[2]=-1.0*(0)
+    M[3]=+2.0*h*(0.25)*(1.0)
     H.putBlock(blk_qnums[0],M)
 
     M=H.getBlock(blk_qnums[1])
     M[0]=-0.0*h
-    M[1]=-1.0
-    M[2]=-1.0
+    M[1]=-1.0*(0)
+    M[2]=-1.0*(0)
     M[3]=+0.0*h
     H.putBlock(blk_qnums[1],M)
 
@@ -306,231 +306,6 @@ def Ham(h):
 
 
  
-def update_rlink(Gamma,Landa,U,D,d_phys):
- Gamma_a=copy.copy(Gamma[0])
- Gamma_b=copy.copy(Gamma[1])
- Gamma_a.setLabel([0,1,2,3,4])
- Gamma_b.setLabel([5,6,7,8,9])
- Hamiltonian=copy.copy(U)
- Hamiltonian.setLabel([10,11,0,5])
- Landa1=copy.copy(Landa[0])
- Landa2=copy.copy(Landa[1])
- Landa3=copy.copy(Landa[2])
- Landa4=copy.copy(Landa[3])
- Landa5=copy.copy(Landa[4])
- Landa6=copy.copy(Landa[5])
- Landa7=copy.copy(Landa[6])
- Landa8=copy.copy(Landa[7])
- Landa3p=copy.copy(Landa[2])
-
-
- Landa1.setLabel([3,6])
- Landa2.setLabel([2,-2])
- Landa3.setLabel([1,-1])
- Landa4.setLabel([4,-4])
- Landa8.setLabel([9,-9])
- Landa3p.setLabel([8,-8])
- Landa7.setLabel([7,-7])
-
-
- Tem_tensor=Gamma_a*(Landa1*Landa2*Landa3*Landa4)
- Tem_tensor2=Gamma_b*(Landa8*Landa3p*Landa7)
- 
- Theta=(Hamiltonian*Tem_tensor)*Tem_tensor2
- Theta.permute([10,-1,-2,-4,11,-7,-8,-9],4)
- ##printTheta.printDiagram() 
- 
- svd1=Theta.getBlock()
- svd = svd1.svd()
- #svd = Theta.getBlock().svd()
- # Truncation
- sv = svd[1]
- 
- 
- Sum=0
- for i in xrange(sv.row()):
-   if (i>=D):
-    Sum=sv[i]+Sum
- #print'truncation=', Sum
- norm = sv.resize(D, D)
- norm=norm.norm()
- sv *= 1.00 / norm
- #print'norm=', norm
- 
- Landa[0].putBlock(sv) 
- bdi_pys=uni10.Bond(uni10.BD_IN, d_phys)
- bdi_pyso=uni10.Bond(uni10.BD_OUT, d_phys)
- bdi=uni10.Bond(uni10.BD_IN, D)
- bdo=uni10.Bond(uni10.BD_OUT, D)
- 
- GsA=uni10.UniTensor([bdi_pys,bdi,bdi,bdi,bdo], "GsA")
- GsB=uni10.UniTensor([bdi,bdi_pyso,bdo,bdo,bdo], "GsB")
- 
- GsA.setLabel([10,-1,-2,-4,3])
- GsB.setLabel([6,11,-7,-8,-9])
- 
- GsA.putBlock(svd[0].resize(svd[0].row(), D))
- GsB.putBlock(svd[2].resize(D, svd[2].col()))
- ##printGsA.printDiagram(),GsB.printDiagram()
- 
-# GsA.permute([10,-1,-2,3,-4],3)
-# GsB.permute([11,6,-7,-8,-9],3)
-
- 
- invLanda2=inverse(Landa2)
- invLanda3=inverse(Landa3)
- invLanda4=inverse(Landa4)
- invLanda2.setLabel([-2,2])
- invLanda3.setLabel([-1,1])
- invLanda4.setLabel([-4,4])
- GsA=GsA*(invLanda2*invLanda3*invLanda4)
-
- invLanda8=inverse(Landa8)
- invLanda3=inverse(Landa3)
- invLanda7=inverse(Landa7)
-
-
- invLanda8.setLabel([-9,9])
- invLanda3.setLabel([-8,8])
- invLanda7.setLabel([-7,7])
- GsB=GsB*(invLanda8*invLanda3*invLanda7)
- ##print'identity', invLanda4.getBlock()*Landa4.getBlock()
- ##print'identity', invLanda3.getBlock()*Landa3.getBlock()
- ##print'identity', invLanda2.getBlock()*Landa2.getBlock()
- 
- 
- GsA.permute([10,1,2,3,4],3)
- GsB.permute([11,6,7,8,9],3)
- 
- GsA.setLabel([0,1,2,3,4])
- GsB.setLabel([0,1,2,3,4])
-
-
- 
- Gamma[0].putBlock(GsA.getBlock())
- Gamma[1].putBlock(GsB.getBlock())
- Gamma[0]*=(1.00/Gamma[0].norm())
- Gamma[1]*=(1.00/Gamma[1].norm())
-
- 
- ##printGamma[0].printDiagram(), Gamma[1].printDiagram() 
-
- #Gs[A].permute([-1, 3, 1], 1)
- #bondrm(Gs[A], Ls[B], 0)
- #bondrm(Gs[B], Ls[B], 1)  
-
-def update_ulink(Gamma,Landa,U,D,d_phys):
- Gamma_a=copy.copy(Gamma[0])
- Gamma_b=copy.copy(Gamma[1])
- Gamma_a.setLabel([0,1,2,3,4])
- Gamma_b.setLabel([5,6,7,8,9])
- Hamiltonian=copy.copy(U)
- Hamiltonian.setLabel([10,11,0,5])
- Landa1=copy.copy(Landa[0])
- Landa2=copy.copy(Landa[1])
- Landa3=copy.copy(Landa[2])
- Landa4=copy.copy(Landa[3])
- Landa5=copy.copy(Landa[4])
- Landa6=copy.copy(Landa[5])
- Landa7=copy.copy(Landa[6])
- Landa8=copy.copy(Landa[7])
- Landa4p=copy.copy(Landa[3])
-
-
- Landa1.setLabel([3,-3])
- Landa2.setLabel([2,9])
- Landa3.setLabel([1,-1])
- Landa4.setLabel([4,-4])
- Landa5.setLabel([6,-6])
- Landa4p.setLabel([7,-7])
- Landa6.setLabel([8,-8])
-
-
- Tem_tensor=Gamma_a*(Landa1*Landa2*Landa3*Landa4)
- Tem_tensor2=Gamma_b*(Landa5*Landa4p*Landa6)
- 
- Theta=(Hamiltonian*Tem_tensor)*Tem_tensor2
- Theta.permute([10,-1,-3,-4,11,-6,-7,-8],4)
- ##printTheta.printDiagram() 
- 
- svd1=Theta.getBlock()
- svd = svd1.svd()
- #svd = Theta.getBlock().svd()
- # Truncation
- sv = svd[1]
- 
- 
- Sum=0
- for i in xrange(sv.row()):
-   if (i>=D):
-    Sum=sv[i]+Sum
- #print'truncation=', Sum
- norm = sv.resize(D, D)
- norm=norm.norm()
- sv *= 1.00 / norm
- #print'norm=', norm
- 
- Landa[1].putBlock(sv) 
- bdi_pys=uni10.Bond(uni10.BD_IN, d_phys)
- bdi_pyso=uni10.Bond(uni10.BD_OUT, d_phys)
- bdi=uni10.Bond(uni10.BD_IN, D)
- bdo=uni10.Bond(uni10.BD_OUT, D)
- 
- GsA=uni10.UniTensor([bdi_pys,bdi,bdi,bdi,bdo], "GsA")
- GsB=uni10.UniTensor([bdi,bdi_pyso,bdo,bdo,bdo], "GsB")
- 
- GsA.setLabel([10,-1,-3,-4,2])
- GsB.setLabel([9,11,-6,-7,-8])
- 
- GsA.putBlock(svd[0].resize(svd[0].row(), D))
- GsB.putBlock(svd[2].resize(D, svd[2].col()))
- ##printGsA.printDiagram(),GsB.printDiagram()
- 
-# GsA.permute([10,-1,-2,3,-4],3)
-# GsB.permute([11,6,-7,-8,-9],3)
-
- 
- invLanda1=inverse(Landa1)
- invLanda3=inverse(Landa3)
- invLanda4=inverse(Landa4)
- invLanda1.setLabel([-3,3])
- invLanda3.setLabel([-1,1])
- invLanda4.setLabel([-4,4])
- GsA=GsA*(invLanda1*invLanda3*invLanda4)
-
- invLanda4=inverse(Landa4)
- invLanda6=inverse(Landa6)
- invLanda5=inverse(Landa5)
-
-
- invLanda4.setLabel([-7,7])
- invLanda5.setLabel([-6,6])
- invLanda6.setLabel([-8,8])
- GsB=GsB*(invLanda5*invLanda4*invLanda6)
- ##print'identity', invLanda4.getBlock()*Landa4.getBlock()
- ##print'identity', invLanda3.getBlock()*Landa3.getBlock()
- ##print'identity', invLanda2.getBlock()*Landa2.getBlock()
- 
- 
- GsA.permute([10,1,2,3,4],3)
- GsB.permute([11,6,7,8,9],3)
- 
- GsA.setLabel([0,1,2,3,4])
- GsB.setLabel([0,1,2,3,4])
-
-
- 
- Gamma[0].putBlock(GsA.getBlock())
- Gamma[1].putBlock(GsB.getBlock())
- Gamma[0]*=(1.00/Gamma[0].norm())
- Gamma[1]*=(1.00/Gamma[1].norm())
-
- 
- ##printGamma[0].printDiagram(), Gamma[1].printDiagram() 
-
- #Gs[A].permute([-1, 3, 1], 1)
- #bondrm(Gs[A], Ls[B], 0)
- #bondrm(Gs[B], Ls[B], 1)  
 def Renew_dim(dims,dims_val,chi,dim_svd):
    free_par=chi-dims_val
    #print "free_par", free_par
@@ -587,37 +362,42 @@ def setTruncation(theta, chi):
     qnums = []
     #print dims#,blk_qnums;
     
-    dims_val=0
-    for i in xrange(len(dims)):
-     dims_val+=dims[i]
-     
-    #print dims_val
-    if dims_val < chi:
-      dims=Renew_dim(dims,dims_val,chi,dim_svd) 
+#    dims_val=0
+#    for i in xrange(len(dims)):
+#     dims_val+=dims[i]
+#     
+#    #print dims_val
+#    if dims_val < chi:
+#      dims=Renew_dim(dims,dims_val,chi,dim_svd) 
 
-    dims_val=0
-    for i in xrange(len(dims)):
-     dims_val+=dims[i]
-    #print dims, dims_val
+#    dims_val=0
+#    for i in xrange(len(dims)):
+#     dims_val+=dims[i]
+#    #print dims, dims_val
 
     for bidx in xrange(len(blk_qnums)):
         qnums += [blk_qnums[bidx]] * dims[bidx]
     bdi_mid = uni10.Bond(uni10.BD_IN, qnums)
     bdo_mid = uni10.Bond(uni10.BD_OUT, qnums)
-    GA.assign([GA.bond(0), GA.bond(1), bdo_mid])
-    GB.assign([bdi_mid, GB.bond(1), GB.bond(2)])
+    GA.assign([theta.bond(0), theta.bond(1), bdo_mid])
+    GB.assign([bdi_mid, theta.bond(2), theta.bond(3)])
     LA.assign([bdi_mid, bdo_mid])
     degs = bdi_mid.degeneracy()
-#    sv_mat = uni10.Matrix(bdi_mid.dim(), bdo_mid.dim(), svs, True)
-#    norm = sv_mat.norm()
+    #print "svs", svs
+    sv_mat = uni10.Matrix(len(svs), len(svs), svs, True)
+    #print "sv_mat", sv_mat
+    sv_mat.resize(int(bdi_mid.dim()), int(bdo_mid.dim()))
+    #print "sv_matF", sv_mat
+
+    #sv_mat = uni10.Matrix(bdi_mid.dim(), bdo_mid.dim(), sv_m.resize(int(bdi_mid.dim()), int(bdo_mid.dim())), True)
+    norm = sv_mat.norm()
     for qnum, dim in degs.iteritems():
         if qnum not in svds:
             raise Exception("In setTruncaton(): Fatal error.")
         svd = svds[qnum]
         GA.putBlock(qnum, svd[0].resize(svd[0].row(), dim))
         GB.putBlock(qnum, svd[2].resize(dim, svd[2].col()))
-        LA.putBlock(qnum, svd[1].resize(dim, dim)  )
-
+        LA.putBlock(qnum, svd[1].resize(dim, dim) * (1.00/norm)  )
 #    print LA
     return GA, GB, LA
 
@@ -642,7 +422,7 @@ def setTruncation1(theta, chi,q_chi):
         svds[qnum] = theta.getBlock(qnum).svd()
         GA.putBlock(qnum, svds[qnum][0].resize(svds[qnum][0].row(), dim))
         GB.putBlock(qnum, svds[qnum][2].resize(dim, svds[qnum][2].col()))
-        LA.putBlock(qnum, svds[qnum][1].resize(dim, dim)  )
+        LA.putBlock(qnum, svds[qnum][1].resize(dim, dim)   )
 
     return GA, GB, LA
 
@@ -793,16 +573,6 @@ def update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D):
  Landa3p.setLabel([8,-8])
  Landa7.setLabel([7,-7])
 
-# bdiB=uni10.Bond(uni10.BD_IN, d_phys*D)
-# bdoB=uni10.Bond(uni10.BD_OUT, d_phys*D)
-# bdi_pys=uni10.Bond(uni10.BD_IN, d_phys)
-# bdi_pyso=uni10.Bond(uni10.BD_OUT, d_phys)
-# bdi=uni10.Bond(uni10.BD_IN, D)
-# bdo=uni10.Bond(uni10.BD_OUT, D)
-# 
-# q_uni=uni10.UniTensor([bdi,bdi,bdi,bdoB])
-# r_uni=uni10.UniTensor([bdiB,bdi_pyso,bdo])
-
 
  
  Left=Gamma_a*(Landa2*Landa3*Landa4)
@@ -818,11 +588,9 @@ def update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D):
 
 
  
-# q_unit=copy.copy(q_uni)
-# q_unit.transpose()
- #print '1', q_uni, q_uni, q_unit.getBlock()*q_uni.getBlock()
-
-
+ A=r_uni*q_uni
+ A.permute([-4,-1,-2,0,3],3)
+ #print A.elemCmp(Left),A[0],Left[0]
 
  
  Right=Gamma_b*(Landa8*Landa3p*Landa7)
@@ -836,14 +604,44 @@ def update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D):
  
  #qqt_uni=copy.copy( qq_uni)
  #qqt_uni.transpose()
- #print '2',  qq_uni,  l_uni, qq_uni.getBlock()*qqt_uni.getBlock()
+ A=l_uni*qq_uni
+ A.permute([5,6,-7,-8,-9],2)
+ #print A.elemCmp(Right),A[1],Right[1]
 
  Theta=(r_uni*Landa1*Hamiltonian)*l_uni
  Theta.permute([10,20,11,40],2)
  ##printTheta.printDiagram() 
+ #blk_qnums=Theta.blockQnum()
+ #print Theta.printDiagram(),Theta.getBlock(blk_qnums[0]),Theta.getBlock(blk_qnums[1])
+
+ U,V,LA=setTruncation(Theta,D_dim) 
 
 
- U,V,Landa[0]=setTruncation(Theta,D_dim) 
+# count=0
+# bdi = uni10.Bond(uni10.BD_IN, q_D)
+# bdo = uni10.Bond(uni10.BD_OUT, q_D)
+# LA=uni10.UniTensor([bdi, bdo])
+# U=uni10.UniTensor([Theta.bond(0), Theta.bond(1), bdo])
+# V=uni10.UniTensor([bdi, Theta.bond(2), Theta.bond(3)])
+# svds = {}
+# blk_qnums = Theta.blockQnum()
+# degs = bdi.degeneracy()
+# for qnum, dim in degs.iteritems():
+#  svds[qnum] = Theta.getBlock(qnum).svd()
+#  U.putBlock(qnum, svds[qnum][0].resize(svds[qnum][0].row(), D[count]))
+#  V.putBlock(qnum, svds[qnum][2].resize(D[count], svds[qnum][2].col()))
+#  LA.putBlock(qnum, svds[qnum][1].resize(D[count], D[count])     )
+#  count+=1
+
+
+# norm=LA.norm()
+ blk_qnums = LA.blockQnum()
+
+
+ Landa[0].assign(LA.bond()) 
+ for qnum in blk_qnums:
+  Landa[0].putBlock(qnum,LA.getBlock(qnum)  )  #* (1.00/norm)
+
 
  U.setLabel([10,20,3])
  V.setLabel([6,11,40])
@@ -860,15 +658,12 @@ def update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D):
  invLanda2=inverse(Landa2)
 # print invLanda2
  
-# print Landa[0]
-# invLanda2=inverse(Landa[0])
-# print invLanda2
-# 
  invLanda3=inverse(Landa3)
  invLanda4=inverse(Landa4)
  invLanda2.setLabel([-2,2])
  invLanda3.setLabel([-1,1])
  invLanda4.setLabel([-4,4])
+ 
  GsA=GsA*(invLanda2*invLanda3*invLanda4)
 
  invLanda8=inverse(Landa8)
@@ -892,31 +687,25 @@ def update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D):
  
  GsA.setLabel([0,1,2,3,4])
  GsB.setLabel([0,1,2,3,4])
- Gamma[0]=uni10.UniTensor(GsA.bond())
- Gamma[1]=uni10.UniTensor(GsB.bond())
- 
- 
- #GsA.printDiagram()
- #Gamma[0].printDiagram()
+ #Gamma[0]=uni10.UniTensor(GsA.bond())
+ #Gamma[1]=uni10.UniTensor(GsB.bond())
+
+
  blk_qnums = GsA.blockQnum()
+ Gamma[0].assign(GsA.bond())
+
  for qnum in blk_qnums:
   Gamma[0].putBlock(qnum,GsA.getBlock(qnum))
   
  blk_qnums = GsB.blockQnum()
+ Gamma[1].assign(GsB.bond())
  for qnum in blk_qnums:
   Gamma[1].putBlock(qnum,GsB.getBlock(qnum))
-  
-  
- #Gamma[1].putBlock(GsB.getBlock())
- #Gamma[0]*=(1.00/Gamma[0].norm())
- #Gamma[1]*=(1.00/Gamma[1].norm())
-
  
- ##printGamma[0].printDiagram(), Gamma[1].printDiagram() 
-
- #Gs[A].permute([-1, 3, 1], 1)
- #bondrm(Gs[A], Ls[B], 0)
- #bondrm(Gs[B], Ls[B], 1) 
+ 
+ #print "hi_inner", GsA[6], GsB[4]
+ #print Landa_tem*(1.0/Landa_tem.norm())
+ #return GsA, GsB, Landa_tem*(1.0/Landa_tem.norm()) 
 
 def update_ulink_eff(Gamma,Landa,U,D,d_phys,q_D):
  D_dim=0
@@ -955,15 +744,16 @@ def update_ulink_eff(Gamma,Landa,U,D,d_phys,q_D):
  
  Left=Gamma_a*(Landa1*Landa3*Landa4)
  Left.permute([-4,-1,-3,0,2],3)
- 
+ #print "Left", Left.printDiagram() 
  
  q_uni,r_uni=qr_parity(Left)
 
  q_uni.setLabel([-4,-1,-3,20])
  r_uni.setLabel([20,0,2])
 
-
-
+ A=r_uni*q_uni
+ A.permute([-4,-1,-3,0,2],3)
+ #print "Left",A.elemCmp(Left),A[0],Left[0]
 
  
  Right=Gamma_b*(Landa5*Landa4p*Landa6)
@@ -975,17 +765,45 @@ def update_ulink_eff(Gamma,Landa,U,D,d_phys,q_D):
  qq_uni.setLabel([40,-7,-8,-6])
 
 
+ A=l_uni*qq_uni
+ A.permute([5,9,-7,-8,-6],2)
+ #print "Right",A.elemCmp(Right),A[1],Right[1]
 
  
  #qqt_uni=copy.copy( qq_uni)
  #qqt_uni.transpose()
  #print '2',  qq_uni,  l_uni, qq_uni.getBlock()*qqt_uni.getBlock()
 
+
+ #print r_uni.printDiagram(),l_uni.printDiagram(),Landa2.printDiagram(),Hamiltonian.printDiagram()
  Theta=(r_uni*Landa2*Hamiltonian)*l_uni
  Theta.permute([10,20,11,40],2)
 
  
- U,V,Landa[1]=setTruncation(Theta,D_dim) 
+ U,V,LA=setTruncation(Theta,D_dim) 
+
+
+# count=0
+# bdi = uni10.Bond(uni10.BD_IN, q_D)
+# bdo = uni10.Bond(uni10.BD_OUT, q_D)
+# LA=uni10.UniTensor([bdi, bdo])
+# U=uni10.UniTensor([Theta.bond(0), Theta.bond(1), bdo])
+# V=uni10.UniTensor([bdi, Theta.bond(2), Theta.bond(3)])
+# svds = {}
+# blk_qnums = Theta.blockQnum()
+# degs = bdi.degeneracy()
+# for qnum, dim in degs.iteritems():
+#  svds[qnum] = Theta.getBlock(qnum).svd()
+#  U.putBlock(qnum, svds[qnum][0].resize(svds[qnum][0].row(), D[count]))
+#  V.putBlock(qnum, svds[qnum][2].resize(D[count], svds[qnum][2].col()))
+#  LA.putBlock(qnum, svds[qnum][1].resize(D[count], D[count])   )
+#  count+=1
+ blk_qnums = LA.blockQnum()
+ #print  LA
+ #norm=LA.norm()
+ Landa[1].assign(LA.bond()) 
+ for qnum in blk_qnums:
+  Landa[1].putBlock(qnum,LA.getBlock(qnum)    )  #*  (1.00/norm)
  
  
  U.setLabel([10,20,2])
@@ -1024,25 +842,23 @@ def update_ulink_eff(Gamma,Landa,U,D,d_phys,q_D):
  GsA.setLabel([0,1,2,3,4])
  GsB.setLabel([0,1,2,3,4])
 
- Gamma[0]=uni10.UniTensor(GsA.bond())
- Gamma[1]=uni10.UniTensor(GsB.bond())
+# Gamma[0]=uni10.UniTensor(GsA.bond())
+# Gamma[1]=uni10.UniTensor(GsB.bond())
  
  
  #GsA.printDiagram()
  #Gamma[0].printDiagram()
  blk_qnums = GsA.blockQnum()
+ Gamma[0].assign(GsA.bond()) 
  for qnum in blk_qnums:
   Gamma[0].putBlock(qnum,GsA.getBlock(qnum))
   
  blk_qnums = GsB.blockQnum()
+ Gamma[1].assign(GsB.bond()) 
  for qnum in blk_qnums:
   Gamma[1].putBlock(qnum,GsB.getBlock(qnum)) 
- ##printGamma[0].printDiagram(), Gamma[1].printDiagram() 
 
- #Gs[A].permute([-1, 3, 1], 1)
- #bondrm(Gs[A], Ls[B], 0)
- #bondrm(Gs[B], Ls[B], 1)  
-
+ #return GsA,GsB, Landa_temp*(1.0/Landa_temp.norm())
 
 def Energy_H(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys):
  
@@ -1434,50 +1250,6 @@ def Energy_V(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4
 
  A=((((E3*E4)*(E2*a_d*a_u))*(c_u*c_d*E5))*(E1*E6))
  print B[0]/A[0]
-
-def Def_deltaNiter(i,N_iterF,Steps):
-  delta=int(0.00)
-  N_iter=int(0.00)
-
-
-#  if 1.00e0>=Steps[0]>1.00e-1:
-#   Steps[0]=Steps[0]-Steps[1]
-#   N_iter=N_iterF
-#   if Steps[0] <= 0 :Steps[0]=1.00e-1;
-
-  if 1.00e-1>=Steps[0]>1.00e-2: 
-    Steps[0]=Steps[0]-Steps[1]
-    if Steps[0] < 1.00e-12:Steps[0]=1.00e-2;    
-    N_iter=N_iterF
-
-  if 1.00e-2>=Steps[0]>1.00e-3:
-    Steps[0]=Steps[0]-Steps[2]
-    #print "hi", Steps[0], Steps[2]
-    N_iter=N_iterF
-    if Steps[0] < 1.00e-12:Steps[0]=1.00e-3;    
-
-  if 1.00e-3>=Steps[0]>1.00e-4:
-    Steps[0]=Steps[0]-Steps[3]
-    N_iter=N_iterF
-    if Steps[0] < 1.00e-12:Steps[0]=1.00e-4;    
-
-  if 1.00e-4>=Steps[0]>1.00e-5:
-    Steps[0]=Steps[0]-Steps[4]
-    N_iter=N_iterF
-    if Steps[0] < 1.00e-12:Steps[0]=1.00e-5;    
-
-  if 1.00e-5>=Steps[0]>1.00e-6:
-    Steps[0]=Steps[0]-Steps[5]
-    N_iter=N_iterF
-    #print "hi0", Steps[0] 
-    if Steps[0] <1.00e-12:Steps[0]=1.00e-6;    
-
-  #print "hi1", Steps[0], Steps[len(Steps)-1], Steps[0] < Steps[len(Steps)-1]
-  if Steps[0] < Steps[len(Steps)-1] or (Steps[0] < 1.00e-12):
-   Steps[0]=int(0.00)
-   N_iter=int(0.00)
-
-  return Steps[0], N_iter
 
 
 
