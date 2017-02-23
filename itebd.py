@@ -8,28 +8,27 @@ import random
 import copy
 import time
 import basicitebd
+import basic
 
 
 def itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,
-Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF,
-delta, h,Steps,Model,q_D):
+Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_D):
   
   
   if Model is "Ising":
-   H0=basicitebd.transverseIsing_Z2(h,d_phys)
+   H0=basic.transverseIsing_Z2(h,d_phys)
   if Model is "Heisenberg":
-   H0=basicitebd.Heisenberg(h,d_phys)
+   H0=basic.Heisenberg_Z2(h,d_phys)
   U = uni10.UniTensor(H0.bond(), "U");
-  Steps_copy=copy.copy(Steps)
   
-  
-  for i in xrange(1,2000):
-   delta=1.00/pow(5.00,i)
+  for i in xrange(1,200):
+
+   delta=1.00/pow(2.0,i)
    if delta>1.0e-1:
     N_iter=N_iterF
-   if delta<1.0e-1 and delta>1.0e-4:
+   if delta<1.0e-1 and delta>1.0e-3:
     N_iter=N_iterF
-   if delta<1.0e-4  and delta>1.0e-5:
+   if delta<1.0e-3  and delta>1.0e-5:
     N_iter=N_iterF
    if delta<1.0e-5:
     break
@@ -37,20 +36,20 @@ delta, h,Steps,Model,q_D):
 
    print 'delta =', delta
    print "N_iterF=", N_iterF
-   #N_iterF=1
 
    for q in xrange(N_iterF):
-   
-    U = uni10.UniTensor(H0.bond(), "U")
     blk_qnums = H0.blockQnum()
     for qnum in blk_qnums:
         U.putBlock(qnum, uni10.takeExp(-delta, H0.getBlock(qnum)))
+        
+    #print "U", U
 #############################################################################
     Gamma=[Gamma_a,Gamma_b]
     Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
   #rlink
     basicitebd.update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D)
-    #print "1",Landa_1
+
+
   #rlink
     Gamma=[Gamma_b, Gamma_a]
     Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_5,Landa_6,Landa_2,Landa_4]
@@ -68,12 +67,11 @@ delta, h,Steps,Model,q_D):
 
 ############################################################################
 
-
  #ulink
     Gamma=[Gamma_a, Gamma_c]
     Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
     basicitebd.update_ulink_eff(Gamma,Landa,U,D,d_phys,q_D)
-    #print "2",Landa_2
+    
  #ulink
     Gamma=[ Gamma_c,Gamma_a]
     Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_7,Landa_8]

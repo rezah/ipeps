@@ -40,9 +40,9 @@ def Renew_dim(dims,dims_val,chi,dim_svd):
 
 def setTruncation(theta, chi):
 
-    LA=uni10.UniTensor([theta.bond(0), theta.bond(2)])
-    GA=uni10.UniTensor([theta.bond(0), theta.bond(1), theta.bond(2)])
-    GB=uni10.UniTensor([theta.bond(0), theta.bond(2), theta.bond(3)])
+    LA=uni10.UniTensor([theta.bond(0), theta.bond(3)])
+    GA=uni10.UniTensor([theta.bond(0), theta.bond(1),theta.bond(2), theta.bond(3)])
+    GB=uni10.UniTensor([theta.bond(0), theta.bond(3), theta.bond(4),theta.bond(5)])
     svds = {}
     blk_qnums = theta.blockQnum()
 
@@ -81,8 +81,8 @@ def setTruncation(theta, chi):
         qnums += [blk_qnums[bidx]] * dims[bidx]
     bdi_mid = uni10.Bond(uni10.BD_IN, qnums)
     bdo_mid = uni10.Bond(uni10.BD_OUT, qnums)
-    GA.assign([GA.bond(0), GA.bond(1), bdo_mid])
-    GB.assign([bdi_mid, GB.bond(1), GB.bond(2)])
+    GA.assign([GA.bond(0), GA.bond(1),GA.bond(2), bdo_mid])
+    GB.assign([bdi_mid, GB.bond(1), GB.bond(2),GB.bond(3)])
     LA.assign([bdi_mid, bdo_mid])
     degs = bdi_mid.degeneracy()
 #    sv_mat = uni10.Matrix(bdi_mid.dim(), bdo_mid.dim(), svs, True)
