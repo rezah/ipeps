@@ -300,31 +300,32 @@ def update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D):
  #blk_qnums=Theta.blockQnum()
  #print Theta.printDiagram(),Theta.getBlock(blk_qnums[0]),Theta.getBlock(blk_qnums[1])
 
- #U,V,LA=setTruncation(Theta,D_dim) 
+ U,V,LA=setTruncation(Theta,D_dim) 
+
+# count=0
+# bdi = uni10.Bond(uni10.BD_IN, q_D)
+# bdo = uni10.Bond(uni10.BD_OUT, q_D)
+# LA=uni10.UniTensor([bdi, bdo])
+# U=uni10.UniTensor([Theta.bond(0), Theta.bond(1),Theta.bond(2), bdo])
+# V=uni10.UniTensor([bdi, Theta.bond(3), Theta.bond(4),Theta.bond(5)])
+# svds = {}
+# blk_qnums = Theta.blockQnum()
+# degs = bdi.degeneracy()
+# for qnum, dim in degs.iteritems():
+#  svds[qnum] = Theta.getBlock(qnum).svd()
+#  U.putBlock(qnum, svds[qnum][0].resize(svds[qnum][0].row(), D[count]))
+#  V.putBlock(qnum, svds[qnum][2].resize(D[count], svds[qnum][2].col()))
+#  LA.putBlock(qnum, svds[qnum][1].resize(D[count], D[count])     )
+#  count+=1
+# norm=norm_Symmetry(LA)
+# LA=LA*(1.00/norm)
 
 
- count=0
- bdi = uni10.Bond(uni10.BD_IN, q_D)
- bdo = uni10.Bond(uni10.BD_OUT, q_D)
- LA=uni10.UniTensor([bdi, bdo])
- U=uni10.UniTensor([Theta.bond(0), Theta.bond(1),Theta.bond(2), bdo])
- V=uni10.UniTensor([bdi, Theta.bond(3), Theta.bond(4),Theta.bond(5)])
- svds = {}
- blk_qnums = Theta.blockQnum()
- degs = bdi.degeneracy()
- for qnum, dim in degs.iteritems():
-  svds[qnum] = Theta.getBlock(qnum).svd()
-  U.putBlock(qnum, svds[qnum][0].resize(svds[qnum][0].row(), D[count]))
-  V.putBlock(qnum, svds[qnum][2].resize(D[count], svds[qnum][2].col()))
-  LA.putBlock(qnum, svds[qnum][1].resize(D[count], D[count])     )
-  count+=1
 
- norm=norm_Symmetry(LA)
- LA=LA*(1.00/norm)
  blk_qnums = LA.blockQnum()
  Landa[0].assign(LA.bond()) 
  for qnum in blk_qnums:
-  Landa[0].putBlock(qnum,LA.getBlock(qnum)  )  
+  Landa[0].putBlock(qnum,LA.getBlock(qnum))
 
 
  U.setLabel([10,20,200,3])
@@ -459,28 +460,28 @@ def update_ulink_eff(Gamma,Landa,U,D,d_phys,q_D):
  Theta.permute([10,20,200,11,40,400],3)
 
  
- #U,V,LA=setTruncation(Theta,D_dim) 
+ U,V,LA=setTruncation(Theta,D_dim) 
 
 
- count=0
- bdi = uni10.Bond(uni10.BD_IN, q_D)
- bdo = uni10.Bond(uni10.BD_OUT, q_D)
- LA=uni10.UniTensor([bdi, bdo])
- U=uni10.UniTensor([Theta.bond(0), Theta.bond(1), Theta.bond(2), bdo])
- V=uni10.UniTensor([bdi, Theta.bond(3), Theta.bond(4), Theta.bond(5)])
- svds = {}
- blk_qnums = Theta.blockQnum()
- degs = bdi.degeneracy()
- for qnum, dim in degs.iteritems():
-  svds[qnum] = Theta.getBlock(qnum).svd()
-  U.putBlock(qnum, svds[qnum][0].resize(svds[qnum][0].row(), D[count]))
-  V.putBlock(qnum, svds[qnum][2].resize(D[count], svds[qnum][2].col()))
-  LA.putBlock(qnum, svds[qnum][1].resize(D[count], D[count])   )
-  count+=1
+# count=0
+# bdi = uni10.Bond(uni10.BD_IN, q_D)
+# bdo = uni10.Bond(uni10.BD_OUT, q_D)
+# LA=uni10.UniTensor([bdi, bdo])
+# U=uni10.UniTensor([Theta.bond(0), Theta.bond(1), Theta.bond(2), bdo])
+# V=uni10.UniTensor([bdi, Theta.bond(3), Theta.bond(4), Theta.bond(5)])
+# svds = {}
+# blk_qnums = Theta.blockQnum()
+# degs = bdi.degeneracy()
+# for qnum, dim in degs.iteritems():
+#  svds[qnum] = Theta.getBlock(qnum).svd()
+#  U.putBlock(qnum, svds[qnum][0].resize(svds[qnum][0].row(), D[count]))
+#  V.putBlock(qnum, svds[qnum][2].resize(D[count], svds[qnum][2].col()))
+#  LA.putBlock(qnum, svds[qnum][1].resize(D[count], D[count])   )
+#  count+=1
+# norm=norm_Symmetry(LA)
+# LA=LA*(1.00/norm)
 
 
- norm=norm_Symmetry(LA)
- LA=LA*(1.00/norm)
  blk_qnums = LA.blockQnum()
  Landa[1].assign(LA.bond()) 
  for qnum in blk_qnums:

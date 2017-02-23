@@ -15,13 +15,13 @@ import Move
 ###################### Initialize parameters ###########################
 Model="Heisenberg"         #Heisenberg, Ising
 D=[2,2]
-chi=[20,20]
+chi=[10,10]
 d_phys=[1,1]
 N_iteritebd=200
 N_iterF=40
 Gauge='Non-Fixed'
 Positive='Restrict'
-Corner_method='CTMRG'   #CTM, CTMRG, CTMFull
+Corner_method='CTM'   #CTM, CTMRG, CTMFull
 Acc_E=1.00e-6
 Steps=[1.0e-1,4.0e-2,4.0e-3,4.0e-4,5.0e-5,1.0e-6] #,[Start,steps,End] 
 delta=0.001
@@ -110,18 +110,17 @@ Env=[c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4]
 
 zlist=[]
 hlist=[h*0.0100 for h in range(270,400)]
-hlist=[1.00]
+hlist=[0.00]
 
 for h in hlist:
  print h
 
 #########################################################################################
  
- Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
+ #Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
  print  Landa_1
  Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,
 Landa_8,chi,q_phys,D,N_iteritebd,h,Model,q_D)
- print  Landa_1
  
  basic.Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8)
  print Landa_1#,Landa_1[0],Landa_1[3],Landa_1[4],Landa_1[7]
@@ -145,7 +144,7 @@ Landa_8,chi,q_phys,D,N_iteritebd,h,Model,q_D)
  Landa=[Landa_6,Landa_8,Landa_5,Landa_7]
  d_u,d=basic.makeab(Landa,Gamma_d)
 
- #E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,q_phys,chi,Corner_method,Model)
+ E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,q_phys,chi,Corner_method,Model)
 
  #print 'E_toal=', E_value
 
