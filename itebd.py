@@ -21,12 +21,19 @@ delta, h,Steps,Model):
    H0=basicitebd.Heisenberg(h)
 
   U = uni10.UniTensor(H0.bond(), "U");
-  Steps_copy=copy.copy(Steps)
+
   for i in xrange(1,1000):
-   delta, N_iterF=basicitebd.Def_deltaNiter(i,N_iterF,Steps_copy)
-   if delta is 0: break;
+
+   delta=1.00/pow(5.00,i)
    print 'delta =', delta
-   print "N_iterF=", N_iterF
+   if delta>1.0e-1:
+    N_iter=N_iterF
+   if delta<1.0e-1 and delta>1.0e-4:
+    N_iter=N_iterF
+   if delta<1.0e-4  and delta>1.0e-5:
+    N_iter=N_iterF
+   if delta<1.0e-5:
+    break
 
 
    for q in xrange(N_iterF):

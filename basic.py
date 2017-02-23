@@ -193,12 +193,11 @@ def Initialize_function(Gamma,Landa):
   Gamma[i].randomize()
   Gamma[i]=Gamma[i]*(1.00/Gamma[i].norm())
   
- D=Gamma[0].bond(1).dim()
- matrix_Iden=uni10.Matrix(D, D)
- matrix_Iden.identity()
- for i in xrange(len(Landa)):
-  Landa[i].putBlock(matrix_Iden)
 
+ for i in xrange(len(Landa)):
+  M=Landa[i].getBlock()
+  M[0]=1.00
+  Landa[i].putBlock(M)
 
  
 def matSx():
@@ -436,7 +435,7 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
     E1=abs(norm1[0])
     if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
    if (count > 20 ): print 'break! CTM'; break;
-   #print E1, abs((E0-E1)/E1),Truncation[0], criteria_val,  count
+   print E1, abs((E0-E1)/E1),Truncation[0],  count
    #print E1, Truncation[0], abs((E0-E1)/E1)
    #print a.norm(), b.norm(), c.norm(), d.norm()
  
@@ -498,7 +497,7 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
   if (count > 20 ): print 'break! CTM'; break;
-  #print E1, abs((E0-E1)/E1),criteria_val, count
+  print E1, abs((E0-E1)/E1)#,criteria_val, count
   #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
  
@@ -616,9 +615,9 @@ def E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4,
  E_dc=Energy_h(d_u,c_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
  E_bd=Energy_v(b_u,d_u,d,c,b,a,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
 
- #print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00
+ print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00
  #print '\n','\n','\n'  
- #print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
+ print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
 
  return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)
 
