@@ -23,9 +23,11 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
   
   for i in xrange(1,200):
 
-   delta=1.00/pow(2.0,i)
+   delta=1.00/pow(5.0,i) 
+
    if delta>1.0e-1:
     N_iter=N_iterF
+    #delta=1.0e-1
    if delta<1.0e-1 and delta>1.0e-3:
     N_iter=N_iterF
    if delta<1.0e-3  and delta>1.0e-5:

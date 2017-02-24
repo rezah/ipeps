@@ -619,199 +619,202 @@ def initialize_lrprime(l, r, l_d, r_d, N_uni):
  
  return  lp, rp, lp_d, rp_d
 
-def initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_u,b_u,Positive):
- U.setLabel([-20,-40,20,40])
- bdiB=uni10.Bond(uni10.BD_IN, d_phys*D)
- bdoB=uni10.Bond(uni10.BD_OUT, d_phys*D)
- bdiBB=uni10.Bond(uni10.BD_IN, d_phys*D*d_phys*D)
- bdoBB=uni10.Bond(uni10.BD_OUT, d_phys*D*d_phys*D)
- bdi_pys=uni10.Bond(uni10.BD_IN, d_phys)
- bdi_pyso=uni10.Bond(uni10.BD_OUT, d_phys)
- bdi=uni10.Bond(uni10.BD_IN, D)
- bdo=uni10.Bond(uni10.BD_OUT, D)
- #A=(r*r_d)*U*(l*l_d)*N_uni
- #print 'test', A[0]
- #print N_uni
+def sqrt_general(N2):
+  N_init=copy.copy(N2)
+  blk_qnums = N2.blockQnum()
+  for qnum in blk_qnums:
+   M=N2.getBlock(qnum)
+   eig=M.eigh()
+   e=Sqrt_mat(eig[0])
+   U_trans=copy.copy(eig[1])
+   U_trans.transpose()
+   M=U_trans*e*eig[1]
+   N_init.putBlock(qnum,M)
+  return N_init
+
+def make_XtranX(N_final):
+  blk_qnums = N_final.blockQnum()
+  X_tran_u=uni10.UniTensor(N_final.bond())
+
+  for qnum in blk_qnums:
+   eig=N_final.getBlock(qnum)
+   eig=eig.eigh() 
+   e=Positiv(eig[0])
+   for q in xrange(int(eig[0].row())):
+      e[q]=(e[q]**(1.00/2.00)) 
+   X=e*eig[1]
+   eig[1].transpose()
+   X_tran=eig[1]*e
+   X_tran_u.putBlock(qnum,X_tran)
+  X_u=copy.copy(X_tran_u)
+  X_u.transpose()
+
+  return X_u, X_tran_u
+def reproduceX(X_u,X_tran_u,qq_u,q_u):
+ bdiB=X_tran_u.bond(0)
+ bdoB=X_u.bond(1)
+ 
+ X_u.setLabel([0,1,2,3,4,5,6,7])
+
+ X_u.permute([4,5,0,1,2,3,6,7],2)
+ bdout=X_u.bond(0)
+ bdout1=X_u.bond(1)
+ 
+ bdout.change(uni10.BD_OUT)
+ bdout1.change(uni10.BD_OUT)
+ 
+ l1_uni=uni10.UniTensor([X_u.bond(0),X_u.bond(1),bdout,bdout1])
+ l1_uni_inv=uni10.UniTensor([X_u.bond(0),X_u.bond(1),bdout,bdout1])
+ 
+ blk_qnums = X_u.blockQnum()
+ for qnum in blk_qnums:
+  lq1=X_u.getBlock(qnum).lq()
+  l1=lq1[0]
+  l1_uni.putBlock(qnum,l1)
+  l1_inv=l1.inverse()
+  l1_uni_inv.putBlock(qnum,l1_inv)
+
+ 
+ X_u.permute([0,1,2,3,4,5,6,7],6)
+
+ bdin=X_u.bond(6)
+ bdin1=X_u.bond(7)
+ 
+ bdin.change(uni10.BD_IN)
+ bdin1.change(uni10.BD_IN)
+
+
+ r1_uni_inv=uni10.UniTensor([bdin,bdin1,X_u.bond(6),X_u.bond(7)])
+ r1_uni=uni10.UniTensor([bdin,bdin1,X_u.bond(6),X_u.bond(7)])
+
+ blk_qnums = X_u.blockQnum()
+ for qnum in blk_qnums:
+  qr1=X_u.getBlock(qnum).qr()
+  r1=qr1[1]
+  r1_uni.putBlock(qnum,r1)
+  r1_inv=r1.inverse()
+  r1_uni_inv.putBlock(qnum,r1_inv)
+ 
+ 
+ r1_uni_inv.setLabel([2,600,-2,-600])
+
+ qq_u=qq_u*r1_uni_inv
+ qq_u.permute([-2,-600,4,5,6],2)
+ qq_u.setLabel([2,600,4,5,6])
+
+ 
+ 
+ l1_uni_inv.setLabel([-1,-500,1,500])
+ q_u=q_u*l1_uni_inv
+ q_u.permute([2,4,5,-1,-500],3)
+ q_u.setLabel([2,4,5,1,500])
+ 
+ X_u.permute([0,1,2,3,4,5,6,7],4)
+ X_u.setLabel([-10,-11,-12,-13,1,500,2,600])
+ 
+ X_u=X_u*l1_uni_inv*r1_uni_inv
+ X_u.permute([-10,-11,-12,-13,-1,-500,-2,-600],4)
+ X_u.setLabel([-10,-11,-12,-13,1,500,2,600])
+ return X_u, q_u, qq_u,r1_uni,l1_uni
+
+
+def initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U1, D, d_phys, q_u, qq_u,a_u,b_u,Positive):
+ U1.setLabel([-20,-40,20,40])
  N=copy.copy(N_uni)
- N.setLabel([1,-1,2,-2])
- N.permute([-1,-2,1,2], 2)
+ N.setLabel([1,500,-1,-500,2,600,-2,-600])
+ N.permute([-1,-500,-2,-600,1,500,2,600], 4)
  N1=copy.copy(N)
  N1.transpose()
  N=(N+N1)*(1.00/2.00)
  if Positive is 'Restrict':
-  M=N.getBlock()
-  N_2=M*M 
-  eig=N_2.eigh()
-  #print eig[0]
-  e=Sqrt(eig[0])
-  #print e
-  U_trans=copy.copy(eig[1])
-  U_trans.transpose()
-  M=U_trans*e*eig[1]
-  N.putBlock(M)
-
- eig=N.getBlock()
- eig=eig.eigh() 
- e=Positiv(eig[0])
- 
-# print '\n','\n'
-# for i1 in xrange(int(e.row())):
-#  print e[i1]
-# print '\n','\n'
- for q in xrange(int(eig[0].row())):
-    e[q]=(e[q]**(1.00/2.00)) 
- X=e*eig[1]
- eig[1].transpose()
- X_tran=eig[1]*e
- X_u=uni10.UniTensor([bdiBB,bdoB,bdoB])
- X_u.putBlock(X)
- 
- X_tran_u=uni10.UniTensor([bdiB,bdiB,bdoBB])
- X_tran_u.putBlock(X_tran)
+  N1=copy.copy(N)
+  N.setLabel([-1,-500,-2,-600,1,500,2,600] )
+  N1.setLabel([1,500,2,600,10,11,12,13] )
+  N2=N*N1
+  N2.permute([-1,-500,-2,-600,10,11,12,13],4)
+  N_final=sqrt_general(N2)
+  
+ X_u, X_tran_u=make_XtranX(N_final)
 
 #################################################
- X_u.permute([1,0,2],1)
- #print X_u
- lq1=X_u.getBlock().lq()
- l1=lq1[0]
- #print l1, l1[0] 
- l1_inv=l1.inverse()
- #print l1*l1_inv
- 
- X_u.permute([1,0,2],2)
- qr1=X_u.getBlock().qr()
- r1=qr1[1]
- r1_inv=r1.inverse()
 
- r1_uni_inv=uni10.UniTensor([bdiB,bdoB])
- r1_uni_inv.putBlock(r1_inv)
- r1_uni_inv.setLabel([2,-2])
- qq_u=qq_u*r1_uni_inv
- qq_u.permute([-2,4,5,6],3)
- qq_u.setLabel([2,4,5,6])
 
- 
- 
- l1_uni_inv=uni10.UniTensor([bdiB,bdoB])
- l1_uni_inv.putBlock(l1_inv)
- l1_uni_inv.setLabel([-1,1])
- #print q_u.printDiagram()
- q_u=q_u*l1_uni_inv
- q_u.permute([2,4,5,-1],3)
- q_u.setLabel([2,4,5,1])
- 
- 
- X_u=X_u*l1_uni_inv*r1_uni_inv
- X_u.permute([0,-1,-2],1)
- X_u.setLabel([0,1,2])
- 
-##############################################
-# X_tran_u.permute([0,2,1],1)
-# lq2=X_tran_u.getBlock().lq()
-# l2=lq2[0]
-# l2_inv=l2.inverse()
-# #print '1', distance_two(l2_inv, l1_inv)
-# X_tran_u.permute([0,2,1],2)
-# qr2=X_tran_u.getBlock().qr()
-# r2=qr2[1]
-# r2_inv=r2.inverse()
-# #print '2', distance_two(r2_inv, r1_inv)
+ X_u, q_u, qq_u,r1_uni,l1_uni=reproduceX(X_u,X_tran_u,qq_u,q_u)
 
-# r2_uni_inv=uni10.UniTensor([bdiB,bdoB])
-# r2_uni_inv.putBlock(r2_inv)
-# r2_uni_inv.setLabel([1,-2])
-# 
-# l2_uni_inv=uni10.UniTensor([bdiB,bdoB])
-# l2_uni_inv.putBlock(l2_inv)
-# l2_uni_inv.setLabel([-1,0])
-# 
-# X_tran_u=X_tran_u*l2_uni_inv*r2_uni_inv
-# X_tran_u.permute([-1,-2,2],2)
-# X_tran_u.setLabel([-1,-2,0])
+######################################################
+ X_u.setLabel([-10,-11,-12,-13,1,500,2,600])
 
  X_tran_u=copy.copy(X_u)
  X_tran_u.transpose()
- X_tran_u.setLabel([-1,-2,0])
- 
-#################################################
- 
- #print l2.similar(l1)  
- #print r2.similar(r1)
-# A=copy.copy(X_tran_u)
-# A.transpose()
-# dis=distance_two(X_u.getBlock(), A.getBlock())
-# print 'hi', X_u.similar(A), dis
-# 
+ X_tran_u.setLabel([-1,-500,-2,-600,-10,-11,-12,-13])
+
  N=X_tran_u*X_u
- N.permute([1,-1,2,-2],2)
- r1_uni=uni10.UniTensor([bdiB,bdoB])
- r1_uni.putBlock(r1)
 
- l1_uni=uni10.UniTensor([bdiB,bdoB])
- l1_uni.putBlock(l1)
+ N.permute([1,500,-1,-500,2,600,-2,-600],4)
 
- #print l, r
- 
- 
- l1_uni.setLabel([1,0])
+ l1_uni.setLabel([1,500,-1,-500])
  r=r*l1_uni
- r.permute([3,20,0],2)
- r.setLabel([3,20,1])
+ r.permute([3,20,-1,-500],2)
+ r.setLabel([3,20,1,500])
  r_d=copy.copy(r)
- r_d.setLabel([-3,-20,-1])
+ r_d.setLabel([-3,-20,-1,-500])
  
  
- r1_uni.setLabel([0,2])
+ r1_uni.setLabel([-2,-600,2,600])
  l=r1_uni*l
- l.permute([0,40,3],2)
- l.setLabel([2,40,3])
+ l.permute([-2,-600,40,3],3)
+ l.setLabel([2,600,40,3])
  l_d=copy.copy(l)
- l_d.setLabel([-2,-40,-3])
- #A=(r*r_d)*U*(l*l_d)*N
- #print 'test', A[0]
- 
-# A=X_u*r*l*X_tran_u*r_d*l_d
-# #print A, Tes1
-# dis=distance_two(A.getBlock(),Tes1.getBlock() )
+ l_d.setLabel([-2,-600,-40,-3])
 
  lp=copy.copy(l)
  rp=copy.copy(r)
  lp_d=copy.copy(l_d)
  rp_d=copy.copy(r_d)
 
- rp_d.setLabel([-3,-20,-1])
- lp_d.setLabel([-2,-40,-3])
+ rp_d.setLabel([-3,-20,-1,-500])
+ lp_d.setLabel([-2,-600,-40,-3])
 
 #######################################################
  
- U.setLabel([-20,-40,20,40])
- lp=copy.copy(l)
- rp=copy.copy(r)
- #lp.setLabel([1,40,-3])
- Teta=U*lp*rp
- Teta.permute([1,-20,2,-40],2)
- svd=Teta.getBlock().svd()
- s=Sqrt(svd[1])
- U=svd[0]*s
- V=s*svd[2]
- U.resize(U.row(),rp.bond()[0].dim() )
- V.resize(rp.bond()[0].dim(), V.col())
- 
- rp=uni10.UniTensor([bdiB, bdi_pys, bdo ])
- rp.putBlock(U)
- rp.setLabel([1,20,3])
- rp.permute([3,20,1],2)
- 
- lp=uni10.UniTensor([ bdi, bdoB, bdi_pyso])
- lp.putBlock(V)
- lp.setLabel([3,2,40])
- lp.permute([2,40,3],2)
- lp_d=copy.copy(lp)
- rp_d=copy.copy(rp)
- rp_d.setLabel([-3,-20,-1])
- lp_d.setLabel([-2,-40,-3])
-##########################################################
+# D_dim=0
+# for i in xrange(len(D)):
+#  D_dim+=D[i]
+# print "D_dim", D_dim
 
+# U1.setLabel([-20,-40,20,40])
+# lp=copy.copy(l)
+# rp=copy.copy(r)
+# Teta=U1*lp*rp
+# Teta.permute([1,500,-20,2,600,-40],3)
+# U,s,V=svd_parity1(Teta,D_dim)
+# 
+# #print "s", s
+# s=Sqrt(s)
+# #print "sqrt(s)", s
+# 
+# U.setLabel([0,1,2,3])
+# s.setLabel([3,6])
+# V.setLabel([6,9,10,11])
+# U=U*s
+# V=s*V
+
+# U.permute([0,1,2,6],3)
+# V.permute([3,9,10,11],1)
+# 
+# U.setLabel([1,500,20,3])
+# rp=copy.copy(U)
+# rp.permute([3,20,1,500],2)
+# 
+# V.setLabel([3,2,600,40])  
+# lp=copy.copy(V)
+# lp.permute([2,600,40,3],3)
+
+# lp_d=copy.copy(lp)
+# rp_d=copy.copy(rp)
+# rp_d.setLabel([-3,-20,-1,-500])
+# lp_d.setLabel([-2,-600,-40,-3])
+ ###################################3
  a_u=q_u*r
  a_u.permute([20,4,5,3,2],3)
  
@@ -1083,17 +1086,17 @@ def sv_merge(svs, bidxs, bidx, sv_mat, chi, len_qn):
     #print svs, bidxs,'\n','\n'
     return svs, bidxs
 
-def initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys):
+def initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U1,D,d_phys):
  
  D_dim=0
  for i in xrange(len(D)):
   D_dim+=D[i]
- #print D_dim
+ print "D_dim", D_dim
 
- U.setLabel([-20,-40,20,40])
+ U1.setLabel([-20,-40,20,40])
  lp=copy.copy(l)
  rp=copy.copy(r)
- Teta=U*lp*rp
+ Teta=U1*lp*rp
  Teta.permute([1,500,-20,2,600,-40],3)
  U,s,V=svd_parity1(Teta,D_dim)
  
@@ -1110,16 +1113,14 @@ def initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys):
  U.permute([0,1,2,6],3)
  V.permute([3,9,10,11],1)
  
- U.setLabel([1,500,-20,3])
  U.setLabel([1,500,20,3])
  rp=copy.copy(U)
  rp.permute([3,20,1,500],2)
  
- V.setLabel([3,2,600,-40]) 
- V.setLabel([3,2,600,40]) 
-
+ V.setLabel([3,2,600,40])  
  lp=copy.copy(V)
  lp.permute([2,600,40,3],3)
+
  lp_d=copy.copy(lp)
  rp_d=copy.copy(rp)
  rp_d.setLabel([-3,-20,-1,-500])
@@ -1482,10 +1483,22 @@ def   Sqrt(Landa):
    Landam=Landa_cp.getBlock(qnum)
    for i in xrange(D):
     for j in xrange(D):
-     Landa_cpm[i*D+j]=Landam[i*D+j]**(1.00/2.00)
+     if Landam[i*D+j] > 1.0e-12:
+      Landa_cpm[i*D+j]=Landam[i*D+j]**(1.00/2.00)
+     else:
+      Landa_cpm[i*D+j]=0
    Landa_cp.putBlock(qnum,Landa_cpm)
   return Landa_cp 
+
+def Sqrt_mat(e):
+ d=int(e.row())
  
+ for q in xrange(d):
+   if e[q] > 0:  
+    e[q]=((e[q])**(1.00/2.00))
+   else:  
+    e[q]=0.0 
+ return e
 def Init_env(Env):
  c1=copy.copy(Env[0])
  c2=copy.copy(Env[1])
@@ -1515,4 +1528,20 @@ def reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env):
   Env[9]=copy.copy(Tb2)
   Env[10]=copy.copy(Tb3)
   Env[11]=copy.copy(Tb4)
+  
+def Rand_env_slight(Env):
+ 
+ for i in xrange(len(Env)):
+  Env_tem=copy.copy(Env[i]) 
+  Env_tem.randomize()
+  Env[i]=Env[i]+0.01*Env_tem
+
+def Rand_env_total(Env):
+ Env1=copy.copy(Env)
+ for i in xrange(len(Env1)):
+  Env1[i]=copy.copy(Env[i])
+  Env1[i].randomize()
+ 
+ return  Env1
+  
 

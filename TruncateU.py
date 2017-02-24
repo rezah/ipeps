@@ -62,7 +62,7 @@ def setTruncation(theta, chi):
     for bidx in bidxs:
         dims[bidx] += 1  
     qnums = []
-    #print dims#,blk_qnums;
+    #print dims,blk_qnums;
     
     dims_val=0
     for i in xrange(len(dims)):

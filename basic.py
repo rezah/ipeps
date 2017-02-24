@@ -49,13 +49,13 @@ def Var_H(a_u,b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
 
  
  lp, rp, lp_d, rp_d=basic_FU.initialize_lrprime(l, r, l_d, r_d, N_uni)
- lp, rp, lp_d, rp_d=basic_FU.initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys)
+ #lp, rp, lp_d, rp_d=basic_FU.initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys)
  #t0=time.time() 
  if Gauge is 'Fixed':
   lp, rp, lp_d, rp_d, N_uni, l, r, l_d, r_d,q_u, qq_u, a_u, b_u=basic_FU.initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_u,b_u,Positive)
  #print time.time() - t0, "N, Left"
 
- #basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,a_u,b_u)
+ basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,a_u,b_u)
  #t0=time.time() 
 
  #rp, rp_d, lp, lp_d=basic_FU.Do_optimization(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
@@ -71,13 +71,13 @@ def Var_H(a_u,b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
  Distance_val=basic_FU.Distance(l, r, lp, rp ,N_uni,U)
  print 'Final', A[0], Distance_val[0]
  
- if ( basic_FU.MaxAbs(bp_u) < 0.50e-1) or (basic_FU.MaxAbs(bp_u) > 0.50e+1)   :
-  bp_u=bp_u*(1.00/basic_FU.MaxAbs(bp_u));
+ if ( MaxAbs(bp_u) < 0.50e-1) or (MaxAbs(bp_u) > 0.50e+1)   :
+  bp_u=bp_u*(1.00/MaxAbs(bp_u));
   #print 'max', bp_u.getBlock().absMax()
  else: bp_u=bp_u;
 
- if (basic_FU.MaxAbs(ap_u) < 0.50e-1) or (basic_FU.MaxAbs(ap_u) > 0.50e+1)   :
-  ap_u=ap_u*(1.00/basic_FU.MaxAbs(ap_u)); 
+ if (MaxAbs(ap_u) < 0.50e-1) or (MaxAbs(ap_u) > 0.50e+1)   :
+  ap_u=ap_u*(1.00/MaxAbs(ap_u)); 
   #print 'max', ap_u.getBlock().absMax()
  else: ap_u=ap_u;
 
@@ -146,12 +146,12 @@ def Var_V(c_u,a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
  basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,c_u,a_u)
 
  lp, rp, lp_d, rp_d=basic_FU.initialize_lrprime(l, r, l_d, r_d, N_uni)
- lp, rp, lp_d, rp_d=basic_FU.initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys)
+ #lp, rp, lp_d, rp_d=basic_FU.initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys)
 
  if Gauge is 'Fixed':
   lp, rp, lp_d, rp_d, N_uni, l, r, l_d, r_d,q_u, qq_u, c_u, a_u=basic_FU.initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,c_u,a_u,Positive)
 
- #basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,c_u,a_u)
+ basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,c_u,a_u)
 
 
  #rp, rp_d, lp, lp_d=basic_FU.Do_optimization(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
@@ -177,8 +177,8 @@ def Var_V(c_u,a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
 
 
 
- if ( basic_FU.MaxAbs(cp_u) < 0.50e-1) or (basic_FU.MaxAbs(cp_u) > 0.50e+1)   :
-  cp_u=cp_u*(1.00/basic_FU.MaxAbs(cp_u));
+ if ( MaxAbs(cp_u) < 0.50e-1) or (MaxAbs(cp_u) > 0.50e+1)   :
+  cp_u=cp_u*(1.00/MaxAbs(cp_u));
   #print 'max', bp_u.getBlock().absMax()
  else: cp_u=cp_u;
  
@@ -349,11 +349,12 @@ def MaxAbs(c):
  for qnum in blk_qnums:
     c_mat=c.getBlock(qnum)
     max_list.append(c_mat.absMax())
-
  #sv_mat = uni10.Matrix( len(max_list), len(max_list), max_list, True)
  #return sv_mat.absMax()
- 
- return max(max_list)
+ max_list_f=[abs(x) for x in max_list]
+ #print max_list_f, max(max_list_f)
+ return max(max_list_f)
+
  
 
 
@@ -544,7 +545,7 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
  z1.identity()
  z2=copy.copy(a)
  z2.randomize()
- z1=z1+(1.0e-2)*z2
+ z1=z1#+(1.0e-2)*z2
  Accuracy=1.00e-7
  E0=20.00
  E1=10.00
@@ -653,24 +654,39 @@ def corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2
 
 
 
-def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
+def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model):
 
+ #Env1=basic_FU.Rand_env_total(Env)
  E_ab=Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
  
+ #Env=basic_FU.Rand_env_total(Env1)
  E_ca=Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
 
- 
- E_cd=Energy_h(c_u,d_u,c,d,a,b,Env,D,h,d_phys,chi,Corner_method,Model)
- 
- E_ac=Energy_v(a_u,c_u,c,d,a,b,Env,D,h,d_phys,chi,Corner_method,Model)
+# #Env=basic_FU.Rand_env_total(Env1)
+ E_cd=Energy_h(c_u,d_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
 
- E_ba=Energy_h(b_u,a_u,b,a,d,c,Env,D,h,d_phys,chi,Corner_method,Model)
- 
- E_db=Energy_v(d_u,b_u,b,a,d,c,Env,D,h,d_phys,chi,Corner_method,Model)
 
- E_dc=Energy_h(d_u,c_u,d,c,b,a,Env,D,h,d_phys,chi,Corner_method,Model)
- 
- E_bd=Energy_v(b_u,d_u,d,c,b,a,Env,D,h,d_phys,chi,Corner_method,Model)
+# #Env=basic_FU.Rand_env_total(Env1)
+ E_ac=Energy_v(a_u,c_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
+
+
+# #Env=basic_FU.Rand_env_total(Env1)
+ E_ba=Energy_h(b_u,a_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
+
+
+# #Env=basic_FU.Rand_env_total(Env1)
+ E_db=Energy_v(d_u,b_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
+
+
+
+# #Env=basic_FU.Rand_env_total(Env1)
+ E_dc=Energy_h(d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+
+# #Env=basic_FU.Rand_env_total(Env1) 
+ E_bd=Energy_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+
+
+
 
  print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00
  print '\n','\n','\n'  
@@ -698,7 +714,9 @@ def Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
 
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic_FU.Init_env(Env)
+ 
  Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
 
  if Corner_method is 'CTM':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
@@ -707,6 +725,7 @@ def Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
  if Corner_method is 'CTMFull':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
 
+ 
 
  basic_FU.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
 
@@ -743,10 +762,11 @@ def Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
 
 def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
 
- bd=a.bond(0)
+ bd=copy.copy(a.bond(0))
  bd.change(uni10.BD_OUT)
  tempo=copy.copy(Tb4)
- Tb4.assign([Tb4.bond(0),bd,bd,Tb4.bond(3)])
+ bd_list=[Tb4.bond(0),bd,bd,Tb4.bond(3)]
+ Tb4.assign(bd_list)
  blk_qnums = Tb4.blockQnum()
  blk_qnums1 = tempo.blockQnum()
 
@@ -761,12 +781,15 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
    sv_mat=uni10.Matrix(dx,dy)
    sv_mat.randomize()
   Tb4.putBlock(qnum,sv_mat.resize(dx,dy) )
- #print "Tb4", Tb4.printDiagram(),Tb4[3]
+ 
+ #print "Tb4",tempo.printDiagram(),Tb4.printDiagram(),a.printDiagram()
+ #print "Tb4", tempo[10],Tb4[10],tempo.elemCmp(Tb4)#,Tb4.printDiagram(),
 ################################################################
- bd=c.bond(0)
+ bd=copy.copy(c.bond(0))
  bd.change(uni10.BD_OUT)
  tempo=copy.copy(Ta4)
- Ta4.assign([Ta4.bond(0),bd,bd,Ta4.bond(3)])
+ bd_list=[Ta4.bond(0),bd,bd,Ta4.bond(3)]
+ Ta4.assign(bd_list)
  blk_qnums = Ta4.blockQnum()
  blk_qnums1 = tempo.blockQnum()
 
@@ -782,13 +805,15 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
    sv_mat.randomize()
   Ta4.putBlock(qnum,sv_mat.resize(dx,dy) )
  #print "Ta4", Ta4.printDiagram(),Ta4[4]
+ #print "Ta4", tempo.elemCmp(Ta4),Tb4.printDiagram(),
 
 ##################################################################
 
- bd=b.bond(2)
+ bd=copy.copy(b.bond(4))
  bd.change(uni10.BD_IN)
  tempo=copy.copy(Ta2)
- Ta2.assign([Ta2.bond(0),bd,bd,Ta2.bond(3)])
+ bd_list=[Ta2.bond(0),bd,bd,Ta2.bond(3)]
+ Ta2.assign(bd_list)
  blk_qnums = Ta2.blockQnum()
  blk_qnums1 = tempo.blockQnum()
 
@@ -803,14 +828,16 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
    sv_mat=uni10.Matrix(dx,dy)
    sv_mat.randomize()
   Ta2.putBlock(qnum,sv_mat.resize(dx,dy) )
- #print "Ta2", Ta2.printDiagram(),Ta2[3]
+# print "Ta2", Ta2.printDiagram(),Ta2[3]
+# print "Ta2", tempo.elemCmp(Ta2),Tb4.printDiagram(),
 
 
 
- bd=d.bond(2)
+ bd=copy.copy(d.bond(4))
  bd.change(uni10.BD_IN)
  tempo=copy.copy(Tb2)
- Tb2.assign([Tb2.bond(0),bd,bd,Tb2.bond(3)])
+ bd_list=[Tb2.bond(0),bd,bd,Tb2.bond(3)]
+ Tb2.assign(bd_list)
  blk_qnums = Tb2.blockQnum()
  blk_qnums1 = tempo.blockQnum()
 
@@ -825,12 +852,15 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
    sv_mat=uni10.Matrix(dx,dy)
    sv_mat.randomize()
   Tb2.putBlock(qnum,sv_mat.resize(dx,dy) )
- #print "Tb2", Tb2.printDiagram(),Tb2[4]
+# print "Tb2", Tb2.printDiagram(),Tb2[4]
+# print "Tb2", tempo.elemCmp(Tb2),Tb4.printDiagram(),
+
 ################################################################3
- bd=a.bond(3)
+ bd=copy.copy(a.bond(6))
  bd.change(uni10.BD_IN)
  tempo=copy.copy(Tb1)
- Tb1.assign([Tb1.bond(0),bd,bd,Tb1.bond(3)])
+ bd_list=[Tb1.bond(0),bd,bd,Tb1.bond(3)]
+ Tb1.assign(bd_list)
  blk_qnums = Tb1.blockQnum()
  blk_qnums1 = tempo.blockQnum()
 
@@ -845,13 +875,15 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
    sv_mat=uni10.Matrix(dx,dy)
    sv_mat.randomize()
   Tb1.putBlock(qnum,sv_mat.resize(dx,dy) )
- #print "Tb1", Tb1.printDiagram(),Tb1[4]
+# print "Tb1", Tb1.printDiagram(),Tb1[4]
+# print "Tb1", tempo.elemCmp(Tb1),Tb4.printDiagram(),
 
 
- bd=b.bond(3)
+ bd=copy.copy(b.bond(6))
  bd.change(uni10.BD_IN)
  tempo=copy.copy(Ta1)
- Ta1.assign([Ta1.bond(0),bd,bd,Ta1.bond(3)])
+ bd_list=[Ta1.bond(0),bd,bd,Ta1.bond(3)]
+ Ta1.assign(bd_list)
  blk_qnums = Ta1.blockQnum()
  blk_qnums1 = tempo.blockQnum()
 
@@ -866,12 +898,15 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
    sv_mat=uni10.Matrix(dx,dy)
    sv_mat.randomize()
   Ta1.putBlock(qnum,sv_mat.resize(dx,dy) )
- #print "Ta1", Ta1.printDiagram(),Ta1[4]
+ #print "Ta1",tempo.printDiagram(),Ta1.printDiagram(),b.printDiagram()
+ #print "Ta1", tempo[10],Ta1[10],tempo.elemCmp(Ta1)#,Tb4.printDiagram(),
+
 ######################################################
- bd=c.bond(1)
+ bd=copy.copy(c.bond(2))
  bd.change(uni10.BD_OUT)
  tempo=copy.copy(Ta3)
- Ta3.assign([Ta3.bond(0),bd,bd,Ta3.bond(3)])
+ bd_list=[Ta3.bond(0),bd,bd,Ta3.bond(3)]
+ Ta3.assign(bd_list)
  blk_qnums = Ta3.blockQnum()
  blk_qnums1 = tempo.blockQnum()
 
@@ -887,13 +922,15 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
    sv_mat.randomize()
   Ta3.putBlock(qnum,sv_mat.resize(dx,dy) )
  #print "Ta3", Ta3.printDiagram(),Ta3[4]
+ #print "Ta3", tempo.elemCmp(Ta3),Tb4.printDiagram(),
  
  
  
- bd=d.bond(1)
+ bd=copy.copy(d.bond(2))
  bd.change(uni10.BD_OUT)
  tempo=copy.copy(Tb3)
- Tb3.assign([Tb3.bond(0),bd,bd,Tb3.bond(3)])
+ bd_list=[Tb3.bond(0),bd,bd,Tb3.bond(3)]
+ Tb3.assign(bd_list)
  blk_qnums = Tb3.blockQnum()
  blk_qnums1 = tempo.blockQnum()
 
@@ -909,6 +946,8 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
    sv_mat.randomize()
   Tb3.putBlock(qnum,sv_mat.resize(dx,dy) )
  #print "Tb3", Tb3.printDiagram(),Tb3[4]
+ #print "Tb3", tempo.elemCmp(Tb3),Tb4.printDiagram(),
+
 ################################################ 
 
  return Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4
@@ -918,14 +957,20 @@ def Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic_FU.Init_env(Env)
 
+ norm=MoveCorboz.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+
  Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
-  
+
+ norm=MoveCorboz.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+
+
  if Corner_method is 'CTM':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
  if Corner_method is 'CTMRG':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
  if Corner_method is 'CTMFull':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+
 
  basic_FU.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
 
@@ -1296,4 +1341,11 @@ def Reload_Full():
  c=uni10.UniTensor("Store/c")
  d=uni10.UniTensor("Store/d")
  return a_u,b_u,c_u,d_u,a,b,c,d
-
+def Rand_env_total(Env):
+ Env1=copy.copy(Env)
+ for i in xrange(len(Env1)):
+  Env1[i]=copy.copy(Env[i])
+  Env1[i].randomize()
+ 
+ return  Env1
+  

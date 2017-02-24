@@ -51,6 +51,7 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  theta=CTM_1.launch()
  theta.permute([100,300,-300,200,400,-400],3)
  #print theta.trace()#, Contract.printDiagram()
+ #print theta.printDiagram(),MaxAbs(theta)
  U1x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
 
 

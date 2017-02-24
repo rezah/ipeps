@@ -19,9 +19,9 @@ chi=[10,10]
 d_phys=[1,1]
 N_iteritebd=200
 N_iterF=40
-Gauge='Non-Fixed'
+Gauge='Fixed'
 Positive='Restrict'
-Corner_method='CTM'   #CTM, CTMRG, CTMFull
+Corner_method='CTMRG'   #CTM, CTMRG, CTMFull
 Acc_E=1.00e-6
 Steps=[1.0e-1,4.0e-2,4.0e-3,4.0e-4,5.0e-5,1.0e-6] #,[Start,steps,End] 
 delta=0.001
@@ -107,17 +107,20 @@ Ta2, Tb2=basic.makeTab(q_chi,q_D)
 Ta3, Tb3=basic.makeTab1(q_chi,q_D)
 Ta4, Tb4=basic.makeTab1(q_chi,q_D)
 Env=[c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4]
+Env1=basic.Rand_env_total(Env)
+Env2=basic.Rand_env_total(Env)
+Env3=basic.Rand_env_total(Env)
 
 zlist=[]
 hlist=[h*0.0100 for h in range(270,400)]
-hlist=[0.00]
+hlist=[1.00]
 
 for h in hlist:
  print h
 
 #########################################################################################
  
- #Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
+ Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
  print  Landa_1
  Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,
 Landa_8,chi,q_phys,D,N_iteritebd,h,Model,q_D)
@@ -144,18 +147,18 @@ Landa_8,chi,q_phys,D,N_iteritebd,h,Model,q_D)
  Landa=[Landa_6,Landa_8,Landa_5,Landa_7]
  d_u,d=basic.makeab(Landa,Gamma_d)
 
- E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,q_phys,chi,Corner_method,Model)
+ E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,q_phys,chi,Corner_method,Model)
 
- #print 'E_toal=', E_value
+ print 'E_toal=', E_value
 
 #########################################################################################
 
 ############################################################################
- Gauge='Non-Fixed'
+ Gauge='Fixed'
  #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
 
- a_u,b_u,c_u,d_u,a,b,c,d,Env=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,q_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E,Steps,Model)
+ a_u,b_u,c_u,d_u,a,b,c,d,Env=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,q_phys,D,delta,h,Env,Env1,Env2,Env3,Gauge,Positive,Corner_method,N_iterF,Acc_E,Steps,Model)
 
  E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,q_phys,chi,Corner_method,Model)
  z_value=basic.z_value(a,b,c,d,a_u,b_u,c_u,d_u,chi,D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Corner_method)

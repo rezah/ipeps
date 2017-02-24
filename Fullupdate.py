@@ -10,7 +10,7 @@ import time
 import basic
 import Move
 
-def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E,Steps,Model):
+def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Env1,Env2,Env3,Gauge,Positive,Corner_method,N_iterF,Acc_E,Steps,Model):
  Steps_copy=copy.copy(Steps)
  Truncation=[0]
 
@@ -53,28 +53,28 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,
 
 
    #t0=time.time()
-   c_u, d_u, c, d=basic.Var_H(c_u,d_u,c,d,a,b,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   c_u, d_u, c, d=basic.Var_H(c_u,d_u,c,d,a,b,Env1,D,U,d_phys,chi,Gauge,Positive,Corner_method)
    #print time.time() - t0, "Seconds, Left"
 
    #t0=time.time()
-   a_u, c_u, a, c=basic.Var_V(a_u,c_u,c,d,a,b,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   a_u, c_u, a, c=basic.Var_V(a_u,c_u,c,d,a,b,Env1,D,U,d_phys,chi,Gauge,Positive,Corner_method)
    #print time.time() - t0, "Seconds, Left"
 
    #t0=time.time()
-   b_u, a_u, b, a=basic.Var_H(b_u,a_u,b,a,d,c,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   b_u, a_u, b, a=basic.Var_H(b_u,a_u,b,a,d,c,Env2,D,U,d_phys,chi,Gauge,Positive,Corner_method)
    #print time.time() - t0, "Seconds, Left"
 
    #t0=time.time()
-   d_u, b_u, d, b=basic.Var_V(d_u,b_u,b,a,d,c,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   d_u, b_u, d, b=basic.Var_V(d_u,b_u,b,a,d,c,Env2,D,U,d_phys,chi,Gauge,Positive,Corner_method)
    #print time.time() - t0, "Seconds, Left"
    
    #t0=time.time()
-   d_u, c_u, d, c=basic.Var_H(d_u,c_u,d,c,b,a,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   d_u, c_u, d, c=basic.Var_H(d_u,c_u,d,c,b,a,Env3,D,U,d_phys,chi,Gauge,Positive,Corner_method)
    #print time.time() - t0, "Seconds, Left"
 
 
    #t0=time.time()
-   b_u, d_u, b, d=basic.Var_V(b_u,d_u,d,c,b,a,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method)
+   b_u, d_u, b, d=basic.Var_V(b_u,d_u,d,c,b,a,Env3,D,U,d_phys,chi,Gauge,Positive,Corner_method)
    #print time.time() - t0, "Seconds, Left"
 
 
@@ -87,7 +87,7 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Gauge,Positive,
    print 'E_diff=', abs((E_0-E_1) / E_0) , 'Num_iter=', q 
    if (( abs((E_0-E_1) / E_0) ) < Acc_E) or ( q is int(N_iter-1)): 
     print 'break', E_0, E_1, abs((E_0-E_1) / E_0)
-    E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+    E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model)
     print 'E_toal=', E_value   
     break;
  
