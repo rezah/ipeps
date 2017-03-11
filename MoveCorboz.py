@@ -1,9 +1,9 @@
 import pyUni10 as uni10
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib
-import pylab
+#import matplotlib.pyplot as plt
+#import matplotlib
+#import pylab
 import random
 import copy
 import time
@@ -52,6 +52,7 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  theta.permute([100,300,-300,200,400,-400],3)
  #print theta.trace()#, Contract.printDiagram()
  #print theta.printDiagram(),MaxAbs(theta)
+ #print theta.printDiagram() 
  U1x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
 
 
@@ -60,7 +61,8 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
 
 
-
+# print "U1x_trans", U1x_trans.printDiagram()
+# print "U1x", U1x.printDiagram()
 
  CTM_2 = uni10.Network("Network/CTM_2.net")
  CTM_2.putTensor('c1',c1)
@@ -88,6 +90,8 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  U2x_trans=copy.copy(U2x)
  U2x_trans.transpose()
 
+# print "U2x_trans", U2x_trans.printDiagram()
+# print "U2x", U2x.printDiagram()
 
  Ta4p=copy.copy(Ta4)
  Ta4p.setName("Ta4p")
@@ -144,7 +148,7 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  U3x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
  U3x_trans=copy.copy(U3x)
  U3x_trans.transpose()
-
+ #print "U3x_trans", U3x_trans.printDiagram()
 
  CTM_4 = uni10.Network("Network/CTM_4.net")
  CTM_4.putTensor('c1',c1)
@@ -186,10 +190,9 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  #print theta.trace()#, Contract.printDiagram()
  U4x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
 
-
-
  U4x_trans=copy.copy(U4x)
  U4x_trans.transpose()
+ #print "U4x_trans", U4x_trans.printDiagram()
 
 
 

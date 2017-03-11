@@ -1,9 +1,9 @@
 import pyUni10 as uni10
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib
-import pylab
+#import matplotlib.pyplot as plt
+#import matplotlib
+#import pylab
 import random
 import copy
 import time
@@ -39,10 +39,9 @@ def Renew_dim(dims,dims_val,chi,dim_svd):
 
 
 def setTruncation(theta, chi):
-
-    LA=uni10.UniTensor([theta.bond(0), theta.bond(3)])
-    GA=uni10.UniTensor([theta.bond(0), theta.bond(1),theta.bond(2), theta.bond(3)])
-    GB=uni10.UniTensor([theta.bond(0), theta.bond(3), theta.bond(4),theta.bond(5)])
+    LA=uni10.UniTensor(theta.bond())
+    GA=uni10.UniTensor(theta.bond())
+    GB=uni10.UniTensor(theta.bond())
     svds = {}
     blk_qnums = theta.blockQnum()
 
@@ -63,26 +62,26 @@ def setTruncation(theta, chi):
         dims[bidx] += 1  
     qnums = []
     #print dims,blk_qnums;
-    
-    dims_val=0
-    for i in xrange(len(dims)):
-     dims_val+=dims[i]
-     
-    #print dims_val
-    if dims_val < chi:
-      dims=Renew_dim(dims,dims_val,chi,dim_svd) 
+########################################################################
+#    dims_val=0
+#    for i in xrange(len(dims)):
+#     dims_val+=dims[i]
+#     
+#    #print dims_val
+#    if dims_val < chi:
+#      dims=Renew_dim(dims,dims_val,chi,dim_svd) 
 
-    dims_val=0
-    for i in xrange(len(dims)):
-     dims_val+=dims[i]
-    #print dims, dims_val
-
+#    dims_val=0
+#    for i in xrange(len(dims)):
+#     dims_val+=dims[i]
+#    #print dims, dims_val
+#######################################################################
     for bidx in xrange(len(blk_qnums)):
         qnums += [blk_qnums[bidx]] * dims[bidx]
     bdi_mid = uni10.Bond(uni10.BD_IN, qnums)
     bdo_mid = uni10.Bond(uni10.BD_OUT, qnums)
-    GA.assign([GA.bond(0), GA.bond(1),GA.bond(2), bdo_mid])
-    GB.assign([bdi_mid, GB.bond(1), GB.bond(2),GB.bond(3)])
+    GA.assign([theta.bond(0), theta.bond(1),theta.bond(2), bdo_mid])
+    GB.assign([bdi_mid, theta.bond(3), theta.bond(4),theta.bond(5)])
     LA.assign([bdi_mid, bdo_mid])
     degs = bdi_mid.degeneracy()
 #    sv_mat = uni10.Matrix(bdi_mid.dim(), bdo_mid.dim(), svs, True)
