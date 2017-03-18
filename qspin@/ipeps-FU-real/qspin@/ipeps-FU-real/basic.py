@@ -1,14 +1,186 @@
 import pyUni10 as uni10
+import sys
+import numpy as np
 #import matplotlib.pyplot as plt
 #import matplotlib
 #import pylab
+import random
 import copy
 import time
 import Move
 import MoveCorboz
 import MoveFull
+import basic_FU
 import basicA
 import basicB
+
+def Var_H(a_u,b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
+ Truncation=[0]
+
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic_FU.Init_env(Env)
+
+ Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
+ #t0=time.time()
+ if Corner_method is 'CTM':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+ if Corner_method is'CTMRG':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+ if Corner_method is'CTMFull':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Truncation=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D, Truncation)
+ #print time.time() - t0, "CTM-H, Left"
+
+ Env=basic_FU.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
+
+
+ #t0=time.time()
+ E1, E2, E3, E4, E5,E6=basic_FU.produce_Env_Hab(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+ #print time.time() - t0, "Env, Left"
+
+ #basic_FU.test_env(E1, E2, E3, E4, E5,E6, a, b, c1,c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+ #basic_FU.test_energy(E1, E2, E3, E4, E5,E6, a, b, c1, c2, c3, c4, Ta1, Tb1, Ta2, Tb2, Ta3, Tb3, Ta4, Tb4, a_u, b_u, U)
+
+
+ N_uni, l, l_d, r, r_d, q_u, qq_u = basic_FU.Qr_lQ_decom(a_u,b_u, E1, E2, E3, E4, E5,E6,D,d_phys)
+
+
+ #basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,a_u,b_u)
+
+ 
+ #lp, rp, lp_d, rp_d=basic_FU.initialize_lrprime(l, r, l_d, r_d, N_uni)
+ #lp, rp, lp_d, rp_d=basic_FU.initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys)
+ #t0=time.time() 
+ if Gauge is 'Fixed':
+  lp, rp, lp_d, rp_d, N_uni, l, r, l_d, r_d,q_u, qq_u, a_u, b_u=basic_FU.initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,a_u,b_u,Positive)
+
+
+ #print time.time() - t0, "N, Left"
+
+ #basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,a_u,b_u)
+ #basic_FU.test_energy(E1, E2, E3, E4, E5,E6, a, b, c1, c2, c3, c4, Ta1, Tb1, Ta2, Tb2, Ta3, Tb3, Ta4, Tb4, a_u, b_u, U)
+ #t0=time.time() 
+
+ rp, rp_d, lp, lp_d=basic_FU.Do_optimization_Full(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
+ #rp, rp_d, lp, lp_d=basic_FU.Do_optimization_Grad(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
+ #print time.time() - t0, "Optimization-Full, Left"
+ 
+ 
+ lp, rp, lp_d, rp_d=basic_FU.Equall_Dist(lp, rp,D,d_phys)
+ ap_u, bp_u=basic_FU.recover(lp, rp, q_u, qq_u)
+ #Distance_val=basic_FU.Distance(l, r, lp, rp ,N_uni,U)
+ #A=basic_FU.final_test_distance(ap_u, bp_u, a_u, b_u,E1, E2, E3, E4, E5,E6,U,N_uni)
+ #Distance_val=basic_FU.Distance(l, r, lp, rp ,N_uni,U)
+ #print 'Final', A[0], Distance_val[0]
+ 
+ bp_u=max_ten(bp_u)
+ ap_u=max_ten(ap_u)
+ a=make_ab(ap_u)
+ b=make_ab(bp_u)
+ return ap_u, bp_u, a, b
+
+
+
+
+def Var_V(c_u,a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
+
+
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic_FU.Init_env(Env)
+
+ Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
+
+
+ #t0=time.time()
+ if Corner_method is 'CTM':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+
+ if Corner_method is 'CTMRG':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+
+ if Corner_method is 'CTMFull':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+ Env=basic_FU.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
+
+ #print time.time() - t0, "CTM-V, Left"
+
+ #print 'Truncation', Truncation[0]
+ #norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+ #print 'norm=', norm[0] 
+ 
+ E1, E2, E3, E4, E5,E6=basic_FU.produce_Env_Hac(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+
+ E1, E2, E3, E4, E5,E6=reorder_env(E1, E2, E3, E4, E5,E6)
+
+
+ c_u.setLabel([0,1,2,3,4])
+ a_u.setLabel([0,1,2,3,4])
+ c_u.permute([0,2,3,4,1],3)
+ a_u.permute([0,2,3,4,1],3)
+ c_u.setLabel([0,1,2,3,4])
+ a_u.setLabel([0,1,2,3,4])
+ c=make_ab(c_u)
+ a=make_ab(a_u)
+ 
+ #basic_FU.test_env(E1, E2, E3, E4, E5,E6, c, a, c1,c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+ 
+ #E1, E2, E3, E4, E5,E6=basic_FU.proper_bond(E1, E2, E3, E4, E5,E6,D,d_phys)
+ 
+ #basic_FU.test_energy(E1, E2, E3, E4, E5,E6, c, a, c1, c2, c3, c4, Ta1, Tb1, Ta2, Tb2, Ta3, Tb3, Ta4, Tb4, c_u, a_u, U)
+ 
+ N_uni, l, l_d, r, r_d, q_u, qq_u = basic_FU.Qr_lQ_decom(c_u,a_u, E1, E2, E3, E4, E5,E6,D,d_phys)
+
+ #basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,c_u,a_u)
+
+ #lp, rp, lp_d, rp_d=basic_FU.initialize_lrprime(l, r, l_d, r_d, N_uni)
+ #lp, rp, lp_d, rp_d=basic_FU.initialize_SVD_lrprime(l, r, l_d, r_d, N_uni,U,D,d_phys)
+
+ if Gauge is 'Fixed':
+  lp, rp, lp_d, rp_d, N_uni, l, r, l_d, r_d,q_u, qq_u, c_u, a_u=basic_FU.initialize_Positiv_lrprime(l, r, l_d, r_d, N_uni, U, D, d_phys, q_u, qq_u,c_u,a_u,Positive)
+
+ #basic_FU.test_energy_lr(N_uni, l, l_d, r, r_d, q_u,qq_u,U,E1, E2, E3, E4, E5,E6,c_u,a_u)
+
+
+ rp, rp_d, lp, lp_d=basic_FU.Do_optimization_Full(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
+ #rp, rp_d, lp, lp_d=basic_FU.Do_optimization_Grad(l, r, l_d, r_d, lp, rp, lp_d, rp_d ,N_uni,U)
+ 
+ 
+ lp, rp, lp_d, rp_d=basic_FU.Equall_Dist(lp, rp,D,d_phys)
+ cp_u, ap_u=basic_FU.recover(lp, rp, q_u, qq_u)
+ #Distance_val=basic_FU.Distance(l, r, lp, rp ,N_uni,U)
+ #A=basic_FU.final_test_distance(cp_u, ap_u, c_u, a_u,E1, E2, E3, E4, E5,E6,U,N_uni)
+ #Distance_val=basic_FU.Distance(l, r, lp, rp ,N_uni,U)
+ #print 'Final', A[0], Distance_val[0]
+ 
+ cp_u.setLabel([0,1,2,3,4])
+ ap_u.setLabel([0,1,2,3,4])
+
+ cp_u.setLabel([0,2,3,4,1])
+ ap_u.setLabel([0,2,3,4,1])
+
+ cp_u.permute([0,1,2,3,4],3)
+ ap_u.permute([0,1,2,3,4],3)
+
+
+ cp_u=max_ten(cp_u)
+ ap_u=max_ten(ap_u)
+ 
+ cp=make_ab(cp_u)
+ ap=make_ab(ap_u)
+ 
+ return cp_u, ap_u, cp, ap
+
+
+def reorder_env(E1, E2, E3, E4, E5,E6):
+
+ E5p=copy.copy(E1)
+ E6p=copy.copy(E2)
+ E1p=copy.copy(E3)
+ E2p=copy.copy(E4)
+ E3p=copy.copy(E5)
+ E4p=copy.copy(E6)
+ return E1p,E2p,E3p,E4p,E5p,E6p
+
+
 
 def Initialize_function(Gamma,Landa):
  q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
@@ -52,33 +224,31 @@ def matSy():
   dim = int(spin * 2 + 1)
   return uni10.Matrix(dim, dim, [0.0, -1.00, 1.00, 0.00]);
 
+def transverseIsing_Z2(h,d_phys):
+    bdi = uni10.Bond(uni10.BD_IN, d_phys)
+    bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+    H = uni10.UniTensor([bdi, bdi, bdo, bdo], "Ising")
+    H.randomize()
+    #print transverseIsing(h).getBlock()
+    #H.setRawElem(transverseIsing(h).getBlock().getElem());
+    #H.setRawElem(Heisenberg().getBlock());
+    blk_qnums=H.blockQnum()
+    M=H.getBlock(blk_qnums[0])
+    M[0]=-2.0*h*(0.25)
+    M[1]=-1.0*(1)
+    M[2]=-1.0*(1)
+    M[3]=+2.0*h*(0.25)*(1.0)
+    H.putBlock(blk_qnums[0],M)
 
-def Heisenberg0(h, J1):
-    spin = 0.5
-    sx = matSx()
-    sy = matSy()
-    sz = matSz()
-    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
-    ham =J1*(h*uni10.otimes(sz,sz)*(1.00/1.00)+(0.00/1.00)*uni10.otimes(sx,sx)+(-0.00/1.00)*uni10.otimes(sy,sy))
-    dim = int(spin * 2 + 1)
-    bdi = uni10.Bond(uni10.BD_IN, dim);
-    bdo = uni10.Bond(uni10.BD_OUT, dim);
-    H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg");
-    H.putBlock(ham)
-    return H
+    M=H.getBlock(blk_qnums[1])
+    M[0]=-0.0
+    M[1]=-1.0*(1)
+    M[2]=-1.0*(1)
+    M[3]=+0.0
+    H.putBlock(blk_qnums[1],M)
 
-def Heisenberg1(J2):
-    spin = 0.5
-    sx = matSx()
-    sy = matSy()
-    sz = matSz()
-    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
-    ham =J2*(uni10.otimes(sz,sz)*(1.00/1.00)+(0.00/1.00)*uni10.otimes(sx,sx)+(-0.00/1.00)*uni10.otimes(sy,sy))
-    dim = int(spin * 2 + 1)
-    bdi = uni10.Bond(uni10.BD_IN, dim);
-    bdo = uni10.Bond(uni10.BD_OUT, dim);
-    H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg");
-    H.putBlock(ham)
+    #print H
+#    print transverseIsing(h).getBlock().getElem()
     return H
 
 
@@ -87,6 +257,10 @@ def Heisenberg0_Z2(h,J1,d_phys):
     bdi = uni10.Bond(uni10.BD_IN, d_phys)
     bdo = uni10.Bond(uni10.BD_OUT, d_phys)
     H = uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg")
+    #H.randomize()
+    #print transverseIsing(h).getBlock()
+    #H.setRawElem(transverseIsing(h).getBlock().getElem());
+    #H.setRawElem(Heisenberg().getBlock());
 
     blk_qnums=H.blockQnum()
     M=H.getBlock(blk_qnums[0])
@@ -112,6 +286,10 @@ def Heisenberg1_Z2(J2,d_phys):
     bdi = uni10.Bond(uni10.BD_IN, d_phys)
     bdo = uni10.Bond(uni10.BD_OUT, d_phys)
     H = uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg")
+    #H.randomize()
+    #print transverseIsing(h).getBlock()
+    #H.setRawElem(transverseIsing(h).getBlock().getElem());
+    #H.setRawElem(Heisenberg().getBlock());
 
     blk_qnums=H.blockQnum()
     M=H.getBlock(blk_qnums[0])
@@ -131,6 +309,12 @@ def Heisenberg1_Z2(J2,d_phys):
     #print "Symmetric", H
     #print Heisenberg(h).getBlock()
     return H
+
+
+
+
+
+
 
 
 def Heisenberg0_U1(h,J1, d_phys):
@@ -160,6 +344,11 @@ def Heisenberg0_U1(h,J1, d_phys):
     M[0]=J1*h
     H.putBlock(blk_qnums[2],M)
 
+
+    #print "Symmetric_U1", H
+    #print Heisenberg(h).getBlock()
+    #H.setRawElem(Heisenberg(h).getBlock().getElem());
+    #print "Symmetric", H
     #print Heisenberg(h)
 
     return H
@@ -169,6 +358,10 @@ def Heisenberg1_U1(J2, d_phys):
     bdi = uni10.Bond(uni10.BD_IN, d_phys)
     bdo = uni10.Bond(uni10.BD_OUT, d_phys)
     H = uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg")
+    #H.randomize()
+    #print transverseIsing(h).getBlock()
+    #H.setRawElem(transverseIsing(h).getBlock().getElem());
+    #H.setRawElem(Heisenberg().getBlock());
     blk_qnums=H.blockQnum()
     blk_qnums[0]
     M=H.getBlock(blk_qnums[0])
@@ -183,12 +376,44 @@ def Heisenberg1_U1(J2, d_phys):
     M=H.getBlock(blk_qnums[2])
     M[0]=J2
     H.putBlock(blk_qnums[2],M)
+    #print "Symmetric_U1", H
+    #print Heisenberg(h).getBlock()
+    #H.setRawElem(Heisenberg(h).getBlock().getElem());
+    #print "Symmetric", H
     #print Heisenberg(h)
     return H
 
 
 
 
+
+def Heisenberg0(h, J1):
+    spin = 0.5
+    sx = matSx()
+    sy = matSy()
+    sz = matSz()
+    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+    ham =J1*(h*uni10.otimes(sz,sz)*(1.00/1.00)+(1.00/1.00)*uni10.otimes(sx,sx)+(-1.00/1.00)*uni10.otimes(sy,sy))
+    dim = int(spin * 2 + 1)
+    bdi = uni10.Bond(uni10.BD_IN, dim);
+    bdo = uni10.Bond(uni10.BD_OUT, dim);
+    H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg");
+    H.putBlock(ham)
+    return H
+
+def Heisenberg1(J2):
+    spin = 0.5
+    sx = matSx()
+    sy = matSy()
+    sz = matSz()
+    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+    ham =J2*(uni10.otimes(sz,sz)*(1.00/1.00)+(1.00/1.00)*uni10.otimes(sx,sx)+(-1.00/1.00)*uni10.otimes(sy,sy))
+    dim = int(spin * 2 + 1)
+    bdi = uni10.Bond(uni10.BD_IN, dim);
+    bdo = uni10.Bond(uni10.BD_OUT, dim);
+    H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg");
+    H.putBlock(ham)
+    return H
 
 
 
@@ -226,6 +451,7 @@ def threebody(h,d_phys):
 
 #    ham =ham + 1.00*(float(h))*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+(-1.0)*uni10.otimes(sy,sytt))
     ham = (1.00/1.00)*(float(h))*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+(-1.0)*uni10.otimes(sy,sytt))
+
     H.putBlock(ham)
     #print H
     #H.randomize()
@@ -251,6 +477,7 @@ def threebody_Z2(h,d_phys):
     #H.setRawElem(Heisenberg().getBlock());
     blk_qnums=H.blockQnum()
     blk_qnums[0]
+    
 
     M=H.getBlock(blk_qnums[0])
     M[0]=2.0*h+2.00
@@ -277,7 +504,9 @@ def threebody_Z2(h,d_phys):
     M[11]=2.00
     M[13]=2.00
     M[14]=2.00
+
     H.putBlock(blk_qnums[1],M)
+
     #print "Symmetric", H
     #print Heisenberg(h).getBlock()
     return H
@@ -337,7 +566,18 @@ def threebody_U1(h,d_phys):
     #print Heisenberg(h).getBlock()
 #    H.setRawElem(threebody(h,d_phys).getBlock().getElem());
 #    print "Symmetric", H
+    
+    
     return H
+
+
+
+
+
+
+
+
+
 
 
 def makeTab(chi,D):
@@ -378,9 +618,15 @@ def MaxAbs(c):
  #print max_list_f, max(max_list_f)
  return max(max_list_f)
 
+ 
+
+
+
 def makec1(chi,D):
  bdi = uni10.Bond(uni10.BD_IN, chi)
  bdo = uni10.Bond(uni10.BD_OUT, chi)
+ 
+ 
  c1=uni10.UniTensor([bdi, bdo])
  c2=uni10.UniTensor([bdi, bdi])
  c3=uni10.UniTensor([bdi, bdo])
@@ -396,9 +642,14 @@ def makec1(chi,D):
  return c1,c2,c3,c4
  
 def makeab(Landa,Gamma):
+
  Landa_cp=[ copy.copy(Landa[i]) for i in xrange(len(Landa)) ]
+
  Landa_sq=sqrt(Landa_cp)
+
  a_u=copy.copy(Gamma)
+
+
  Landa_sq[0].setLabel([-1,1])
  Landa_sq[1].setLabel([-2,2])
  Landa_sq[2].setLabel([3,-3])
@@ -416,8 +667,17 @@ def makeab(Landa,Gamma):
 
  a_u.setLabel([0,1,2,3,4])
 
+
  a=a_u*a_d
  a.permute([1,-1,2,-2,3,-3,4,-4],4)
+# a.combineBond([1,-1])
+# a.permute([2,-2,3,-3,4,-4,1],4)
+# a.combineBond([2,-2])
+# a.permute([3,-3,4,-4,1,2],4)
+# a.combineBond([3,-3])
+# a.permute([4,-4,1,2,3],4)
+# a.combineBond([4,-4])
+# a.permute([1,2,3,4],2)
 
  return a_u, a
 
@@ -452,15 +712,28 @@ def inverse(Landa2):
      invL2[i*D1+j] = 0 if ((invLt[i*D1+j].real) < 1.0e-12) else (1.00 / (invLt[i*D1+j].real))
   invLanda2.putBlock(qnum,invL2)
  return invLanda2
+ 
+ 
+ 
+
+
+
+
+
+
 
 
 def make_ab(a_u):
  a_u.setLabel([0,1,2,3,4])
+
  a_uc=copy.copy(a_u)
  a_uc.transpose()
  a_uc.setLabel([-3,-4,0,-1,-2])
+
+
  result=a_uc*a_u
  result.permute([1,-1,2,-2,3,-3,4,-4], 4)
+
  return result
 
 
@@ -543,9 +816,7 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
  z1.identity()
  z2=copy.copy(a)
  z2.randomize()
- z1=z1+(1.0e-1)*z2
- #z1=200*z2
- 
+ z1=z1#+(1.0e-2)*z2
  Accuracy=1.00e-7
  E0=20.00
  E1=10.00
@@ -599,7 +870,7 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
    E1=abs(norm1[0])
    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
-  if (count > 10 ): print 'break! CTM'; break;
+  if (count > 15 ): print 'break! CTM'; break;
   #print E1, abs((E0-E1)/E1),norm[0], count
   #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
@@ -758,38 +1029,39 @@ def corner_transfer_matrix_twosite_CTMFull(ap,bp,cp,dp,chi,c1, c2,c3,c4,Ta1, Tb1
 
 
 
-def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model):
 
 
-########################
- E_val1=Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print "E_val1", E_val1
-
- E_val2=Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print "E_val2", E_val2
+def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model):
+# print "Total"
 #########################
- E_val3=Energy_cb(d_u,a_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
- print "E_val3", E_val3
+# E_val1=Energy_cab(a_u,b_u,c_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+# print "E_val1", E_val1
 
- E_val4=Energy_ad(b_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
- print "E_val4", E_val4
+# E_val2=Energy_acd(a_u,b_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+# print "E_val2", E_val2
 #########################
- E_val5=Energy_cb(a_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
- print "E_val5", E_val5
+# E_val3=Energy_cab(b_u,a_u,d_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+# print "E_val3", E_val3
 
- E_val6=Energy_ad(c_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
- print "E_val6", E_val6
+# E_val4=Energy_acd(b_u,a_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+# print "E_val4", E_val4
+#########################
+# E_val5=Energy_cab(c_u,d_u,a_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+# print "E_val5", E_val5
+
+# E_val6=Energy_acd(c_u,d_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+# print "E_val6", E_val6
 ##########################
- E_val7=Energy_cb(b_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
- print "E_val7", E_val7
+# E_val7=Energy_cab(d_u,c_u,b_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+# print "E_val7", E_val7
 
- E_val8=Energy_ad(d_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
- print "E_val8", E_val8
+# E_val8=Energy_acd(d_u,c_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+# print "E_val8", E_val8
 #########################
 # print E_val1,E_val2,E_val3, E_val4, (E_val1+E_val2+E_val3+E_val4) / 4.00
 # print E_val5,E_val6,E_val7, E_val8, (E_val5+E_val6+E_val7+E_val8) / 4.00
 
-#######################
+########################
 
  E_ab=Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
  print E_ab 
@@ -808,40 +1080,37 @@ def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corne
  E_bd=Energy_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
  print E_bd
 
-# print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00  
-# print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
- #return E_ab+E_ca#+E_val1+E_val2
- #return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
- 
- return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+ print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00  
+ print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
 
 
+ return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
 
-def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model):
 
-########################
- E_val1=Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print  E_val1
+def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model):
 
- E_val2=Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print  E_val2
+# E_val1=Energy_cab(a_u,b_u,c_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+# print "E_val1", E_val1
+
+# E_val2=Energy_acd(a_u,b_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+# print "E_val2", E_val2
 #########################
-# E_val3=Energy_cb(b_u,a_u,d_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+# E_val3=Energy_cab(b_u,a_u,d_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
 # print "E_val3", E_val3
 
-# E_val4=Energy_ad(b_u,a_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+# E_val4=Energy_acd(b_u,a_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
 # print "E_val4", E_val4
 #########################
-# E_val5=Energy_cb(c_u,d_u,a_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+# E_val5=Energy_cab(c_u,d_u,a_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
 # print "E_val5", E_val5
 
-# E_val6=Energy_ad(c_u,d_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+# E_val6=Energy_acd(c_u,d_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
 # print "E_val6", E_val6
 ##########################
-# E_val7=Energy_cb(d_u,c_u,b_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+# E_val7=Energy_cab(d_u,c_u,b_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
 # print "E_val7", E_val7
 
-# E_val8=Energy_ad(d_u,c_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+# E_val8=Energy_acd(d_u,c_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
 # print "E_val8", E_val8
 #########################
 # print E_val1,E_val2,E_val3, E_val4, (E_val1+E_val2+E_val3+E_val4) / 4.00
@@ -850,36 +1119,33 @@ def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_met
 ########################
 
  E_ab=Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print E_ab 
  E_ca=Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print E_ca
-# E_cd=Energy_h(c_u,d_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
-# print E_cd
-# E_ac=Energy_v(a_u,c_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
-# print E_ac 
-# E_ba=Energy_h(b_u,a_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
-# print E_ba
-# E_db=Energy_v(d_u,b_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
-# print E_db
-# E_dc=Energy_h(d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
-# print E_dc
-# E_bd=Energy_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
-# print E_bd
 
-# print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00  
-# print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
- return E_ab+E_ca+E_val1+E_val2
- return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+ E_cd=Energy_h(c_u,d_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
+ E_ac=Energy_v(a_u,c_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
  
- #return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+ E_ba=Energy_h(b_u,a_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
+ E_db=Energy_v(d_u,b_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
 
+ E_dc=Energy_h(d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+ E_bd=Energy_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+
+
+ #print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00  
+ #print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
+
+
+ return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
 
 
 def Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
+ Truncation=[0]
+ 
 
- c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic_FU.Init_env(Env)
  
  Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
 
  if Corner_method is 'CTM':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
@@ -888,11 +1154,31 @@ def Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
  if Corner_method is 'CTMFull':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
 
- reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
-
- E1, E2, E3, E4, E5, E6, E7, E8=basicB.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
-
  
+
+ basic_FU.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
+
+ E1, E2, E3, E4, E5,E6=produce_Env_Hac(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+
+ E1, E2, E3, E4, E5,E6=reorder_env(E1, E2, E3, E4, E5,E6)
+ cp_u=copy.copy(c_u)
+ ap_u=copy.copy(a_u)
+ cp=copy.copy(c)
+ ap=copy.copy(a)
+ 
+ cp_u.setLabel([0,1,2,3,4])
+ ap_u.setLabel([0,1,2,3,4])
+
+ cp_u.permute([0,2,3,4,1],3)
+ ap_u.permute([0,2,3,4,1],3)
+ cp_u.setLabel([0,1,2,3,4])
+ ap_u.setLabel([0,1,2,3,4])
+ cp=make_ab(cp_u)
+ ap=make_ab(ap_u)
+ 
+ #test_env(E1, E2, E3, E4, E5,E6, cp, ap, c1,c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+ 
+ #E1, E2, E3, E4, E5,E6=proper_bond(E1, E2, E3, E4, E5,E6,D,d_phys,c_u,a_u)
  if Model is "Heisenberg":
    H0=Heisenberg0(h[0],h[1])
    H1=Heisenberg1(h[2])
@@ -903,18 +1189,226 @@ def Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
    H0=Heisenberg0_U1(h[0],h[1],d_phys)
    H1=Heisenberg1_U1(h[2],d_phys)
 
- E_ca=basicB.Energy_ca(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0,c_u,a_u)
+ E_ca=test_energy(E1, E2, E3, E4, E5,E6, cp, ap, c1, c2, c3, c4, Ta1, Tb1, Ta2, Tb2, Ta3, Tb3, Ta4, Tb4, cp_u, ap_u, H0)
  
  return E_ca
 
 
+def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
+
+ bd=uni10.Bond(uni10.BD_OUT,a.bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,a.bond(1).Qlist())
+
+ tempo=copy.copy(Tb4)
+ bd_list=[Tb4.bond(0),bd,bd1,Tb4.bond(3)]
+ Tb4.assign(bd_list)
+ blk_qnums = Tb4.blockQnum()
+ blk_qnums1 = tempo.blockQnum()
+
+ for qnum in blk_qnums:
+  mat_t=Tb4.getBlock(qnum)
+  dx=int(mat_t.row())
+  dy=int(mat_t.col())
+  if qnum in blk_qnums1: 
+   sv_mat=tempo.getBlock(qnum)
+  else:
+   print "changing Tb4 dimension"      
+   sv_mat=uni10.Matrix(dx,dy)
+   sv_mat.randomize()
+  Tb4.putBlock(qnum,sv_mat.resize(dx,dy) )
+ 
+ #print "Tb4",tempo.printDiagram(),Tb4.printDiagram(),a.printDiagram()
+ #print "Tb4", tempo[10],Tb4[10],tempo.elemCmp(Tb4)#,Tb4.printDiagram(),
+################################################################
+
+ bd=uni10.Bond(uni10.BD_OUT,c.bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,c.bond(1).Qlist())
+ 
+ tempo=copy.copy(Ta4)
+ bd_list=[Ta4.bond(0),bd,bd1,Ta4.bond(3)]
+ Ta4.assign(bd_list)
+ blk_qnums = Ta4.blockQnum()
+ blk_qnums1 = tempo.blockQnum()
+
+ for qnum in blk_qnums:
+  mat_t=Ta4.getBlock(qnum)
+  dx=int(mat_t.row())
+  dy=int(mat_t.col())
+  if qnum in blk_qnums1: 
+   sv_mat=tempo.getBlock(qnum)
+  else:
+   print "changing Ta4 dimension"      
+   sv_mat=uni10.Matrix(dx,dy)
+   sv_mat.randomize()
+  Ta4.putBlock(qnum,sv_mat.resize(dx,dy) )
+ #print "Ta4", Ta4.printDiagram(),Ta4[4]
+ #print "Ta4", tempo.elemCmp(Ta4),Tb4.printDiagram(),
+
+##################################################################
+
+ bd=uni10.Bond(uni10.BD_IN,b.bond(4).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,b.bond(5).Qlist())
+
+ tempo=copy.copy(Ta2)
+ bd_list=[Ta2.bond(0),bd,bd1,Ta2.bond(3)]
+ Ta2.assign(bd_list)
+ blk_qnums = Ta2.blockQnum()
+ blk_qnums1 = tempo.blockQnum()
+
+ for qnum in blk_qnums:
+  mat_t=Ta2.getBlock(qnum)
+  dx=int(mat_t.row())
+  dy=int(mat_t.col())
+  if qnum in blk_qnums1: 
+   sv_mat=tempo.getBlock(qnum)
+  else:
+   print "changing Ta2 dimension"      
+   sv_mat=uni10.Matrix(dx,dy)
+   sv_mat.randomize()
+  Ta2.putBlock(qnum,sv_mat.resize(dx,dy) )
+# print "Ta2", Ta2.printDiagram(),Ta2[3]
+# print "Ta2", tempo.elemCmp(Ta2),Tb4.printDiagram(),
+
+
+
+ bd=uni10.Bond(uni10.BD_IN,d.bond(4).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,d.bond(5).Qlist())
+
+
+ tempo=copy.copy(Tb2)
+ bd_list=[Tb2.bond(0),bd,bd1,Tb2.bond(3)]
+ Tb2.assign(bd_list)
+ blk_qnums = Tb2.blockQnum()
+ blk_qnums1 = tempo.blockQnum()
+
+ for qnum in blk_qnums:
+  mat_t=Tb2.getBlock(qnum)
+  dx=int(mat_t.row())
+  dy=int(mat_t.col())
+  if qnum in blk_qnums1: 
+   sv_mat=tempo.getBlock(qnum)
+  else:
+   print "changing Tb2 dimension"    
+   sv_mat=uni10.Matrix(dx,dy)
+   sv_mat.randomize()
+  Tb2.putBlock(qnum,sv_mat.resize(dx,dy) )
+# print "Tb2", Tb2.printDiagram(),Tb2[4]
+# print "Tb2", tempo.elemCmp(Tb2),Tb4.printDiagram(),
+
+################################################################3
+ bd=uni10.Bond(uni10.BD_IN,a.bond(6).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,a.bond(7).Qlist())
+
+ tempo=copy.copy(Tb1)
+ bd_list=[Tb1.bond(0),bd,bd1,Tb1.bond(3)]
+ Tb1.assign(bd_list)
+ blk_qnums = Tb1.blockQnum()
+ blk_qnums1 = tempo.blockQnum()
+
+ for qnum in blk_qnums:
+  mat_t=Tb1.getBlock(qnum)
+  dx=int(mat_t.row())
+  dy=int(mat_t.col())
+  if qnum in blk_qnums1: 
+   sv_mat=tempo.getBlock(qnum)
+  else:
+   print "changing Tb1 dimension"  
+   sv_mat=uni10.Matrix(dx,dy)
+   sv_mat.randomize()
+  Tb1.putBlock(qnum,sv_mat.resize(dx,dy) )
+# print "Tb1", Tb1.printDiagram(),Tb1[4]
+# print "Tb1", tempo.elemCmp(Tb1),Tb4.printDiagram(),
+
+
+ bd=uni10.Bond(uni10.BD_IN,b.bond(6).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,b.bond(7).Qlist())
+
+ tempo=copy.copy(Ta1)
+ bd_list=[Ta1.bond(0),bd,bd1,Ta1.bond(3)]
+ Ta1.assign(bd_list)
+ blk_qnums = Ta1.blockQnum()
+ blk_qnums1 = tempo.blockQnum()
+
+ for qnum in blk_qnums:
+  mat_t=Ta1.getBlock(qnum)
+  dx=int(mat_t.row())
+  dy=int(mat_t.col())
+  if qnum in blk_qnums1: 
+   sv_mat=tempo.getBlock(qnum)
+  else:
+   print "changing Ta1 dimension"  
+   sv_mat=uni10.Matrix(dx,dy)
+   sv_mat.randomize()
+  Ta1.putBlock(qnum,sv_mat.resize(dx,dy) )
+ #print "Ta1",tempo.printDiagram(),Ta1.printDiagram(),b.printDiagram()
+ #print "Ta1", tempo[10],Ta1[10],tempo.elemCmp(Ta1)#,Tb4.printDiagram(),
+
+######################################################
+ bd=uni10.Bond(uni10.BD_OUT,c.bond(2).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,c.bond(3).Qlist())
+
+ tempo=copy.copy(Ta3)
+ bd_list=[Ta3.bond(0),bd,bd1,Ta3.bond(3)]
+ Ta3.assign(bd_list)
+ blk_qnums = Ta3.blockQnum()
+ blk_qnums1 = tempo.blockQnum()
+
+ for qnum in blk_qnums:
+  mat_t=Ta3.getBlock(qnum)
+  dx=int(mat_t.row())
+  dy=int(mat_t.col())
+  if qnum in blk_qnums1: 
+   sv_mat=tempo.getBlock(qnum)
+  else:
+   print "changing Ta3 dimension"  
+   sv_mat=uni10.Matrix(dx,dy)
+   sv_mat.randomize()
+  Ta3.putBlock(qnum,sv_mat.resize(dx,dy) )
+ #print "Ta3", Ta3.printDiagram(),Ta3[4]
+ #print "Ta3", tempo.elemCmp(Ta3),Tb4.printDiagram(),
+ 
+ 
+ 
+ bd=uni10.Bond(uni10.BD_OUT,d.bond(2).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,d.bond(3).Qlist())
+
+ tempo=copy.copy(Tb3)
+ bd_list=[Tb3.bond(0),bd,bd1,Tb3.bond(3)]
+ Tb3.assign(bd_list)
+ blk_qnums = Tb3.blockQnum()
+ blk_qnums1 = tempo.blockQnum()
+
+ for qnum in blk_qnums:
+  mat_t=Tb3.getBlock(qnum)
+  dx=int(mat_t.row())
+  dy=int(mat_t.col())
+  if qnum in blk_qnums1: 
+   sv_mat=tempo.getBlock(qnum)
+  else:
+   print "changing Tb3 dimension"
+   sv_mat=uni10.Matrix(dx,dy)
+   sv_mat.randomize()
+  Tb3.putBlock(qnum,sv_mat.resize(dx,dy) )
+ #print "Tb3", Tb3.printDiagram(),Tb3[4]
+ #print "Tb3", tempo.elemCmp(Tb3),Tb4.printDiagram(),
+
+################################################ 
+
+ return Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4
 
 
 def Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
 
- c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic_FU.Init_env(Env)
 
+ 
  Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
+# Ta1.randomize(),Tb1.randomize()
+# Ta2.randomize(),Tb2.randomize()
+# Ta3.randomize(),Tb3.randomize()
+# Ta4.randomize(),Tb4.randomize()
+
 
  if Corner_method is 'CTM':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
@@ -923,11 +1417,16 @@ def Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
  if Corner_method is 'CTMFull':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
 
- reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
 
- E1, E2, E3, E4, E5, E6, E7, E8=basicB.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+ basic_FU.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
 
+ E1, E2, E3, E4, E5,E6=produce_Env_Hab(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+ 
+ 
+ #test_env(E1, E2, E3, E4, E5,E6, a, b, c1,c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
+ #E1, E2, E3, E4, E5,E6=proper_bond(E1, E2, E3, E4, E5,E6,D,d_phys,a_u,b_u)
+ 
  if Model is "Heisenberg":
    H0=Heisenberg0(h[0],h[1])
    H1=Heisenberg1(h[2])
@@ -939,17 +1438,30 @@ def Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
    H1=Heisenberg1_U1(h[2],d_phys)
    
    
- E_ab=basicB.Energy_ab(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0,a_u,b_u)
+ E_ab=test_energy(E1, E2, E3, E4, E5,E6, a, b, c1, c2, c3, c4, Ta1, Tb1, Ta2, Tb2, Ta3, Tb3, Ta4, Tb4, a_u, b_u, H0)
+ 
+########################################################################3 
  return E_ab
 
 
 
-def Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
+
+def Energy_cab(a_u,b_u,c_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
+
+
  
- c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic_FU.Init_env(Env)
+
  
  Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
+
+# Ta1.randomize(),Tb1.randomize()
+# Ta2.randomize(),Tb2.randomize()
+# Ta3.randomize(),Tb3.randomize()
+# Ta4.randomize(),Tb4.randomize()
+# print 'hi' 
+ 
  if Corner_method is 'CTM':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
  if Corner_method is 'CTMRG':
@@ -957,7 +1469,8 @@ def Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
  if Corner_method is 'CTMFull':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
 
- reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
+
+ basic_FU.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
 
  E1, E2, E3, E4, E5, E6, E7, E8=basicA.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
 
@@ -974,11 +1487,19 @@ def Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
  return E
 
 
-def Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
+def Energy_acd(a_u,b_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
 
- c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic_FU.Init_env(Env)
+
+ #Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
 
+# Ta1.randomize(),Tb1.randomize()
+# Ta2.randomize(),Tb2.randomize()
+# Ta3.randomize(),Tb3.randomize()
+# Ta4.randomize(),Tb4.randomize()
+ 
+ 
  if Corner_method is 'CTM':
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
  if Corner_method is 'CTMRG':
@@ -987,7 +1508,7 @@ def Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
   c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
 
 
- reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
+ basic_FU.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
 
  E1, E2, E3, E4, E5, E6, E7, E8=basicB.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
 
@@ -997,14 +1518,155 @@ def Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
    H1=Heisenberg1_Z2(h[2],d_phys)
  if Model is "Heisenberg_U1":
    H1=Heisenberg1_U1(h[2],d_phys)
- 
+
  E=basicA.energy_ad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H1,a_u,d_u)
  return E
 
+def produce_Env_Hab(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys):
+
+ c1.setLabel([0,1])
+ Tb1.setLabel([1,2,-2,3])
+ E1=c1*Tb1
+ E1.permute([0,2,-2,3],2)
+ E1.setLabel([7,3,-3,8])
+ E1.permute([7,3,-3,8],3)
+ 
+ c2.setLabel([1,0])
+ Ta1.setLabel([3,2,-2,1])
+ E6=c2*Ta1
+ E6.permute([0,2,-2,3],2)
+ E6.setLabel([9,6,-6,8])
+ E6.permute([8,6,-6,9],4)
+ 
+ E5=Ta2
+ E5.setLabel([10,5,-5,9])
+ E5.permute([10,5,-5,9],3)
+ 
+ E2=Tb4
+ E2.setLabel([12,13,-13,7])
+ E2.permute([12,13,-13,7],1)
 
  
+ c3.setLabel([8,7])
+ Tb2.setLabel([7,15,-15,22])
+ Tb3.setLabel([13,14,-14,8])
+ d.setLabel([16,-16,14,-14,15,-15,23,-23])
+ E4=(((c3*Tb3)*Tb2)*d)
+ E4.permute([13,16,-16,23,-23,22],3)
+ E4.setLabel([11,16,-16,4,-4,10])
+ E4.permute([11,16,-16,4,-4,10],3)
 
 
+ 
+ c4.setLabel([11,10])
+ Ta4.setLabel([11,17,-17,18])
+ Ta3.setLabel([10,12,-12,13])
+ c.setLabel([17,-17,12,-12,16,-16,19,-19])
+ E3=(((c4*Ta4)*Ta3)*c)
+ E3.permute([13,16,-16,19,-19,18],0)
+ E3.setLabel([11,16,-16,1,-1,12])
+
+ return E1, E2, E3, E4, E5,E6
+ 
+def putBlock_Total(E1,E2):
+    blk_qnums = E1.blockQnum()
+    for qnum in blk_qnums:
+        A=E1.getBlock(qnum)
+        E2.putBlock(qnum,A)
+    return E2
+ 
+ 
+
+def  test_energy(E1, E2, E3, E4, E5,E6, a, b, c1,c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4, a_u,b_u,U):
+
+ a_u.setLabel([20,13,1,2,3])
+ a_d=copy.copy(a_u)
+ a_d.transpose()
+ a_d.setLabel([-2,-3,20,-13,-1])
+
+ b_u.setLabel([40,2,4,5,6])
+ b_d=copy.copy(b_u)
+ b_d.transpose()
+ b_d.setLabel([-5,-6,40,-2,-4])
+ A=(((E2*(a_u*a_d))*E1)*E3)*(((((b_u*b_d)*E5)*E6)*E4))
+ Norm_f=A
+
+
+ a_u.setLabel([20,13,1,2,3])
+ a_d.setLabel([-2,-3,-20,-13,-1])
+
+ b_u.setLabel([40,2,4,5,6])
+ b_d.setLabel([-5,-6,-40,-2,-4,])
+
+
+ U.setLabel([-20,-40,20,40])
+
+
+
+ B=((((E2*(a_u*a_d))*E1)*E3)*U)*(((((b_u*b_d)*E5)*E6)*E4))
+
+ return B[0]/A[0]
+
+def test_env(E1, E2, E3, E4, E5,E6, a, b, c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
+ a.setLabel([13,-13,1,-1,2,-2,3,-3])
+ b.setLabel([2,-2,4,-4,5,-5,6,-6])
+ A=(((E2*a)*E1)*E3)*((((b*E5)*E6)*E4))
+ print 'NormEnv=', A[0]
+
+def produce_Env_Hac(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys):
+
+ c1.setLabel([0,1])
+ Tb4.setLabel([3,2,-2,0])
+ E2=c1*Tb4
+ E2.permute([3,2,-2,1],3)
+ E2.setLabel([10,2,-2,12])
+ E2.setLabel([8,6,-6,9])
+ E2.permute([8,6,-6,9],3)
+ 
+ c4.setLabel([0,1])
+ Ta3.setLabel([1,2,-2,3])
+ E4=c4*Ta3
+ E4.permute([0,2,-2,3],2)
+ E4.setLabel([9,6,-6,8])
+ E4.setLabel([7,13,-13,12])
+ E4.permute([12,13,-13,7],1)
+ 
+ E1=Tb1
+ E1.setLabel([12,1,-1,13])
+ E1.setLabel([9,5,-5,10])
+ E1.permute([10,5,-5,9],3)
+
+ E3=Ta4
+ E3.setLabel([9,5,-5,10])
+ E3.setLabel([7,3,-3,8])
+ E3.permute([7,3,-3,8],3)
+ 
+ 
+ c2.setLabel([5,6])
+ Ta1.setLabel([21,20,-20,5])
+ Ta2.setLabel([22,19,-19,6])
+ b.setLabel([4,-4,23,-23,19,-19,20,-20])
+ E6=(((c2*Ta2)*Ta1)*b)
+ #E6.combineBond([23,22])
+ E6.permute([21,4,-4,23,-23,22],4)
+ E6.setLabel([13,3,-3,11,-11,22])
+ E6.setLabel([10,4,-4,11,-11,22])
+ E6.permute([11,-11,22,4,-4,10],3)
+ 
+ 
+ 
+ c3.setLabel([8,7])
+ Tb2.setLabel([7,15,-15,22])
+ Tb3.setLabel([13,14,-14,8])
+ d.setLabel([16,-16,14,-14,15,-15,23,-23])
+ E5=(((c3*Tb3)*Tb2)*d)
+ #E5.combineBond([23,22])
+ E5.permute([13,16,-16,23,-23,22],4)
+ E5.setLabel([8,7,-7,11,-11,22])
+ E5.setLabel([12,1,-1,11,-11,22])
+ E5.permute([11,-11,22,1,-1,12],0)
+ return E1, E2, E3, E4, E5,E6
+ 
  
  
 def reorder_env(E1, E2, E3, E4, E5,E6):
@@ -1066,6 +1728,21 @@ def Def_deltaNiter(i,N_iterF,Steps):
    N_iter=int(0.00)
 
   return Steps[0], N_iter
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
 
 
 def Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file):
@@ -1286,253 +1963,5 @@ def max_ten(a):
  
  return a
 
-def Init_env(Env):
- c1=copy.copy(Env[0])
- c2=copy.copy(Env[1])
- c3=copy.copy(Env[2]) 
- c4=copy.copy(Env[3]) 
- Ta1=copy.copy(Env[4])
- Ta2=copy.copy(Env[5])
- Ta3=copy.copy(Env[6])
- Ta4=copy.copy(Env[7])
- Tb1=copy.copy(Env[8])
- Tb2=copy.copy(Env[9])
- Tb3=copy.copy(Env[10])
- Tb4=copy.copy(Env[11])
- return  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4
-
-def reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env):
-  
-  Env[0]=copy.copy(c1)
-  Env[1]=copy.copy(c2)
-  Env[2]=copy.copy(c3) 
-  Env[3]=copy.copy(c4) 
-  Env[4]=copy.copy(Ta1)
-  Env[5]=copy.copy(Ta2)
-  Env[6]=copy.copy(Ta3)
-  Env[7]=copy.copy(Ta4)
-  Env[8]=copy.copy(Tb1)
-  Env[9]=copy.copy(Tb2)
-  Env[10]=copy.copy(Tb3)
-  Env[11]=copy.copy(Tb4)
-  
-def Rand_env_slight(Env):
- 
- for i in xrange(len(Env)):
-  Env_tem=copy.copy(Env[i]) 
-  Env_tem.randomize()
-  Env[i]=Env[i]+0.01*Env_tem
-
-def Rand_env_total(Env):
- Env1=copy.copy(Env)
- for i in xrange(len(Env1)):
-  Env1[i]=copy.copy(Env[i])
-  Env1[i].randomize()
- 
- return  Env1
-
-
-
-def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
-
- bd=uni10.Bond(uni10.BD_OUT,a.bond(0).Qlist())
- bd1=uni10.Bond(uni10.BD_OUT,a.bond(1).Qlist())
-
- tempo=copy.copy(Tb4)
- bd_list=[Tb4.bond(0),bd,bd1,Tb4.bond(3)]
- Tb4.assign(bd_list)
- blk_qnums = Tb4.blockQnum()
- blk_qnums1 = tempo.blockQnum()
-
- for qnum in blk_qnums:
-  mat_t=Tb4.getBlock(qnum)
-  dx=int(mat_t.row())
-  dy=int(mat_t.col())
-  if qnum in blk_qnums1: 
-   sv_mat=tempo.getBlock(qnum)
-  else:
-   print "changing Tb4 dimension"      
-   sv_mat=uni10.Matrix(dx,dy)
-   sv_mat.randomize()
-  Tb4.putBlock(qnum,sv_mat.resize(dx,dy) )
- 
- #print "Tb4",tempo.printDiagram(),Tb4.printDiagram(),a.printDiagram()
- #print "Tb4", tempo[10],Tb4[10],tempo.elemCmp(Tb4)#,Tb4.printDiagram(),
-################################################################
-
- bd=uni10.Bond(uni10.BD_OUT,c.bond(0).Qlist())
- bd1=uni10.Bond(uni10.BD_OUT,c.bond(1).Qlist())
- 
- tempo=copy.copy(Ta4)
- bd_list=[Ta4.bond(0),bd,bd1,Ta4.bond(3)]
- Ta4.assign(bd_list)
- blk_qnums = Ta4.blockQnum()
- blk_qnums1 = tempo.blockQnum()
-
- for qnum in blk_qnums:
-  mat_t=Ta4.getBlock(qnum)
-  dx=int(mat_t.row())
-  dy=int(mat_t.col())
-  if qnum in blk_qnums1: 
-   sv_mat=tempo.getBlock(qnum)
-  else:
-   print "changing Ta4 dimension"      
-   sv_mat=uni10.Matrix(dx,dy)
-   sv_mat.randomize()
-  Ta4.putBlock(qnum,sv_mat.resize(dx,dy) )
- #print "Ta4", Ta4.printDiagram(),Ta4[4]
- #print "Ta4", tempo.elemCmp(Ta4),Tb4.printDiagram(),
-
-##################################################################
-
- bd=uni10.Bond(uni10.BD_IN,b.bond(4).Qlist())
- bd1=uni10.Bond(uni10.BD_IN,b.bond(5).Qlist())
-
- tempo=copy.copy(Ta2)
- bd_list=[Ta2.bond(0),bd,bd1,Ta2.bond(3)]
- Ta2.assign(bd_list)
- blk_qnums = Ta2.blockQnum()
- blk_qnums1 = tempo.blockQnum()
-
- for qnum in blk_qnums:
-  mat_t=Ta2.getBlock(qnum)
-  dx=int(mat_t.row())
-  dy=int(mat_t.col())
-  if qnum in blk_qnums1: 
-   sv_mat=tempo.getBlock(qnum)
-  else:
-   print "changing Ta2 dimension"      
-   sv_mat=uni10.Matrix(dx,dy)
-   sv_mat.randomize()
-  Ta2.putBlock(qnum,sv_mat.resize(dx,dy) )
-# print "Ta2", Ta2.printDiagram(),Ta2[3]
-# print "Ta2", tempo.elemCmp(Ta2),Tb4.printDiagram(),
-
-
-
- bd=uni10.Bond(uni10.BD_IN,d.bond(4).Qlist())
- bd1=uni10.Bond(uni10.BD_IN,d.bond(5).Qlist())
-
-
- tempo=copy.copy(Tb2)
- bd_list=[Tb2.bond(0),bd,bd1,Tb2.bond(3)]
- Tb2.assign(bd_list)
- blk_qnums = Tb2.blockQnum()
- blk_qnums1 = tempo.blockQnum()
-
- for qnum in blk_qnums:
-  mat_t=Tb2.getBlock(qnum)
-  dx=int(mat_t.row())
-  dy=int(mat_t.col())
-  if qnum in blk_qnums1: 
-   sv_mat=tempo.getBlock(qnum)
-  else:
-   print "changing Tb2 dimension"    
-   sv_mat=uni10.Matrix(dx,dy)
-   sv_mat.randomize()
-  Tb2.putBlock(qnum,sv_mat.resize(dx,dy) )
-# print "Tb2", Tb2.printDiagram(),Tb2[4]
-# print "Tb2", tempo.elemCmp(Tb2),Tb4.printDiagram(),
-
-################################################################3
- bd=uni10.Bond(uni10.BD_IN,a.bond(6).Qlist())
- bd1=uni10.Bond(uni10.BD_IN,a.bond(7).Qlist())
-
- tempo=copy.copy(Tb1)
- bd_list=[Tb1.bond(0),bd,bd1,Tb1.bond(3)]
- Tb1.assign(bd_list)
- blk_qnums = Tb1.blockQnum()
- blk_qnums1 = tempo.blockQnum()
-
- for qnum in blk_qnums:
-  mat_t=Tb1.getBlock(qnum)
-  dx=int(mat_t.row())
-  dy=int(mat_t.col())
-  if qnum in blk_qnums1: 
-   sv_mat=tempo.getBlock(qnum)
-  else:
-   print "changing Tb1 dimension"  
-   sv_mat=uni10.Matrix(dx,dy)
-   sv_mat.randomize()
-  Tb1.putBlock(qnum,sv_mat.resize(dx,dy) )
-# print "Tb1", Tb1.printDiagram(),Tb1[4]
-# print "Tb1", tempo.elemCmp(Tb1),Tb4.printDiagram(),
-
-
- bd=uni10.Bond(uni10.BD_IN,b.bond(6).Qlist())
- bd1=uni10.Bond(uni10.BD_IN,b.bond(7).Qlist())
-
- tempo=copy.copy(Ta1)
- bd_list=[Ta1.bond(0),bd,bd1,Ta1.bond(3)]
- Ta1.assign(bd_list)
- blk_qnums = Ta1.blockQnum()
- blk_qnums1 = tempo.blockQnum()
-
- for qnum in blk_qnums:
-  mat_t=Ta1.getBlock(qnum)
-  dx=int(mat_t.row())
-  dy=int(mat_t.col())
-  if qnum in blk_qnums1: 
-   sv_mat=tempo.getBlock(qnum)
-  else:
-   print "changing Ta1 dimension"  
-   sv_mat=uni10.Matrix(dx,dy)
-   sv_mat.randomize()
-  Ta1.putBlock(qnum,sv_mat.resize(dx,dy) )
- #print "Ta1",tempo.printDiagram(),Ta1.printDiagram(),b.printDiagram()
- #print "Ta1", tempo[10],Ta1[10],tempo.elemCmp(Ta1)#,Tb4.printDiagram(),
-
-######################################################
- bd=uni10.Bond(uni10.BD_OUT,c.bond(2).Qlist())
- bd1=uni10.Bond(uni10.BD_OUT,c.bond(3).Qlist())
-
- tempo=copy.copy(Ta3)
- bd_list=[Ta3.bond(0),bd,bd1,Ta3.bond(3)]
- Ta3.assign(bd_list)
- blk_qnums = Ta3.blockQnum()
- blk_qnums1 = tempo.blockQnum()
-
- for qnum in blk_qnums:
-  mat_t=Ta3.getBlock(qnum)
-  dx=int(mat_t.row())
-  dy=int(mat_t.col())
-  if qnum in blk_qnums1: 
-   sv_mat=tempo.getBlock(qnum)
-  else:
-   print "changing Ta3 dimension"  
-   sv_mat=uni10.Matrix(dx,dy)
-   sv_mat.randomize()
-  Ta3.putBlock(qnum,sv_mat.resize(dx,dy) )
- #print "Ta3", Ta3.printDiagram(),Ta3[4]
- #print "Ta3", tempo.elemCmp(Ta3),Tb4.printDiagram(),
- 
- 
- 
- bd=uni10.Bond(uni10.BD_OUT,d.bond(2).Qlist())
- bd1=uni10.Bond(uni10.BD_OUT,d.bond(3).Qlist())
-
- tempo=copy.copy(Tb3)
- bd_list=[Tb3.bond(0),bd,bd1,Tb3.bond(3)]
- Tb3.assign(bd_list)
- blk_qnums = Tb3.blockQnum()
- blk_qnums1 = tempo.blockQnum()
-
- for qnum in blk_qnums:
-  mat_t=Tb3.getBlock(qnum)
-  dx=int(mat_t.row())
-  dy=int(mat_t.col())
-  if qnum in blk_qnums1: 
-   sv_mat=tempo.getBlock(qnum)
-  else:
-   print "changing Tb3 dimension"
-   sv_mat=uni10.Matrix(dx,dy)
-   sv_mat.randomize()
-  Tb3.putBlock(qnum,sv_mat.resize(dx,dy) )
- #print "Tb3", Tb3.printDiagram(),Tb3[4]
- #print "Tb3", tempo.elemCmp(Tb3),Tb4.printDiagram(),
-
-################################################ 
-
- return Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4
 
  

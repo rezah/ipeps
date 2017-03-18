@@ -15,25 +15,21 @@ def itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,
 Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_D):
   
    
-  if Model is "Ising":
-   H0=basic.transverseIsing_Z2(h,d_phys)
-  if Model is "Heisenberg":
-   H0=basic.Heisenberg(h)
-  if Model is "Heisenberg_Z2":
-    H0=basic.Heisenberg_Z2(h,d_phys)
-  if Model is "Heisenberg_U1":
-    H0=basic.Heisenberg_U1(h,d_phys)
-  if Model is "threebody_Z2":
-    H0=basic.threebody_Z2(h,d_phys)
-  if Model is "threebody_U1":
-    H0=basic.threebody_U1(h,d_phys)
-  if Model is "threebody":
-    H0=basic.threebody(h,d_phys)
-   
+ if Model is "Heisenberg":
+   H0=basic.Heisenberg0(h[0],h[1])
+   H1=basic.Heisenberg1(h[2])
+ if Model is "Heisenberg_Z2":
+   H0=basic.Heisenberg0_Z2(h[0],h[1],d_phys)
+   H1=basic.Heisenberg1_Z2(h[2],d_phys)
+ if Model is "Heisenberg_U1":
+   H0=basic.Heisenberg0_U1(h[0],h[1],d_phys)
+   H1=basic.Heisenberg1_U1(h[2],d_phys)
 
-  U = uni10.UniTensor(H0.bond(), "U");
   
-  for i in xrange(1,600):
+ U = uni10.UniTensor(H0.bond(), "U");
+
+  
+ for i in xrange(1,600):
 
    delta=1.00/pow(5,i) 
 
@@ -55,8 +51,8 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
 
 
 ##########################################################################################
-    H0=basic.Heisenberg_U1(h,d_phys)
-    #H0=basic.Heisenberg(h)
+#    H0=basic.Heisenberg_U1(h,d_phys)
+#    H0=basic.Heisenberg(h)
     U = uni10.UniTensor(H0.bond(), "U");
     blk_qnums = H0.blockQnum()
     for qnum in blk_qnums:
@@ -276,7 +272,7 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
     
 
 
-  return Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8  
+ return Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8  
 
 
 
