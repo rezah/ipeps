@@ -59,7 +59,7 @@ def Heisenberg0(h, J1):
     sy = matSy()
     sz = matSz()
     iden = uni10.Matrix(2,2, [1, 0, 0, 1])
-    ham =J1*(h*uni10.otimes(sz,sz)*(1.00/1.00)+(0.00/1.00)*uni10.otimes(sx,sx)+(-0.00/1.00)*uni10.otimes(sy,sy))
+    ham =J1*(h*uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy))
     dim = int(spin * 2 + 1)
     bdi = uni10.Bond(uni10.BD_IN, dim);
     bdo = uni10.Bond(uni10.BD_OUT, dim);
@@ -73,7 +73,7 @@ def Heisenberg1(J2):
     sy = matSy()
     sz = matSz()
     iden = uni10.Matrix(2,2, [1, 0, 0, 1])
-    ham =J2*(uni10.otimes(sz,sz)*(1.00/1.00)+(0.00/1.00)*uni10.otimes(sx,sx)+(-0.00/1.00)*uni10.otimes(sy,sy))
+    ham =J2*(uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy))
     dim = int(spin * 2 + 1)
     bdi = uni10.Bond(uni10.BD_IN, dim);
     bdo = uni10.Bond(uni10.BD_OUT, dim);
@@ -187,12 +187,6 @@ def Heisenberg1_U1(J2, d_phys):
     return H
 
 
-
-
-
-
-
-
 def threebody(h,d_phys):
     bdi = uni10.Bond(uni10.BD_IN, d_phys)
     bdo = uni10.Bond(uni10.BD_OUT, d_phys)
@@ -212,20 +206,11 @@ def threebody(h,d_phys):
     sxtt=uni10.otimes(iden,sx)
     sytt=uni10.otimes(iden,sy)
 
-#    ham =(-1.00)*uni10.otimes(szt,iden)+uni10.otimes(sxt,iden)+(-1.0)*uni10.otimes(syt,iden)
-#    ham =ham + (-1.00)*uni10.otimes(iden,szt)+uni10.otimes(iden,sxt)+(-1.0)*uni10.otimes(iden,syt)
+    ham =h[1]*(uni10.otimes(szt,iden)+uni10.otimes(sxt,iden)+(-1.0)*uni10.otimes(syt,iden))
+    ham =ham + h[1]*(uni10.otimes(iden,szt)+uni10.otimes(iden,sxt)+(-1.0)*uni10.otimes(iden,syt))
 
+    ham = ham +(h[2])*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+(-1.0)*uni10.otimes(sy,sytt))
 
-#    ham =(-1.00)*uni10.otimes(sz,ident)#+uni10.otimes(sxt,iden)+(-1.0)*uni10.otimes(syt,iden)
-#    ham =ham + (-1.00)*uni10.otimes(sztt,iden)#+uni10.otimes(iden,sxt)+(-1.0)*uni10.otimes(iden,syt)
-#    ham =ham + (-1.00)*uni10.otimes(ident, sz)#+uni10.otimes(iden,sxt)+(-1.0)*uni10.otimes(iden,syt)
-
-
-    #ham =uni10.otimes(iden,szt)+uni10.otimes(iden,sxt)+(-1.0)*uni10.otimes(iden,syt)
-    #ham =uni10.otimes(iden,ident)+uni10.otimes(iden,sxt)+(-1.0)*uni10.otimes(iden,syt)
-
-#    ham =ham + 1.00*(float(h))*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+(-1.0)*uni10.otimes(sy,sytt))
-    ham = (1.00/1.00)*(float(h))*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+(-1.0)*uni10.otimes(sy,sytt))
     H.putBlock(ham)
     #print H
     #H.randomize()
@@ -760,118 +745,114 @@ def corner_transfer_matrix_twosite_CTMFull(ap,bp,cp,dp,chi,c1, c2,c3,c4,Ta1, Tb1
 
 def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model):
 
-
-########################
- E_val1=Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print "E_val1", E_val1
-
- E_val2=Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print "E_val2", E_val2
 #########################
- E_val3=Energy_cb(d_u,a_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
- print "E_val3", E_val3
+# E_val1=Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val1", E_val1
 
- E_val4=Energy_ad(b_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
- print "E_val4", E_val4
-#########################
- E_val5=Energy_cb(a_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
- print "E_val5", E_val5
-
- E_val6=Energy_ad(c_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
- print "E_val6", E_val6
+# E_val2=Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val2", E_val2
 ##########################
- E_val7=Energy_cb(b_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
- print "E_val7", E_val7
+# E_val3=Energy_cb(d_u,a_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val3", E_val3
 
- E_val8=Energy_ad(d_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
- print "E_val8", E_val8
-#########################
-# print E_val1,E_val2,E_val3, E_val4, (E_val1+E_val2+E_val3+E_val4) / 4.00
-# print E_val5,E_val6,E_val7, E_val8, (E_val5+E_val6+E_val7+E_val8) / 4.00
+# E_val4=Energy_ad(b_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val4", E_val4
+##########################
+# E_val5=Energy_cb(a_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val5", E_val5
+
+# E_val6=Energy_ad(c_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val6", E_val6
+###########################
+# E_val7=Energy_cb(b_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val7", E_val7
+
+# E_val8=Energy_ad(d_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val8", E_val8
+##########################
 
 #######################
-
  E_ab=Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print E_ab 
+ #print E_ab 
  E_ca=Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print E_ca
+ #print E_ca
  E_cd=Energy_h(c_u,d_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
- print E_cd
+ #print E_cd
  E_ac=Energy_v(a_u,c_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
- print E_ac 
+ #print E_ac 
  E_ba=Energy_h(b_u,a_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
- print E_ba
+ #print E_ba
  E_db=Energy_v(d_u,b_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
- print E_db
+ #print E_db
  E_dc=Energy_h(d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
- print E_dc
+ #print E_dc
  E_bd=Energy_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
- print E_bd
+ #print E_bd
 
 # print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00  
 # print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
  #return E_ab+E_ca#+E_val1+E_val2
  #return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
  
- return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+ return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
 
+ #return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc)/4.00)
 
 
 def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model):
 
-########################
- E_val1=Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print  E_val1
-
- E_val2=Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print  E_val2
 #########################
-# E_val3=Energy_cb(b_u,a_u,d_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
-# print "E_val3", E_val3
+# E_val1=Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val1", E_val1
 
-# E_val4=Energy_ad(b_u,a_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
-# print "E_val4", E_val4
-#########################
-# E_val5=Energy_cb(c_u,d_u,a_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
-# print "E_val5", E_val5
-
-# E_val6=Energy_ad(c_u,d_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
-# print "E_val6", E_val6
+# E_val2=Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val2", E_val2
 ##########################
-# E_val7=Energy_cb(d_u,c_u,b_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
-# print "E_val7", E_val7
+# E_val3=Energy_cb(d_u,a_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val3", E_val3
 
-# E_val8=Energy_ad(d_u,c_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
-# print "E_val8", E_val8
-#########################
-# print E_val1,E_val2,E_val3, E_val4, (E_val1+E_val2+E_val3+E_val4) / 4.00
-# print E_val5,E_val6,E_val7, E_val8, (E_val5+E_val6+E_val7+E_val8) / 4.00
+# E_val4=Energy_ad(b_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val4", E_val4
+##########################
+# E_val5=Energy_cb(a_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val5", E_val5
 
-########################
+# E_val6=Energy_ad(c_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val6", E_val6
+###########################
+# E_val7=Energy_cb(b_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val7", E_val7
 
+# E_val8=Energy_ad(d_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+# #print "E_val8", E_val8
+##########################
+
+#######################
  E_ab=Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print E_ab 
+ #print E_ab 
  E_ca=Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- print E_ca
-# E_cd=Energy_h(c_u,d_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
-# print E_cd
-# E_ac=Energy_v(a_u,c_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
-# print E_ac 
-# E_ba=Energy_h(b_u,a_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
-# print E_ba
-# E_db=Energy_v(d_u,b_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
-# print E_db
-# E_dc=Energy_h(d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
-# print E_dc
-# E_bd=Energy_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
-# print E_bd
+ #print E_ca
+ E_cd=Energy_h(c_u,d_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
+ #print E_cd
+ E_ac=Energy_v(a_u,c_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
+ #print E_ac 
+ E_ba=Energy_h(b_u,a_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
+ #print E_ba
+ E_db=Energy_v(d_u,b_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
+ #print E_db
+ E_dc=Energy_h(d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+ #print E_dc
+ E_bd=Energy_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+ #print E_bd
 
 # print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00  
 # print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
- return E_ab+E_ca+E_val1+E_val2
- return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+ #return E_ab+E_ca#+E_val1+E_val2
+ #return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
  
- #return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+ return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+
+ #return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)
 
 
 
@@ -1001,77 +982,8 @@ def Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
  E=basicA.energy_ad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H1,a_u,d_u)
  return E
 
-
  
 
-
- 
- 
-def reorder_env(E1, E2, E3, E4, E5,E6):
-
- E5p=copy.copy(E1)
- E6p=copy.copy(E2)
- E1p=copy.copy(E3)
- E2p=copy.copy(E4)
- E3p=copy.copy(E5)
- E4p=copy.copy(E6)
- return E1p,E2p,E3p,E4p,E5p,E6p
-
-def Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file):
- Length=len(zlist)-1
- file.write( str(hlist[Length]) + " " + str(zlist[Length]) +  " "+str(zlist1[Length])+" "+str(zlist2[Length])+" "+ str(Elist[Length])+" "+ str(Elist1[Length]) +" "+ str(Elist2[Length]) +  "\n")
- file.flush()
-
-
-def Def_deltaNiter(i,N_iterF,Steps):
-  delta=int(0.00)
-  N_iter=int(0.00)
-
-
-#  if 1.00e0>=Steps[0]>1.00e-1:
-#   Steps[0]=Steps[0]-Steps[1]
-#   N_iter=N_iterF
-#   if Steps[0] <= 0 :Steps[0]=1.00e-1;
-
-  if 1.00e-1>=Steps[0]>1.00e-2: 
-    Steps[0]=Steps[0]-Steps[1]
-    if Steps[0] < 1.00e-12:Steps[0]=1.00e-2;    
-    N_iter=N_iterF
-
-  if 1.00e-2>=Steps[0]>1.00e-3:
-    Steps[0]=Steps[0]-Steps[2]
-    #print "hi", Steps[0], Steps[2]
-    N_iter=N_iterF
-    if Steps[0] < 1.00e-12:Steps[0]=1.00e-3;    
-
-  if 1.00e-3>=Steps[0]>1.00e-4:
-    Steps[0]=Steps[0]-Steps[3]
-    N_iter=N_iterF
-    if Steps[0] < 1.00e-12:Steps[0]=1.00e-4;    
-
-  if 1.00e-4>=Steps[0]>1.00e-5:
-    Steps[0]=Steps[0]-Steps[4]
-    N_iter=N_iterF
-    if Steps[0] < 1.00e-12:Steps[0]=1.00e-5;    
-
-  if 1.00e-5>=Steps[0]>1.00e-6:
-    Steps[0]=Steps[0]-Steps[5]
-    N_iter=N_iterF
-    #print "hi0", Steps[0] 
-    if Steps[0] <1.00e-12:Steps[0]=1.00e-6;    
-
-  #print "hi1", Steps[0], Steps[len(Steps)-1], Steps[0] < Steps[len(Steps)-1]
-  if Steps[0] < Steps[len(Steps)-1] or (Steps[0] < 1.00e-12):
-   Steps[0]=int(0.00)
-   N_iter=int(0.00)
-
-  return Steps[0], N_iter
-
-
-def Store(hlist,zlist, zlist1,zlist2,Elist, Elist1 , Elist2 , file):
- Length=len(zlist)-1
- file.write( str(hlist[Length]) + " " + str(zlist[Length]) +  " "+str(zlist1[Length])+" "+str(zlist2[Length])+" "+ str(Elist[Length])+" "+ str(Elist1[Length]) +" "+ str(Elist2[Length]) +  "\n")
- file.flush()
 
 def Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8):
  Gamma_a.save("Store/Gamma_a")
@@ -1149,12 +1061,10 @@ def Rand_env_total(Env):
  for i in xrange(len(Env1)):
   Env1[i]=copy.copy(Env[i])
   Env1[i].randomize()
- 
  return  Env1
 
 
 def qr_parity(theta):
-
 
     bd1=uni10.Bond(uni10.BD_IN,theta.bond(4).Qlist())
     bd2=uni10.Bond(uni10.BD_IN,theta.bond(5).Qlist())
@@ -1173,7 +1083,7 @@ def qr_parity(theta):
 
 #    print LA
     return GA, LA
-    
+
 def lq_parity(theta):
 
     bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
@@ -1190,8 +1100,6 @@ def lq_parity(theta):
 
 #    print LA
     return  LA, GA
-
-
 
 
 def Decomposition(U):
@@ -1213,10 +1121,6 @@ def Decomposition(U):
  qq.permute([-1,-2,1,-4,-3,4],3)
  r.permute([-3,-4,2,5],3)
  
-
- 
-
- 
  MPO_list=[]
  MPO_list.append(l)
  MPO_list.append(qq)
@@ -1228,6 +1132,7 @@ def Decomposition(U):
 
  #print "Test", H1.elemCmp(U), MPO_list[0],MPO_list[1],MPO_list[2]
  return MPO_list
+
 def slighty_random(a_u,b_u,c_u,d_u,a,b,c,d):
  rand=copy.copy(a_u)
  rand.randomize()
@@ -1535,4 +1440,67 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
 
  return Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4
 
+def Short_TrotterSteps(N_iterF):
+ List_delN=[]
+
+ for i in xrange(5, 1, -1):
+  Delta_N=(i*(1.0/100),N_iterF)
+  List_delN.append(Delta_N)
+
+ for i in xrange(10, 1, -1):
+  Delta_N=(i*(1.0/1000),N_iterF)
+  List_delN.append(Delta_N)
+
+ for i in xrange(10, 0, -1):
+  Delta_N=(i*(1.0/10000),N_iterF)
+  List_delN.append(Delta_N)
+
+ return List_delN
+ 
+def Short_TrotterSteps1(N_iterF):
+ List_delN=[]
+
+ for i in xrange(5, 0, -2):
+  Delta_N=(i*(1.0/100),N_iterF)
+  List_delN.append(Delta_N)
+
+ for i in xrange(10, 0, -2):
+  Delta_N=(i*(1.0/1000),N_iterF)
+  List_delN.append(Delta_N)
+
+ for i in xrange(10, 0, -2):
+  Delta_N=(i*(1.0/10000),N_iterF)
+  List_delN.append(Delta_N)
+
+ return List_delN 
+ 
+def Long_TrotterSteps(N_iterF):
+ List_delN=[]
+
+
+ for i in xrange(10, 1, -1):
+  Delta_N=(i*(1.0/1000),N_iterF)
+  List_delN.append(Delta_N)
+
+ for i in xrange(10, 0, -1):
+  Delta_N=(i*(1.0/10000),N_iterF)
+  List_delN.append(Delta_N)
+
+ return List_delN 
+ 
+ 
+def Long_TrotterSteps1(N_iterF):
+ List_delN=[]
+
+
+ for i in xrange(10, 1, -2):
+  Delta_N=(i*(1.0/1000),N_iterF)
+  List_delN.append(Delta_N)
+
+ for i in xrange(10, 0, -2):
+  Delta_N=(i*(1.0/10000),N_iterF)
+  List_delN.append(Delta_N)
+
+ return List_delN 
+ 
  

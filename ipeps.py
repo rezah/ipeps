@@ -21,8 +21,8 @@ Model="Heisenberg"         #Heisenberg, Ising
 #Model="threebody_U1"         #Heisenberg, Ising
 #Model="threebody"         #Heisenberg, Ising
 
-D=[4]
-chi=[40]
+D=[2]
+chi=[30]
 d_phys=[1]
 
 
@@ -40,7 +40,7 @@ N_iteritebd=50
 N_iterF=30
 Gauge='Fixed'
 Positive='Restrict'
-Corner_method='CTM'   #CTM, CTMRG, CTMFull
+Corner_method='CTMRG'   #CTM, CTMRG, CTMFull
 Acc_E=1.00e-7
 Steps=[1.0e-1,4.0e-2,4.0e-3,4.0e-4,5.0e-5,1.0e-6] #,[Start,steps,End] 
 delta=0.001
@@ -192,16 +192,16 @@ Env3=basic.Rand_env_total(Env)
 
 zlist=[]
 J1_list=[h*0.0100 for h in range(270,400)]
-J1_list=[0.0]
-J2_list=[1.0]
-h_list=[0.0]
+J1_list=[1.0]
+J2_list=[0.0]
+h_list=[1.0]
 
 for h, J2, J1 in zip( h_list, J2_list, J1_list):
  print h, J2, J1 
  h=[h, J1, J2]
 #########################################################################################
  
- #Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
+ Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
  #Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,q_phys,D,N_iteritebd,h,Model,q_D)
  
  #basic.Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8)
@@ -229,14 +229,14 @@ for h, J2, J1 in zip( h_list, J2_list, J1_list):
  d_u,d=basic.makeab(Landa,Gamma_d)
  #print "a",a.printDiagram()
  
- #E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,q_phys,chi,Corner_method,Model)
+ E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,q_phys,chi,Corner_method,Model)
 
- #print 'E_toal=', E_value
+ print 'E_toal=', E_value
  #break
 #########################################################################################
 
 ############################################################################
- Gauge='nFixed'
+ Gauge='Fixed'
  #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.slighty_random(a_u,b_u,c_u,d_u,a,b,c,d)
