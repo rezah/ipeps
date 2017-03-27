@@ -8,74 +8,24 @@ import random
 import copy
 import time
 
-def Renew_dim(dims,dims_val,chi,dim_svd):
-   free_par=chi-dims_val
-   #print "free_par", free_par
-   #print dim_svd
-   cnt=0;
-   cnt1=-10;
-   while cnt < free_par:
-    for i in xrange(len(dims)):
-     if  ((int(len(dims)/2)+i)<=(len(dims)-1)):
-         if (dims[int(len(dims)/2)+i]<dim_svd[int(len(dims)/2)+i]) and  (dims[int(len(dims)/2)+i] > 0):
-          dims[int(len(dims)/2)+i]+=1
-          cnt+=1
-          if cnt >= free_par:
-           break
-         if (int(len(dims)/2)-i) >= 0 and ((int(len(dims)/2)-i)<=(len(dims)-1)):
-          if (dims[int(len(dims)/2)-i]<dim_svd[int(len(dims)/2)-i]) and (dims[int(len(dims)/2)-i] > 0):
-           dims[int(len(dims)/2)-i]+=1
-           cnt+=1
-           if cnt >= free_par:
-            break
-    
-    if (cnt-cnt1) is 0:
-      break;
-    cnt1=cnt;
-
-   return dims
-
-
-
-
 def setTruncation(theta, chi):
     LA=uni10.UniTensor(theta.bond())
     GA=uni10.UniTensor(theta.bond())
     GB=uni10.UniTensor(theta.bond())
     svds = {}
     blk_qnums = theta.blockQnum()
-
-#    print '\n', blk_qnums
     dim_svd=[]
     for qnum in blk_qnums:
         svds[qnum] = theta.getBlock(qnum).svd()
-        #print_inline(svds[qnum][1])
         dim_svd.append(int(svds[qnum][1].col()))
-        #print svds[qnum][1]
     svs = []
     bidxs = []
     for bidx in xrange(len(blk_qnums)):
         svs, bidxs = sv_merge(svs, bidxs, bidx, svds[blk_qnums[bidx]][1], chi,len(blk_qnums))
-        #print svs
     dims = [0] * len(blk_qnums)
     for bidx in bidxs:
         dims[bidx] += 1  
     qnums = []
-    #print dims,blk_qnums;
-########################################################################
-#    dims_val=0
-#    for i in xrange(len(dims)):
-#     dims_val+=dims[i]
-#     
-#    #print dims_val
-#    if dims_val < chi:
-#      dims=Renew_dim(dims,dims_val,chi,dim_svd) 
-
-#    dims_val=0
-#    for i in xrange(len(dims)):
-#     dims_val+=dims[i]
-#    #print dims, dims_val
-#######################################################################
     for bidx in xrange(len(blk_qnums)):
         qnums += [blk_qnums[bidx]] * dims[bidx]
     bdi_mid = uni10.Bond(uni10.BD_IN, qnums)
@@ -84,8 +34,6 @@ def setTruncation(theta, chi):
     GB.assign([bdi_mid, theta.bond(3), theta.bond(4),theta.bond(5)])
     LA.assign([bdi_mid, bdo_mid])
     degs = bdi_mid.degeneracy()
-#    sv_mat = uni10.Matrix(bdi_mid.dim(), bdo_mid.dim(), svs, True)
-#    norm = sv_mat.norm()
     for qnum, dim in degs.iteritems():
         if qnum not in svds:
             raise Exception("In setTruncaton(): Fatal error.")
@@ -93,40 +41,138 @@ def setTruncation(theta, chi):
         GA.putBlock(qnum, svd[0].resize(svd[0].row(), dim))
         GB.putBlock(qnum, svd[2].resize(dim, svd[2].col()))
         LA.putBlock(qnum, svd[1].resize(dim, dim)  )
-
-#    print LA
     return GA, GB, LA
 
 
+def svd_parity(theta):
 
-
-
-
-
-def setTruncation1(theta, chi,q_chi):
-    bdi = uni10.Bond(uni10.BD_IN, q_chi)
-    bdo = uni10.Bond(uni10.BD_OUT, q_chi)
-    LA=uni10.UniTensor([bdi, bdo])
-    GA=uni10.UniTensor([theta.bond(0), theta.bond(1), bdo])
-    GB=uni10.UniTensor([bdi, theta.bond(2), theta.bond(3)])
+    LA=uni10.UniTensor([theta.bond(0), theta.bond(1)])
+    GA=uni10.UniTensor([theta.bond(0), theta.bond(1)])
+    GB=uni10.UniTensor([theta.bond(0), theta.bond(1)])
     svds = {}
     blk_qnums = theta.blockQnum()
-    degs = bdi.degeneracy()
-
     dim_svd=[]
-    for qnum, dim in degs.iteritems():
+    for qnum in blk_qnums:
         svds[qnum] = theta.getBlock(qnum).svd()
-        GA.putBlock(qnum, svds[qnum][0].resize(svds[qnum][0].row(), dim))
-        GB.putBlock(qnum, svds[qnum][2].resize(dim, svds[qnum][2].col()))
-        LA.putBlock(qnum, svds[qnum][1].resize(dim, dim)  )
-
-    return GA, GB, LA
-
-
-
+    for qnum in blk_qnums:
+        svd = svds[qnum]
+        GA.putBlock(qnum, svd[0])
+        GB.putBlock(qnum, svd[2])
+        LA.putBlock(qnum, svd[1])
+    return GA, LA,GB
 
 
 
+def svd_parity1(theta):
+
+    bd1=uni10.Bond(uni10.BD_IN,theta.bond(3).Qlist())
+    bd2=uni10.Bond(uni10.BD_IN,theta.bond(4).Qlist())
+    bd3=uni10.Bond(uni10.BD_IN,theta.bond(5).Qlist())
+
+    GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3),theta.bond(4),theta.bond(5)])
+    LA=uni10.UniTensor([bd1,bd2,bd3,theta.bond(3),theta.bond(4),theta.bond(5)])
+    GB=uni10.UniTensor([bd1,bd2,bd3,theta.bond(3),theta.bond(4),theta.bond(5)])
+
+
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).svd()
+        if (GA.getBlock(qnum).row() == svds[qnum][0].row()) and (GA.getBlock(qnum).col() == svds[qnum][0].col()):
+         GA.putBlock(qnum, svds[qnum][0])
+         LA.putBlock(qnum, svds[qnum][1])
+         GB.putBlock(qnum, svds[qnum][2])
+        else:
+         GA.putBlock(qnum, svds[qnum][0].resize(GA.getBlock(qnum).row(),GA.getBlock(qnum).col()))
+         GB.putBlock(qnum, svds[qnum][2].resize(GB.getBlock(qnum).row(),GB.getBlock(qnum).col()))
+         LA.putBlock(qnum, svds[qnum][1].resize(LA.getBlock(qnum).row(),LA.getBlock(qnum).col()))
+
+
+#    print LA
+    return GA, LA, GB
+
+def svd_parity2(theta):
+
+    bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
+    bd2=uni10.Bond(uni10.BD_OUT,theta.bond(1).Qlist())
+    bd3=uni10.Bond(uni10.BD_OUT,theta.bond(2).Qlist())
+
+    GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),bd1,bd2,bd3])
+    LA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),bd1,bd2,bd3])
+    GB=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3),theta.bond(4),theta.bond(5)])
+
+
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).svd()
+        print GA.getBlock(qnum).col(), GA.getBlock(qnum).row(), svds[qnum][0].col(), svds[qnum][0].row()
+        GA.putBlock(qnum, svds[qnum][0])
+        
+        LA.putBlock(qnum, svds[qnum][1])
+        GB.putBlock(qnum, svds[qnum][2])
+
+#    print LA
+    return GA, LA, GB
+
+
+
+
+
+
+
+def   Sqrt(Landa):
+  Landa_cp=copy.copy(Landa)
+  blk_qnums=Landa.blockQnum()
+  for qnum in blk_qnums:
+   D=int(Landa_cp.getBlock(qnum).col())
+   Landa_cpm=Landa_cp.getBlock(qnum)
+   Landam=Landa_cp.getBlock(qnum)
+   for i in xrange(D):
+    for j in xrange(D):
+     if Landam[i*D+j] > 1.0e-12:
+      Landa_cpm[i*D+j]=Landam[i*D+j]**(1.00/2.00)
+     else:
+      Landa_cpm[i*D+j]=0
+   Landa_cp.putBlock(qnum,Landa_cpm)
+  return Landa_cp 
+
+def inverse(Landa2):
+ invLanda2=uni10.UniTensor(Landa2.bond())
+ blk_qnums=Landa2.blockQnum()
+ for qnum in blk_qnums:
+  D=int(Landa2.getBlock(qnum).row())
+  D1=int(Landa2.getBlock(qnum).col())
+  invL2 = uni10.Matrix(D, D1)
+  invLt = uni10.Matrix(D, D1)
+  invLt=Landa2.getBlock(qnum)
+  for i in xrange(D):
+    for j in xrange(D1):
+     invL2[i*D1+j] = 0 if ((invLt[i*D1+j].real) < 1.0e-12) else (1.00 / (invLt[i*D1+j].real))
+  invLanda2.putBlock(qnum,invL2)
+ return invLanda2
+
+
+def lq_parity(theta):
+    bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
+    bd2=uni10.Bond(uni10.BD_OUT,theta.bond(1).Qlist())    
+    bd3=uni10.Bond(uni10.BD_OUT,theta.bond(2).Qlist())    
+    
+    
+    LA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),bd1,bd2, bd3])
+    GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3),theta.bond(4),theta.bond(5)])
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).lq()
+        GA.putBlock(qnum, svds[qnum][1])
+        LA.putBlock(qnum, svds[qnum][0])
+
+#    print LA
+    return  LA, GA
 
 
 
@@ -138,20 +184,12 @@ def setTruncation1(theta, chi,q_chi):
 
 
 
-def print_inline(s):
- print '\n'
- for i in xrange(int(s.col())):
-  print s[i]
- print '\n'
 
 
 def sv_merge(svs, bidxs, bidx, sv_mat, chi, len_qn):
-#Return the length (the number of items) of an object. The argument may be a sequence (such as a string, bytes, tuple, list, or range) or a collection (such as a dictionary, set, or frozen set).
-    #print 'helo'
     if(len(svs)):
         length = len(svs) + sv_mat.elemNum()
         length = length if length < chi else chi
-        #print 'length', length
         ori_svs = svs
         ori_bidxs = bidxs
         svs = [0] * length
@@ -194,7 +232,6 @@ def sv_merge(svs, bidxs, bidx, sv_mat, chi, len_qn):
         bidxs = [bidx] * sv_mat.elemNum()
         svs = [sv_mat[i] for i in xrange(sv_mat.elemNum())]
        else: bidxs = [bidx];  svs = [sv_mat[0]];  
-    #print svs, bidxs,'\n','\n'
     return svs, bidxs
 
 

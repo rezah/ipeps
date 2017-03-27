@@ -953,22 +953,16 @@ def equall_dis(c_up, b_up, a_u):
  
  l.setLabel([18,80])
  qq.setLabel([80,20,6,4,54])
- 
-
-
 
  A=copy.copy(a_u)
  A.setLabel([55,16,17,18,2])
  A.permute([2,16,17,55,18],4)
- 
- 
  
  q,r=qr_parity1(A) 
  
  
  q.setLabel([2,16,17,55,81])
  r.setLabel([81,18])
-
 
  Teta=l*r
  Teta.permute([81,80],1)
@@ -992,7 +986,6 @@ def equall_dis(c_up, b_up, a_u):
  b_up.permute([54,18,20,6,4],3)
  a_up.permute([55,16,17,18,2],3)
 #################################################################################
-
  A=copy.copy(a_up)
  A.setLabel([55,16,17,18,2])
  A.permute([17,55,16,18,2],1)
@@ -1001,16 +994,10 @@ def equall_dis(c_up, b_up, a_u):
  
  l.setLabel([17,80])
  qq.setLabel([80,55,16,18,2])
- 
-
-
 
  A=copy.copy(c_up)
  A.setLabel([53,14,12,19,17])
  A.permute([53,14,12,19,17],4)
- 
- 
- 
  q,r=qr_parity1(A) 
  
  
@@ -1038,12 +1025,8 @@ def equall_dis(c_up, b_up, a_u):
  c_up=q*U
  c_up.permute([53,14,12,19,17],3)
  a_up.permute([55,16,17,18,2],3)
-
-
-
- 
- 
  return c_up,b_up,a_up
+
 
 
 
@@ -1366,9 +1349,6 @@ def lq_parity(theta):
     return  LA, GA
 
 
-
-
-
  
 def qr_parity(theta):
 
@@ -1410,7 +1390,6 @@ def sqrt_general(N2):
   return N_init
 def Sqrt_mat(e):
  d=int(e.row())
- 
  for q in xrange(d):
    #print e[q] 
    if e[q] > 0:  

@@ -9,6 +9,7 @@ import MoveCorboz
 import MoveFull
 import basicA
 import basicB
+import basicC
 
 def Initialize_function(Gamma,Landa):
  q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
@@ -79,6 +80,37 @@ def Heisenberg1(J2):
     bdo = uni10.Bond(uni10.BD_OUT, dim);
     H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg");
     H.putBlock(ham)
+    return H
+
+
+def threebody(h,d_phys):
+    bdi = uni10.Bond(uni10.BD_IN, d_phys)
+    bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+    H = uni10.UniTensor([bdi, bdi,bdi, bdo, bdo,bdo], "Heisenberg")
+
+    spin = 0.5
+    sx = matSx()
+    sy = matSy()
+    sz = matSz()
+    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+    szt=uni10.otimes(sz,sz)
+    sxt=uni10.otimes(sx,sx)
+    syt=uni10.otimes(sy,sy)
+    ident=uni10.otimes(iden,iden)
+
+    sztt=uni10.otimes(iden,sz)
+    sxtt=uni10.otimes(iden,sx)
+    sytt=uni10.otimes(iden,sy)
+
+    ham =h[1]*(h[0]*uni10.otimes(szt,iden)+uni10.otimes(sxt,iden)+(-1.0)*uni10.otimes(syt,iden))
+    ham =ham + h[1]*(h[0]*uni10.otimes(iden,szt)+uni10.otimes(iden,sxt)+(-1.0)*uni10.otimes(iden,syt))
+
+    ham = ham +(2.00*h[2])*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+(-1.0)*uni10.otimes(sy,sytt))
+    #ham = (h[2])*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+(-1.0)*uni10.otimes(sy,sytt))
+
+    H.putBlock(ham)
+    #print H
+    #H.randomize()
     return H
 
 
@@ -187,34 +219,6 @@ def Heisenberg1_U1(J2, d_phys):
     return H
 
 
-def threebody(h,d_phys):
-    bdi = uni10.Bond(uni10.BD_IN, d_phys)
-    bdo = uni10.Bond(uni10.BD_OUT, d_phys)
-    H = uni10.UniTensor([bdi, bdi,bdi, bdo, bdo,bdo], "Heisenberg")
-
-    spin = 0.5
-    sx = matSx()
-    sy = matSy()
-    sz = matSz()
-    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
-    szt=uni10.otimes(sz,sz)
-    sxt=uni10.otimes(sx,sx)
-    syt=uni10.otimes(sy,sy)
-    ident=uni10.otimes(iden,iden)
-
-    sztt=uni10.otimes(iden,sz)
-    sxtt=uni10.otimes(iden,sx)
-    sytt=uni10.otimes(iden,sy)
-
-    ham =h[1]*(uni10.otimes(szt,iden)+uni10.otimes(sxt,iden)+(-1.0)*uni10.otimes(syt,iden))
-    ham =ham + h[1]*(uni10.otimes(iden,szt)+uni10.otimes(iden,sxt)+(-1.0)*uni10.otimes(iden,syt))
-
-    ham = ham +(h[2])*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+(-1.0)*uni10.otimes(sy,sytt))
-
-    H.putBlock(ham)
-    #print H
-    #H.randomize()
-    return H
 
 
 
@@ -456,69 +460,54 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
  z1.identity()
  z2=copy.copy(a)
  z2.randomize()
- z1=z1#+(1.0e-2)*z2
- criteria_val=0
+ z1=z1#+(1.0e-1)*z2
+ 
  Accuracy=1.00e-7
- Truncation=[0]
  E0=20.00
  E1=10.00
  Loop_iter=0
  count=0
  #print  '\n', '\n', 'CTM'
- #t0=time.time()
- while Loop_iter is 0:
-  count+=1
+ 
+ while Loop_iter is 0: 
 
-  #t0=time.time()
-  c1, Ta4, Tb4, c4=Move.add_left1(c1,Tb4,Ta4,c4,Tb1,Ta3,a,c,chi,D)
-  c1, Ta4, Tb4, c4=Move.add_left1(c1,Tb4,Ta4,c4,Ta1,Tb3,b,d,chi,D)
-  #print time.time() - t0, " 2*Left"
-  #print c1#,Ta4.printDiagram()
+  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=Move.add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D)
+  
+  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=Move.add_left1(c1,c2,c3,c4,Tb1,Ta2,Tb3,Ta4,Ta1,Tb2,Ta3,Tb4,b,a,d,c,chi,D) 
 
-  c2, Ta2, Tb2, c3=Move.add_right1(c2,Ta2,Tb2,c3,Ta1,Tb3,b,d,chi,D)
-  c2, Ta2, Tb2, c3=Move.add_right1(c2,Ta2,Tb2,c3,Tb1,Ta3,a,c,chi,D)
+  Move.permuteN(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
-  Move.permuteN(a, b,c,d ,c1, c2, c3, c4, Ta1, Tb1, Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
-
-
-  c1, Ta1, Tb1, c2=Move.add_left1(c1,Tb1,Ta1,c2,Tb4,Ta2,a,b,chi,D)
-  c1, Ta1, Tb1, c2=Move.add_left1(c1,Tb1,Ta1,c2,Ta4,Tb2,c,d,chi,D)
-
+  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=Move.add_left1(c1,c4,c3,c2,Ta4,Ta3,Ta2,Ta1,Tb4,Tb3,Tb2,Tb1,a,c,b,d,chi,D)
   
 
-  c4, Ta3, Tb3, c3=Move.add_right1(c4,Ta3,Tb3,c3,Ta4,Tb2,c,d,chi,D)
-  c4, Ta3, Tb3, c3=Move.add_right1(c4,Ta3,Tb3,c3,Tb4,Ta2,a,b,chi,D)
+  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=Move.add_left1(c1,c4,c3,c2,Tb4,Ta3,Tb2,Ta1,Ta4,Tb3,Ta2,Tb1,c,a,d,b,chi,D)
 
-  Move.permuteN1( a, b, c, d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+  Move.permuteN1(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
-  if (count > 0 )  :
-#   print c1.norm(),c2.norm(),c3.norm(),c4.norm()
-#   print Ta4.norm(),Ta3.norm(),Ta2.norm(),Ta1.norm()
-#   print Tb4.norm(),Tb3.norm(),Tb2.norm(),Tb1.norm()
-    
-   norm=Move.magnetization_value1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
-   norm1=Move.magnetization_value1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
-   #print time.time() - t0, count, "CTM-Norm, Left"
+#  print c1.norm(), c2.norm(), c3.norm(), c4.norm()
+#  print Ta4.norm(), Ta3.norm(), Ta2.norm(), Ta1.norm()
+#  print Tb4.norm(), Tb3.norm(), Tb2.norm(), Tb1.norm()
 
-   E0=E1
-   if (abs(norm[0]) > 1.00e-10):
-    E1=abs(norm1[0])/abs(norm[0])
-    if (abs((E0-E1)/E0) < Accuracy) :Loop_iter=1;
-   else:
-    E1=abs(norm1[0])
-    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
-   if (count > 10 ): print 'break! CTM'; break;
-   print E1, abs((E0-E1)/E1),norm[0],  count
-   #print E1, Truncation[0], abs((E0-E1)/E1)
-   #print a.norm(), b.norm(), c.norm(), d.norm()
+#  c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=Move.test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
+#  criteria_val=Move.distance(c1, c2, c3, c4, c1_f, c2_f, c3_f, c4_f)
+
+  
+  norm=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+  norm1=Move.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
+  E0=E1
+  if (abs(norm[0]) > 1.00e-10):
+   E1=abs(norm1[0])/abs(norm[0])
+   if (abs((E0-E1)/E0) < Accuracy):Loop_iter=1;
+  else:
+   E1=abs(norm1[0])
+   if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
+  count+=1
+  if (count > 50 ): print 'break! CTM'; break;
+  print E1, abs((E0-E1)/E1),norm[0], count
+  #print E1, Truncation[0], abs((E0-E1)/E1)
+  #print a.norm(), b.norm(), c.norm(), d.norm()
  
- #print 'CTM', norm[0], count, c2
- #c2.permute([0,1],1)
- #print c2
- #print time.time() - t0, count, "CTM, Left"
-
-
-
+ #print 'CTM', norm[0]
  return c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4
 
 
@@ -528,7 +517,7 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
  z1.identity()
  z2=copy.copy(a)
  z2.randomize()
- z1=z1+(1.0e-1)*z2
+ z1=z1#+(1.0e-1)*z2
  #z1=200*z2
  
  Accuracy=1.00e-7
@@ -536,42 +525,22 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
  E1=10.00
  Loop_iter=0
  count=0
- #print  '\n', '\n', 'CTM'
-# norm=Move.magnetization_value1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
-# print "f",norm[0]
- 
+ #print  '\n', '\n', 'CTM' 
  while Loop_iter is 0: 
 
   c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveCorboz.add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D)
-#  norm=Move.magnetization_value1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
-#  print "f",norm[0]
   
-  #print c1.printDiagram(),c2.printDiagram(), c4.printDiagram(),c3.printDiagram()
-  #print Ta4.printDiagram(),Tb4.printDiagram(),Ta2.printDiagram(),Tb2.printDiagram()
   c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveCorboz.add_left1(c1,c2,c3,c4,Tb1,Ta2,Tb3,Ta4,Ta1,Tb2,Ta3,Tb4,b,a,d,c,chi,D) 
-  #print c1.printDiagram()#
-#  norm=Move.magnetization_value1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
-#  print "f",norm[0]
 
   MoveCorboz.permuteN(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
-#  print c1.norm(), c2.norm(), c3.norm(), c4.norm()
   c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveCorboz.add_left1(c1,c4,c3,c2,Ta4,Ta3,Ta2,Ta1,Tb4,Tb3,Tb2,Tb1,a,c,b,d,chi,D)
   
-#  print c1.norm(), c2.norm(), c3.norm(), c4.norm()
-#  print Ta4.norm(), Ta3.norm(), Ta2.norm(), Ta1.norm()
-#  print Tb4.norm(), Tb3.norm(), Tb2.norm(), Tb1.norm()
 
   c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveCorboz.add_left1(c1,c4,c3,c2,Tb4,Ta3,Tb2,Ta1,Ta4,Tb3,Ta2,Tb1,c,a,d,b,chi,D)
 
   MoveCorboz.permuteN1(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
-#  print c1.norm(), c2.norm(), c3.norm(), c4.norm()
-#  print Ta4.norm(), Ta3.norm(), Ta2.norm(), Ta1.norm()
-#  print Tb4.norm(), Tb3.norm(), Tb2.norm(), Tb1.norm()
-
-#  c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=Move.test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
-#  criteria_val=Move.distance(c1, c2, c3, c4, c1_f, c2_f, c3_f, c4_f)
 
   
   norm=MoveCorboz.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
@@ -584,8 +553,8 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
    E1=abs(norm1[0])
    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
-  if (count > 10 ): print 'break! CTM'; break;
-  #print E1, abs((E0-E1)/E1),norm[0], count
+  if (count > 100 ): print 'break! CTM'; break;
+  print E1, abs((E0-E1)/E1),norm[0], count
   #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
  
@@ -593,100 +562,34 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
  return c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4
 
 
-def corner_transfer_matrix_twosite_CTMFull(ap,bp,cp,dp,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D):
- a=copy.copy(ap)
- b=copy.copy(bp)
- c=copy.copy(cp)
- d=copy.copy(dp)
-
- a.setLabel([1,-1,2,-2,3,-3,4,-4])
- b.setLabel([1,-1,2,-2,3,-3,4,-4])
- c.setLabel([1,-1,2,-2,3,-3,4,-4])
- d.setLabel([1,-1,2,-2,3,-3,4,-4])
-
-
-
- a.combineBond([1,-1])
- a.combineBond([2,-2])
- a.combineBond([3,-3])
- a.combineBond([4,-4])
- b.combineBond([1,-1])
- b.combineBond([2,-2])
- b.combineBond([3,-3])
- b.combineBond([4,-4])
- c.combineBond([1,-1])
- c.combineBond([2,-2])
- c.combineBond([3,-3])
- c.combineBond([4,-4])
- d.combineBond([1,-1])
- d.combineBond([2,-2])
- d.combineBond([3,-3])
- d.combineBond([4,-4])
- Ta11=copy.copy(Ta1)
- Ta22=copy.copy(Ta2)
- Ta33=copy.copy(Ta3)
- Ta44=copy.copy(Ta4)
- 
- Tb11=copy.copy(Tb1)
- Tb22=copy.copy(Tb2)
- Tb33=copy.copy(Tb3)
- Tb44=copy.copy(Tb4)
- c3.transpose()
- 
- 
- Ta1.setLabel([1,2,-2,3])
- Ta1.combineBond([2,-2])
- Ta2.setLabel([1,2,-2,3])
- Ta2.combineBond([2,-2])
- Ta3.setLabel([1,2,-2,3])
- Ta3.combineBond([2,-2])
- Ta4.setLabel([1,2,-2,3])
- Ta4.combineBond([2,-2])
- Tb4.setLabel([1,2,-2,3])
- Tb4.combineBond([2,-2])
- Tb3.setLabel([1,2,-2,3])
- Tb3.combineBond([2,-2])
- Tb2.setLabel([1,2,-2,3])
- Tb2.combineBond([2,-2])
- Tb1.setLabel([1,2,-2,3])
- Tb1.combineBond([2,-2])
-
-
-
- chi=20
+def corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D):
  z1=copy.copy(a)
- z2=copy.copy(b)
- z2.randomize()
  z1.identity()
- z1=z1#+(1.00e-5)*z2
+ z2=copy.copy(a)
+ z2.randomize()
+ z1=z1#+(1.0e-1)*z2
+ #z1=200*z2
+ 
  Accuracy=1.00e-7
- Truncation=[0]
  E0=20.00
  E1=10.00
  Loop_iter=0
  count=0
- #print  '\n', '\n', 'CTM'
  while Loop_iter is 0: 
-  c1_f=copy.copy(c1)
-  c2_f=copy.copy(c2)
-  c3_f=copy.copy(c3)
-  c4_f=copy.copy(c4)
 
-  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveFull.add_left(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D)
-  
-  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveFull.add_left (c1,c2,c3,c4,Tb1,Ta2,Tb3,Ta4,Ta1,Tb2,Ta3,Tb4,b,a,d,c,chi,D)
-  MoveFull.permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveFull.add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D)
 
-  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveFull.add_left(c1,c4,c3,c2,Ta4,Ta3,Ta2,Ta1,Tb4,Tb3,Tb2,Tb1,a,c,b,d,chi,D)
-  
-  
-  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveFull.add_left (c1,c4,c3,c2,Tb4,Ta3,Tb2,Ta1,Ta4,Tb3,Ta2,Tb1,c,a,d,b,chi,D)
+  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveFull.add_left1(c1,c2,c3,c4,Tb1,Ta2,Tb3,Ta4,Ta1,Tb2,Ta3,Tb4,b,a,d,c,chi,D) 
 
-  MoveFull.permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+  MoveFull.permuteN(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
-#  c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=Move.test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
+  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveFull.add_left1(c1,c4,c3,c2,Ta4,Ta3,Ta2,Ta1,Tb4,Tb3,Tb2,Tb1,a,c,b,d,chi,D)
   
-#  criteria_val=Move.distance(c1, c2, c3, c4, c1_f, c2_f, c3_f, c4_f)
+
+  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveFull.add_left1(c1,c4,c3,c2,Tb4,Ta3,Tb2,Ta1,Ta4,Tb3,Ta2,Tb1,c,a,d,b,chi,D)
+
+  MoveFull.permuteN1(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
   
   norm=MoveFull.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
   norm1=MoveFull.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
@@ -698,133 +601,120 @@ def corner_transfer_matrix_twosite_CTMFull(ap,bp,cp,dp,chi,c1, c2,c3,c4,Ta1, Tb1
    E1=abs(norm1[0])
    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
-  if (count > 10 ): print 'break! CTM'; break;
-  print E1, abs((E0-E1)/E1), norm[0], count
+  if (count > 100 ): print 'break! CTM'; break;
+  print E1, abs((E0-E1)/E1),norm[0], count
   #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
  
- print 'CTM', norm[0]
- c3.transpose()
+ #print 'CTM', norm[0]
+ return c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4
  
-
- M=Ta1.getBlock()
- Ta11.putBlock(M)
- 
- M=Ta2.getBlock()
- Ta22.putBlock(M)
- Ta3.permute([10,12,13],1)
- M=Ta3.getBlock()
- Ta33.putBlock(M)
-
- Ta4.permute([11,17,18],1)
-
- M=Ta4.getBlock()
- Ta44.putBlock(M)
-
- M=Tb1.getBlock()
- Tb11.putBlock(M)
- M=Tb2.getBlock()
- Tb22.putBlock(M)
-
- Tb3.permute([13,14,8],1)
-
-
- M=Tb3.getBlock()
- Tb33.putBlock(M)
-
- #print Tb4.printDiagram(),Tb44.printDiagram() 
-
- Tb4.permute([18,3,0],1)
- M=Tb4.getBlock()
- Tb44.putBlock(M)
-
- 
- return c1, c2,c3,c4,Ta11, Tb11,Ta22, Tb22,Ta33, Tb33,Ta44, Tb44
 
 
 
 def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model):
 
-#########################
+############################################################################
 # E_val1=Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
 # #print "E_val1", E_val1
 
 # E_val2=Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
 # #print "E_val2", E_val2
-##########################
+
 # E_val3=Energy_cb(d_u,a_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
 # #print "E_val3", E_val3
 
 # E_val4=Energy_ad(b_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
 # #print "E_val4", E_val4
-##########################
+# 
 # E_val5=Energy_cb(a_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
 # #print "E_val5", E_val5
 
 # E_val6=Energy_ad(c_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
 # #print "E_val6", E_val6
-###########################
+
 # E_val7=Energy_cb(b_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
 # #print "E_val7", E_val7
 
 # E_val8=Energy_ad(d_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
 # #print "E_val8", E_val8
-##########################
+############################################################################
 
-#######################
- E_ab=Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- #print E_ab 
- E_ca=Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
- #print E_ca
- E_cd=Energy_h(c_u,d_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
- #print E_cd
- E_ac=Energy_v(a_u,c_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
- #print E_ac 
- E_ba=Energy_h(b_u,a_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
- #print E_ba
- E_db=Energy_v(d_u,b_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
- #print E_db
- E_dc=Energy_h(d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
- #print E_dc
- E_bd=Energy_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
- #print E_bd
+##############################################################################
+# E_ab=Energy_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+# #print E_ab 
+# E_ca=Energy_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+# #print E_ca
+# E_cd=Energy_h(c_u,d_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
+# #print E_cd
+# E_ac=Energy_v(a_u,c_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model)
+# #print E_ac 
+# E_ba=Energy_h(b_u,a_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
+# #print E_ba
+# E_db=Energy_v(d_u,b_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model)
+# #print E_db
+# E_dc=Energy_h(d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+# #print E_dc
+# E_bd=Energy_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+# #print E_bd
+###############################################################################
 
-# print E_ab,E_ba,E_cd, E_dc, (E_ab+E_ba+E_cd+E_dc) / 4.00  
-# print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
- #return E_ab+E_ca#+E_val1+E_val2
- #return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+ E_1=Energy_cab(c_u,a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+ print "E_1", E_1
+
+ E_2=Energy_acd(a_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+ print "E_2", E_2
+
+ E_3=Energy_cab(d_u,b_u,a_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+ print "E_3", E_3
+
+ E_4=Energy_acd(b_u,d_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+ print "E_4", E_4
  
- return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+ E_5=Energy_cab(a_u,c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+ print "E_5", E_5
 
+ E_6=Energy_acd(c_u,a_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+ print "E_6", E_6
+ 
+ E_7=Energy_cab(b_u,d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+ print "E_7", E_7
+
+ E_8=Energy_acd(d_u,b_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+ print "E_8", E_8
+ 
+ return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/8.00
+ return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+ #return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
  #return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc)/4.00)
 
 
 def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model):
 
 #########################
-# E_val1=Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
-# #print "E_val1", E_val1
+ E_val1=Energy_cb(c_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+ #print "E_val1", E_val1
 
-# E_val2=Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
-# #print "E_val2", E_val2
+ E_val2=Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model)
+ #print "E_val2", E_val2
+#########################
+ E_val3=Energy_cb(d_u,a_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+ #print "E_val3", E_val3
+
+ E_val4=Energy_ad(b_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
+ #print "E_val4", E_val4
+#########################
+ E_val5=Energy_cb(a_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+ #print "E_val5", E_val5
+
+ E_val6=Energy_ad(c_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
+ #print "E_val6", E_val6
 ##########################
-# E_val3=Energy_cb(d_u,a_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
-# #print "E_val3", E_val3
+ E_val7=Energy_cb(b_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+ #print "E_val7", E_val7
 
-# E_val4=Energy_ad(b_u,c_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model)
-# #print "E_val4", E_val4
-##########################
-# E_val5=Energy_cb(a_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
-# #print "E_val5", E_val5
-
-# E_val6=Energy_ad(c_u,b_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model)
-# #print "E_val6", E_val6
-###########################
-# E_val7=Energy_cb(b_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
-# #print "E_val7", E_val7
-
-# E_val8=Energy_ad(d_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
-# #print "E_val8", E_val8
+ E_val8=Energy_ad(d_u,a_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model)
+ #print "E_val8", E_val8
 ##########################
 
 #######################
@@ -850,7 +740,7 @@ def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_met
  #return E_ab+E_ca#+E_val1+E_val2
  #return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
  
- return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
+ return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
 
  #return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)
 
@@ -982,6 +872,53 @@ def Energy_ad(a_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
  E=basicA.energy_ad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H1,a_u,d_u)
  return E
 
+def Energy_cab(c_u,a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
+ 
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+ 
+ Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
+ if Corner_method is 'CTM':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+ if Corner_method is 'CTMRG':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+ if Corner_method is 'CTMFull':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+
+ reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
+
+ E1, E2, E3, E4, E5, E6, E7, E8=basicC.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+
+ H2=threebody(h,d_phys)
+ MPO_list=Decomposition(H2)
+
+ E=basicC.energy_cab(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u)
+
+ return E
+
+def Energy_acd(a_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
+ 
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+ 
+ Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+
+ if Corner_method is 'CTM':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+ if Corner_method is 'CTMRG':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+ if Corner_method is 'CTMFull':
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+
+ reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
+
+ E1, E2, E3, E4, E5, E6, E7, E8=basicC.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+
+ H2=threebody(h,d_phys)
+ MPO_list=Decomposition(H2)
+
+ E=basicC.energy_acd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,c_u,d_u)
+
+ return E
  
 
 
@@ -1179,6 +1116,11 @@ def total_random(a_u,b_u,c_u,d_u,a,b,c,d):
  b=make_ab(b_u)
  c=make_ab(c_u)
  d=make_ab(d_u)
+
+ a=a*(1.00/MaxAbs(a)) 
+ b=b*(1.00/MaxAbs(b)) 
+ c=c*(1.00/MaxAbs(c)) 
+ d=d*(1.00/MaxAbs(d)) 
  
  return a_u,b_u,c_u,d_u,a,b,c,d
 
@@ -1503,4 +1445,510 @@ def Long_TrotterSteps1(N_iterF):
 
  return List_delN 
  
+
+def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist):
+
+ D_r=[0]*4
+ d.setLabel([19,-19,10,-10,8,-8,20,-20])
+
+
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ a_u1=copy.copy(a_u)
+ b_u1=copy.copy(b_u)
+ c_u1=copy.copy(c_u)
+
+ a_d1=copy.copy(a_u)
+ b_d1=copy.copy(b_u)
+ c_d1=copy.copy(c_u)
+ 
+###########################################################
+
+ c_u1.setLabel([54,14,12,19,17])
+ a_u1.setLabel([55,16,17,18,2])
+ b_u1.setLabel([56,18,20,6,4])
+
+ c_d1.setLabel([51,-14,-12,-19,-17])
+ a_d1.setLabel([52,-16,-17,-18,-2])
+ b_d1.setLabel([53,-18,-20,-6,-4])
+
+ c_u1=((c_u1*(MPO_list[0])))
+ a_u1=(a_u1*(MPO_list[1]))
+ b_u1=((b_u1*(MPO_list[2])))
+
+ c_u1.permute([-54,14,12,58,57,19,17],3)
+ a_u1.permute([-55,16,17,58,57,18,2,59,60],5)
+ b_u1.permute([-56,18,20,59,60,6,4],5)
+
+ c_d1=copy.copy(c_u1)
+ b_d1=copy.copy(b_u1)
+ a_d1=copy.copy(a_u1)
+
+ c_d1.setLabel([-54,-14,-12,-58,-57,-19,-17])
+ a_d1.setLabel([-55,-16,-17,-58,-57,-18,-2,-59,-60])
+ b_d1.setLabel([-56,-18,-20,-59,-60,-6,-4])
+##########################################################
+ a_u.setLabel([55,16,64,66,2])
+ a_d=copy.copy(a_u)
+ a_d.setLabel([52,-16,-64,-66,-2])
+
+ b_u.setLabel([56,68,20,6,4])
+ b_d=copy.copy(b_u)
+ b_d.setLabel([53,-68,-20,-6,-4])
+
+ c_u.setLabel([54,14,12,19,62])
+ c_d=copy.copy(c_u)
+ c_d.setLabel([51,-14,-12,-19,-62])
+##################################  1  #####################################################
+ c_ut=((c_u*(MPO_list[0])))
+ a_ut=(a_u*(plist[1]*plist[2]*MPO_list[1]))
+ b_ut=((b_u*(plist[3]*MPO_list[2])))
+
+ c_ut.permute([-54,14,12,19,62,58,57],3)
+ a_ut.permute([-55,16,17,18,2],3)
+ b_ut.permute([-56,18,20,6,4],3)
+
+ c_dt=copy.copy(c_ut)
+ b_dt=copy.copy(b_ut)
+ a_dt=copy.copy(a_ut)
+
+ c_dt.setLabel([-54,-14,-12,-19,-62,-58,-57])
+ a_dt.setLabel([-55,-16,-17,-18,-2])
+ b_dt.setLabel([-56,-18,-20,-6,-4])
+ A=((((E4*E5)*d)*((E2*E3)*(b_ut*b_dt)))*(((E1*E8)*(a_ut*a_dt))))*((E7*E6)*(c_ut*c_dt))
+
+ A.permute([-62,-58,-57,-17,62,58,57,17],4)
+
+ xt=copy.copy(plist[0])
+ xt.setLabel([-62,-58,-57,-17])
+ xt.permute([-62,-58,-57,-17],4)
+ D_r[0]=xt*A
+ D_r[0].permute([62,58,57,17],0)
+
+ x=copy.copy(plist[0])
+ x.permute([62,58,57,17],0)
+ A.transpose()
+ A=x*A
+ A.permute([-62,-58,-57,-17],0)
+ D_r[0]=D_r[0]+A
+##########################################################################################
+ 
+ 
+ Ap=((((E1*E8)*(a_u1*a_dt))))*(((E4*E5)*d)*((E2*E3)*(b_u1*b_dt)))*(((E7*E6)*(c_u1*c_dt)))
+ Ap.permute([-62,-58,-57,-17],4)
+ Ap.transpose()
+ D_r[0]=D_r[0]+(-1.00)*Ap
+
+ Ap=((((E1*E8)*(a_ut*a_d1))))*(((E4*E5)*d)*((E2*E3)*(b_ut*b_d1)))*(((E7*E6)*(c_ut*c_d1)))
+ Ap.permute([62,58,57,17],0)
+ D_r[0]=D_r[0]+(-1.00)*Ap
+ D_r[0].permute([62,58,57,17],3)
+############################################################################################
+
+##################################   2   #############################################
+ c_ut=((c_u*(plist[0]*MPO_list[0])))
+ a_ut=(a_u*(plist[2]*MPO_list[1]))
+ b_ut=((b_u*(plist[3]*MPO_list[2])))
+
+ c_ut.permute([-54,14,12,19,17],3)
+ a_ut.permute([-55,16,64,58,57,18,2],5)
+ b_ut.permute([-56,18,20,6,4],3)
+
+ c_dt=copy.copy(c_ut)
+ b_dt=copy.copy(b_ut)
+ a_dt=copy.copy(a_ut)
+
+ c_dt.setLabel([-54,-14,-12,-19,-17])
+ a_dt.setLabel([-55,-16,-64,-58,-57,-18,-2])
+ b_dt.setLabel([-56,-18,-20,-6,-4])
+
+
+ A=((((E4*E5)*d)*((E2*E3)*(b_ut*b_dt)))*((E7*E6)*(c_ut*c_dt)))*((E1*E8)*(a_ut*a_dt))
+ A.permute([-17,-64,-58,-57,17,64,58,57],4)
+
+ xt=copy.copy(plist[1])
+ xt.setLabel([-17,-64,-58,-57])
+ xt.permute([-17,-64,-58,-57],4)
+ D_r[1]=xt*A
+ D_r[1].permute([17,64,58,57],0)
+
+ x=copy.copy(plist[1])
+ x.permute([17,64,58,57],0)
+ A.transpose()
+ A=x*A
+ A.permute([-17,-64,-58,-57],0)
+ D_r[1]=D_r[1]+A
+##########################################################################################
+ Ap=(((((E7*E6)*(c_u1*c_dt))))*(((E4*E5)*d)*((E2*E3)*(b_u1*b_dt))))*((E1*E8)*(a_u1*a_dt))
+ Ap.permute([-17,-64,-58,-57],4)
+ Ap.transpose()
+ D_r[1]=D_r[1]+(-1.00)*Ap
+
+ Ap=(((((E7*E6)*(c_ut*c_d1))))*(((E4*E5)*d)*((E2*E3)*(b_ut*b_d1))))*((E1*E8)*(a_ut*a_d1))
+ Ap.permute([17,64,58,57],0)
+ D_r[1]=D_r[1]+(-1.00)*Ap
+ D_r[1].permute([17,64,58,57],1)
+############################################################################################
+
+
+##################################  3  #####################################################
+ a_ut=(a_u*(plist[1]*MPO_list[1]))
+ c_ut=((c_u*(plist[0]*MPO_list[0])))
+ b_ut=((b_u*(plist[3]*MPO_list[2])))
+
+ c_ut.permute([-54,14,12,19,17],3)
+ a_ut.permute([-55,16,17,66,59,60,2],3)
+ b_ut.permute([-56,18,20,6,4],3)
+
+ c_dt=copy.copy(c_ut)
+ b_dt=copy.copy(b_ut)
+ a_dt=copy.copy(a_ut)
+
+ c_dt.setLabel([-54,-14,-12,-19,-17])
+ a_dt.setLabel([-55,-16,-17,-66,-59,-60,-2])
+ b_dt.setLabel([-56,-18,-20,-6,-4])
+
+ A=((((E4*E5)*d)*((E2*E3)*(b_ut*b_dt)))*((E7*E6)*(c_ut*c_dt)))*((E1*E8)*(a_ut*a_dt))
+ A.permute([-66,-59,-60,-18,66,59,60,18],4)
+
+ xt=copy.copy(plist[2])
+ xt.setLabel([-66,-59,-60,-18]) 
+ xt.permute([-66,-59,-60,-18],4)
+ D_r[2]=xt*A
+ D_r[2].permute([66,59,60,18],0)
+
+ x=copy.copy(plist[2])
+ x.permute([66,59,60,18],0)
+ A.transpose()
+ A=x*A
+ A.permute([-66,-59,-60,-18],0)
+ D_r[2]=D_r[2]+A
+##########################################################################################
+
+ Ap=(((((E7*E6)*(c_u1*c_dt))))*(((E4*E5)*d)*((E2*E3)*(b_u1*b_dt))))*((E1*E8)*(a_u1*a_dt))
+ Ap.permute([-66,-59,-60,-18],4)
+ Ap.transpose()
+ D_r[2]=D_r[2]+(-1.00)*Ap
+
+ Ap=(((((E7*E6)*(c_ut*c_d1))))*(((E4*E5)*d)*((E2*E3)*(b_ut*b_d1))))*((E1*E8)*(a_ut*a_d1))
+ Ap.permute([66,59,60,18],0)
+ D_r[2]=D_r[2]+(-1.00)*Ap
+ D_r[2].permute([66,59,60,18],3)
+############################################################################################
+
+##################################  4  #####################################################
+ c_ut=((c_u*(plist[0]*MPO_list[0])))
+ a_ut=(a_u*(plist[1]*plist[2]*MPO_list[1]))
+ b_ut=((b_u*(MPO_list[2])))
+
+ c_ut.permute([-54,14,12,19,17],3)
+ a_ut.permute([-55,16,17,18,2],3)
+ b_ut.permute([-56,68,59,60,20,6,4],5)
+
+ c_dt=copy.copy(c_ut)
+ b_dt=copy.copy(b_ut)
+ a_dt=copy.copy(a_ut)
+
+ c_dt.setLabel([-54,-14,-12,-19,-17])
+ a_dt.setLabel([-55,-16,-17,-18,-2])
+ b_dt.setLabel([-56,-68,-59,-60,-20,-6,-4])
+
+ A=((((E1*E8)*(a_ut*a_dt)) *((E7*E6)*(c_ut*c_dt))) * ((((E4*E5)*d)))) * ((E2*E3)*(b_ut*b_dt))
+
+ A.permute([-18,-68,-59,-60,18,68,59,60],4)
+
+ xt=copy.copy(plist[3])
+ xt.setLabel([-18,-68,-59,-60]) 
+ xt.permute([-18,-68,-59,-60],4)
+ D_r[3]=xt*A
+ D_r[3].permute([18,68,59,60],0)
+
+ x=copy.copy(plist[3])
+ x.permute([18,68,59,60],0)
+ A.transpose()
+ A=x*A
+ A.permute([-18,-68,-59,-60],0)
+ D_r[3]=D_r[3]+A
+##########################################################################################
+ 
+
+
+ Ap=(((((E1*E8)*(a_u1*a_dt))*((E7*E6)*(c_u1*c_dt))))*(((E4*E5)*d)))*((E2*E3)*(b_u1*b_dt))
+ Ap.permute([-18,-68,-59,-60],4)
+ Ap.transpose()
+ D_r[3]=D_r[3]+(-1.00)*Ap
+
+
+ 
+ Ap=(((((E1*E8)*(a_ut*a_d1))*((E7*E6)*(c_ut*c_d1))))*(((E4*E5)*d)))*((E2*E3)*(b_ut*b_d1))
+ Ap.permute([18,68,59,60],0)
+ D_r[3]=D_r[3]+(-1.00)*Ap
+ D_r[3].permute([18,68,59,60],1)
+############################################################################################
+ return D_r 
+ 
+ 
+def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,c_u,d_u,plist):
+
+ D_r=[0]*4
+ b.setLabel([18,-18,20,-20,6,-6,4,-4])
+
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+
+ 
+ a_u1=copy.copy(a_u)
+ d_u1=copy.copy(d_u)
+ c_u1=copy.copy(c_u)
+
+###########################################################
+ a_u1.setLabel([54,16,17,18,2])
+ c_u1.setLabel([55,14,12,19,17])
+ d_u1.setLabel([56,19,10,8,20])
+
+  
+ a_u1=(a_u1*(MPO_list[0]))
+ c_u1=((c_u1*(MPO_list[1])))
+ d_u1=((d_u1*(MPO_list[2]))) 
+ 
+ a_u1.permute([-54,16,17,58,57,18,2],3)
+ c_u1.permute([-55,14,12,58,57,19,17,59,60],5)
+ d_u1.permute([-56,19,10,59,60,8,20],5)
+ 
+ a_d1=copy.copy(a_u1)
+ c_d1=copy.copy(c_u1)
+ d_d1=copy.copy(d_u1)
+
+ a_d1.setLabel([-54,-16,-17,-58,-57,-18,-2])
+ c_d1.setLabel([-55,-14,-12,-58,-57,-19,-17,-59,-60])
+ d_d1.setLabel([-56,-19,-10,-59,-60,-8,-20])
+ 
+ 
+ 
+ 
+##########################################################
+
+
+##################################  1  #####################################################
+ a_u.setLabel([54,16,68,18,2])
+ c_u.setLabel([55,14,12,62,66])
+ d_u.setLabel([56,64,10,8,20])
+
+
+ a_ut=((a_u*(plist[3]*MPO_list[0])))
+ c_ut=(c_u*(plist[2]*MPO_list[1]))
+ d_ut=((d_u*(plist[1]*MPO_list[2])))
+ 
+ a_ut.permute([-54,16,17,18,2],3)
+ c_ut.permute([-55,14,12,62,59,60,17],3)
+ d_ut.permute([-56,19,10,8,20],3)
+
+ a_dt=copy.copy(a_ut)
+ c_dt=copy.copy(c_ut)
+ d_dt=copy.copy(d_ut)
+
+ a_dt.setLabel([-54,-16,-17,-18,-2])
+ c_dt.setLabel([-55,-14,-12,-62,-59,-60,-17])
+ d_dt.setLabel([-56,-19,-10,-8,-20])
+
+ A=((((E4*E5)*(d_ut*d_dt))*((E2*E3)*(b)))*(((E1*E8)*(a_ut*a_dt))))*((E7*E6)*(c_ut*c_dt))
+
+
+ A.permute([-62,-59,-60,-19,62,59,60,19],4)
+
+ xt=copy.copy(plist[0])
+ xt.setLabel([-62,-59,-60,-19])
+ xt.permute([-62,-59,-60,-19],4)
+ D_r[0]=xt*A
+ D_r[0].permute([62,59,60,19],0)
+
+ x=copy.copy(plist[0])
+ x.permute([62,59,60,19],0)
+ A.transpose()
+ A=x*A
+ A.permute([-62,-59,-60,-19],0)
+ D_r[0]=D_r[0]+A
+##########################################################################################
+ 
+
+ Ap=((((E1*E8)*(a_u1*a_dt))))*(((E4*E5)*(d_u1*d_dt))*((E2*E3)*(b)))*(((E7*E6)*(c_u1*c_dt)))
+ Ap.permute([-62,-59,-60,-19],4)
+ Ap.transpose()
+ D_r[0]=D_r[0]+(-1.00)*Ap
+
+
+ Ap=((((E1*E8)*(a_ut*a_d1))))*(((E4*E5)*(d_ut*d_d1))*((E2*E3)*(b)))*(((E7*E6)*(c_ut*c_d1)))
+ Ap.permute([62,59,60,19],0)
+
+ D_r[0]=D_r[0]+(-1.00)*Ap
+ D_r[0].permute([62,59,60,19],3)
+############################################################################################
+
+#############################   2   ##########################################
+ a_u.setLabel([54,16,68,18,2])
+ c_u.setLabel([55,14,12,62,66])
+ d_u.setLabel([56,64,10,8,20])
+
+
+ a_ut=((a_u*(plist[3]*MPO_list[0])))
+ c_ut=(c_u*(plist[2]*plist[0]*MPO_list[1]))
+ d_ut=((d_u*(MPO_list[2])))
+
+ a_ut.permute([-54,16,17,18,2],3)
+ c_ut.permute([-55,14,12,19,17],3)
+ d_ut.permute([-56,64,59,60,10,8,20],4)
+
+ a_dt=copy.copy(a_ut)
+ c_dt=copy.copy(c_ut)
+ d_dt=copy.copy(d_ut)
+
+ a_dt.setLabel([-54,-16,-17,-18,-2])
+ c_dt.setLabel([-55,-14,-12,-19,-17])
+ d_dt.setLabel([-56,-64,-59,-60,-10,-8,-20])
+
+
+ A=((((E1*E8)*(a_ut*a_dt))*((E2*E3)*(b)))*((E7*E6)*(c_ut*c_dt)))*((E4*E5)*(d_ut*d_dt))
+
+ A.permute([-19,-59,-60,-64,19,59,60,64],4)
+
+ xt=copy.copy(plist[1])
+ xt.setLabel([-19,-64,-59,-60])
+ xt.permute([-19,-59,-60,-64],4)
+ D_r[1]=xt*A
+ D_r[1].permute([19,59,60,64],0)
+
+ x=copy.copy(plist[1])
+ x.permute([19,59,60,64],0)
+ A.transpose()
+ A=x*A
+ A.permute([-19,-59,-60,-64],0)
+ D_r[1]=D_r[1]+A
+##########################################################################################
+ 
+ Ap=(((((E7*E6)*(c_u1*c_dt))))*(((E1*E8)*(a_u1*a_dt))*((E2*E3)*(b))))*((E4*E5)*(d_u1*d_dt))
+ Ap.permute([-19,-59,-60,-64],4)
+ Ap.transpose()
+ D_r[1]=D_r[1]+(-1.00)*Ap
+
+
+ Ap=(((((E7*E6)*(c_ut*c_d1))))*(((E1*E8)*(a_ut*a_d1))*((E2*E3)*(b))))*((E4*E5)*(d_ut*d_d1))
+ Ap.permute([19,59,60,64],0)
+
+ D_r[1]=D_r[1]+(-1.00)*Ap
+ D_r[1].permute([19,64,59,60],1)
+############################################################################################
+
+
+##################################  3  #####################################################
+ a_u.setLabel([54,16,68,18,2])
+ c_u.setLabel([55,14,12,62,66])
+ d_u.setLabel([56,64,10,8,20])
+
+
+ a_ut=((a_u*(plist[3]*MPO_list[0])))
+ c_ut=(c_u*(plist[0]*MPO_list[1]))
+ d_ut=((d_u*(plist[1]*MPO_list[2])))
+
+ a_ut.permute([-54,16,17,18,2],3)
+ c_ut.permute([-55,14,12,58,57,19,66],5)
+ d_ut.permute([-56,19,10,8,20],3)
+
+ a_dt=copy.copy(a_ut)
+ c_dt=copy.copy(c_ut)
+ d_dt=copy.copy(d_ut)
+
+ a_dt.setLabel([-54,-16,-17,-18,-2])
+ c_dt.setLabel([-55,-14,-12,-58,-57,-19,-66])
+ d_dt.setLabel([-56,-19,-10,-8,-20])
+
+ A=((((E4*E5)*(d_ut*d_dt))*((E2*E3)*(b)))*((E1*E8)*(a_ut*a_dt)))*((E7*E6)*(c_ut*c_dt))
+
+ A.permute([-66,-58,-57,-17,66,58,57,17],4)
+
+ xt=copy.copy(plist[2])
+ xt.setLabel([-66,-17,-58,-57])
+ xt.permute([-66,-58,-57,-17],4)
+ D_r[2]=xt*A
+ D_r[2].permute([66,58,57,17],0)
+
+ x=copy.copy(plist[2])
+ x.permute([66,58,57,17],0)
+ A.transpose()
+ A=x*A
+ A.permute([-66,-58,-57,-17],0)
+ D_r[2]=D_r[2]+A
+##########################################################################################
+ 
+ Ap=((((E1*E8)*(a_u1*a_dt)))*(((E4*E5)*(d_u1*d_dt))*((E2*E3)*(b))))*(((E7*E6)*(c_u1*c_dt)))
+ Ap.permute([-66,-58,-57,-17],4)
+ Ap.transpose()
+ D_r[2]=D_r[2]+(-1.00)*Ap
+
+
+ Ap=((((E1*E8)*(a_ut*a_d1)))*(((E4*E5)*(d_ut*d_d1))*((E2*E3)*(b))))*(((E7*E6)*(c_ut*c_d1)))
+ Ap.permute([66,58,57,17],0)
+ D_r[2]=D_r[2]+(-1.00)*Ap
+ D_r[2].permute([66,17,58,57],1)
+############################################################################################
+
+##################################  4  #####################################################
+ a_u.setLabel([54,16,68,18,2])
+ c_u.setLabel([55,14,12,62,66])
+ d_u.setLabel([56,64,10,8,20])
+
+
+ a_ut=((a_u*(MPO_list[0])))
+ c_ut=(c_u*(plist[0]*plist[2]*MPO_list[1]))
+ d_ut=((d_u*(plist[1]*MPO_list[2])))
+ 
+ a_ut.permute([-54,16,68,58,57,18,2],3)
+ c_ut.permute([-55,14,12,19,17],3)
+ d_ut.permute([-56,19,10,8,20],3)
+
+ a_dt=copy.copy(a_ut)
+ c_dt=copy.copy(c_ut)
+ d_dt=copy.copy(d_ut)
+
+ a_dt.setLabel([-54,-16,-68,-58,-57,-18,-2])
+ c_dt.setLabel([-55,-14,-12,-19,-17])
+ d_dt.setLabel([-56,-19,-10,-8,-20])
+
+ A=((((E4*E5)*(d_ut*d_dt))*((E2*E3)*(b)))*((E7*E6)*(c_ut*c_dt)))*((E1*E8)*(a_ut*a_dt))
+
+ A.permute([-17,-58,-57,-68,17,58,57,68],4)
+
+ xt=copy.copy(plist[3])
+ xt.setLabel([-17,-58,-57,-68])
+ xt.permute([-17,-58,-57,-68],4)
+ D_r[3]=xt*A
+ D_r[3].permute([17,58,57,68],0)
+
+ x=copy.copy(plist[3])
+ x.permute([17,58,57,68],0)
+ A.transpose()
+ A=x*A
+ A.permute([-17,-58,-57,-68],0)
+ D_r[3]=D_r[3]+A
+##########################################################################################
+ 
+
+ Ap=(((((E7*E6)*(c_u1*c_dt))))*(((E4*E5)*(d_u1*d_dt))*((E2*E3)*(b))))*((E1*E8)*(a_u1*a_dt))
+ 
+ Ap.permute([-17,-58,-57,-68],4)
+ Ap.transpose()
+ D_r[3]=D_r[3]+(-1.00)*Ap
+
+
+ Ap=(((((E7*E6)*(c_ut*c_d1))))*(((E4*E5)*(d_ut*d_d1))*((E2*E3)*(b))))*((E1*E8)*(a_ut*a_d1))
+ Ap.permute([17,58,57,68],0)
+ D_r[3]=D_r[3]+(-1.00)*Ap
+ D_r[3].permute([17,58,57,68],3)
+############################################################################################
+
+
+ return D_r 
  
