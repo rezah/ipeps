@@ -43,6 +43,90 @@ def setTruncation(theta, chi):
         LA.putBlock(qnum, svd[1].resize(dim, dim)  )
     return GA, GB, LA
 
+def setTruncation1(theta, chi):
+    LA=uni10.UniTensor(theta.bond())
+    GA=uni10.UniTensor(theta.bond())
+    GB=uni10.UniTensor(theta.bond())
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).svd()
+        dim_svd.append(int(svds[qnum][1].col()))
+    svs = []
+    bidxs = []
+    for bidx in xrange(len(blk_qnums)):
+        svs, bidxs = sv_merge1(svs, bidxs, bidx, svds[blk_qnums[bidx]][1], chi,len(blk_qnums))
+    dims = [0] * len(blk_qnums)
+    for bidx in bidxs:
+        dims[bidx] += 1  
+    qnums = []
+    for bidx in xrange(len(blk_qnums)):
+        qnums += [blk_qnums[bidx]] * dims[bidx]
+    bdi_mid = uni10.Bond(uni10.BD_IN, qnums)
+    bdo_mid = uni10.Bond(uni10.BD_OUT, qnums)
+    GA.assign([theta.bond(0), bdo_mid])
+    GB.assign([bdi_mid, theta.bond(1), theta.bond(2),theta.bond(3),theta.bond(4),theta.bond(5)])
+    LA.assign([bdi_mid, bdo_mid])
+    degs = bdi_mid.degeneracy()
+    for qnum, dim in degs.iteritems():
+        if qnum not in svds:
+            raise Exception("In setTruncaton(): Fatal error.")
+        svd = svds[qnum]
+        GA.putBlock(qnum, svd[0].resize(svd[0].row(), dim))
+        GB.putBlock(qnum, svd[2].resize(dim, svd[2].col()))
+        LA.putBlock(qnum, svd[1].resize(dim, dim)  )
+    return GA, GB, LA
+
+
+
+def setTruncation2(theta, chi):
+    LA=uni10.UniTensor(theta.bond())
+    GA=uni10.UniTensor(theta.bond())
+    GB=uni10.UniTensor(theta.bond())
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).svd()
+        dim_svd.append(int(svds[qnum][1].col()))
+    svs = []
+    bidxs = []
+    for bidx in xrange(len(blk_qnums)):
+        svs, bidxs = sv_merge1(svs, bidxs, bidx, svds[blk_qnums[bidx]][1], chi,len(blk_qnums))
+    dims = [0] * len(blk_qnums)
+    for bidx in bidxs:
+        dims[bidx] += 1  
+    qnums = []
+    for bidx in xrange(len(blk_qnums)):
+        qnums += [blk_qnums[bidx]] * dims[bidx]
+    bdi_mid = uni10.Bond(uni10.BD_IN, qnums)
+    bdo_mid = uni10.Bond(uni10.BD_OUT, qnums)
+    GA.assign([theta.bond(0),theta.bond(1), theta.bond(2),theta.bond(3),theta.bond(4), bdo_mid])
+    GB.assign([bdi_mid, theta.bond(5)])
+    LA.assign([bdi_mid, bdo_mid])
+    degs = bdi_mid.degeneracy()
+    for qnum, dim in degs.iteritems():
+        if qnum not in svds:
+            raise Exception("In setTruncaton(): Fatal error.")
+        svd = svds[qnum]
+        GA.putBlock(qnum, svd[0].resize(svd[0].row(), dim))
+        GB.putBlock(qnum, svd[2].resize(dim, svd[2].col()))
+        LA.putBlock(qnum, svd[1].resize(dim, dim)  )
+    return GA, GB, LA
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def svd_parity(theta):
 
@@ -92,6 +176,11 @@ def svd_parity1(theta):
 #    print LA
     return GA, LA, GB
 
+
+
+
+
+
 def svd_parity2(theta):
 
     bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
@@ -113,9 +202,50 @@ def svd_parity2(theta):
         
         LA.putBlock(qnum, svds[qnum][1])
         GB.putBlock(qnum, svds[qnum][2])
+    return GA, LA, GB
+
+
+
+
+
+def qr_parity1(theta):
+
+    bd1i=uni10.Bond(uni10.BD_IN,theta.bond(0).Qlist())
+    bd1o=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
+    
+    GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3),theta.bond(4),bd1o])
+    LA=uni10.UniTensor([bd1i, theta.bond(5)])
+
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).qr()
+        GA.putBlock(qnum, svds[qnum][0])
+        LA.putBlock(qnum, svds[qnum][1])
 
 #    print LA
-    return GA, LA, GB
+    return GA, LA
+
+def lq_parity1(theta):
+
+    bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
+    bd2=uni10.Bond(uni10.BD_OUT,theta.bond(1).Qlist())
+    GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3),theta.bond(4),theta.bond(5)])
+    LA=uni10.UniTensor([theta.bond(0),bd1])
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).lq()
+        GA.putBlock(qnum, svds[qnum][1])
+        LA.putBlock(qnum, svds[qnum][0])
+
+
+    return  LA, GA
+
+
 
 
 
@@ -234,4 +364,51 @@ def sv_merge(svs, bidxs, bidx, sv_mat, chi, len_qn):
        else: bidxs = [bidx];  svs = [sv_mat[0]];  
     return svs, bidxs
 
+def sv_merge1(svs, bidxs, bidx, sv_mat, chi, len_qn):
+    if(len(svs)):
+        length = len(svs) + sv_mat.elemNum()
+        length = length if length < chi else chi
+        ori_svs = svs
+        ori_bidxs = bidxs
+        svs = [0] * length
+        bidxs = [0] * length
+        svs = []
+        bidxs = []
+        cnt  = 0
+        cur1 = 0
+        cur2 = 0
+        while cnt < length:
+            if(cur1 < len(ori_svs)) and cur2 < sv_mat.elemNum():
+                if ori_svs[cur1] >= sv_mat[cur2]:
+                    if (ori_svs[cur1] > -0.01):
+                     svs.append(ori_svs[cur1]) 
+                     bidxs.append(ori_bidxs[cur1])
+                    cur1 += 1
+                else:
+                    if (sv_mat[cur2] > -0.01):
+                     svs.append( sv_mat[cur2])
+                     bidxs.append(bidx) 
+                    cur2 += 1
+            elif cur2 < sv_mat.elemNum() :
+                for i in xrange(cnt, length):
+                    if (sv_mat[cur2] > -0.01):
+                     svs.append(sv_mat[cur2]) 
+                     bidxs.append(bidx) 
+                    cur2 += 1
+                break
+            else:
+                for i in xrange(cur1, len(ori_svs)):
+                 svs.append(ori_svs[i])
+                 bidxs.append(ori_bidxs[i]) 
+                break
+            cnt += 1
+    else:
+       if (len_qn is 1):
+        bidxs = [bidx] * chi  
+        svs = [sv_mat[i] for i in xrange(chi)]
+       elif (sv_mat[0] > -0.01):
+        bidxs = [bidx] * sv_mat.elemNum()
+        svs = [sv_mat[i] for i in xrange(sv_mat.elemNum())]
+       else: bidxs = [bidx];  svs = [sv_mat[0]];  
+    return svs, bidxs
 

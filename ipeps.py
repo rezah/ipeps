@@ -15,32 +15,41 @@ import Move
 ###################### Initialize parameters ###########################
 #Model="Heisenberg_Z2"         #Heisenberg, Ising
 Model="Heisenberg_U1"         #Heisenberg, Ising
-Model="Heisenberg"         #Heisenberg, Ising
+#Model="Heisenberg_U1Z2"         #Heisenberg, Ising
+#Model="Heisenberg"         #Heisenberg, Ising
 #Model="threebody"         #Heisenberg, Ising
 #Model="threebody_Z2"         #Heisenberg, Ising
 #Model="threebody_U1"         #Heisenberg, Ising
 #Model="threebody"         #Heisenberg, Ising
 
-D=[6]
-chi=[10]
-d_phys=[1]
+#D=[4]
+#chi=[10]
+#d_phys=[2]
 
 
 
-#D=[2,2]
+#D=[2,1]
 #chi=[10,10]
-#d_phys=[1,1]
+#d_phys=[4,4]
 
-D=[2,2,2]
-chi=[60,60,60]
+
+D=[1,2,1]
+chi=[15,20,15]
 d_phys=[1,1]
 
 
-N_iteritebd=50
+
+
+#D=[2,2,2,2,2,2]
+#chi=[5,5,5,5,5,5]
+#d_phys=[1,1]
+
+
+N_iteritebd=90
 N_iterF=30
 Gauge='Fixed'
 Positive='Restrict'
-Corner_method='CTMFull'   #CTM, CTMRG, CTMFull
+Corner_method='CTMRG'   #CTM, CTMRG, CTMFull
 Acc_E=1.00e-7
 Steps=[1.0e-1,4.0e-2,4.0e-3,4.0e-4,5.0e-5,1.0e-6] #,[Start,steps,End] 
 delta=0.001
@@ -54,11 +63,10 @@ Elist2=[]
 
 ######################### No-symmetry #############################################3
 
-q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
-q_list=[q0_even,q0_even]
-qchi_list=[q0_even,q0_even]
-q_phys=[q0_even,q0_even]
-
+#q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+#q_list=[q0_even]
+#qchi_list=[q0_even]
+#q_phys=[q0_even]*d_phys[0]
 
 ###################### Z(2) ######################################
 
@@ -66,9 +74,8 @@ q_phys=[q0_even,q0_even]
 #q0_odd = uni10.Qnum(0,uni10.PRT_ODD);
 #q_list=[q0_even,q0_odd]
 #qchi_list=[q0_even,q0_odd]
-#q_phys=[q0_even,q0_odd]
-#q_phys=[q0_even,q0_odd]
-
+#q_phys=[q0_even,q0_even,q0_even,q0_even,q0_odd,q0_odd,q0_odd,q0_odd]
+##q_phys=[q0_even,q0_odd]
 
 ##########################  U(1)  ################################
 
@@ -83,16 +90,19 @@ q_2_even = uni10.Qnum(-2,uni10.PRT_EVEN);
 q_3_even = uni10.Qnum(-3,uni10.PRT_EVEN);
 q_4_even = uni10.Qnum(-4,uni10.PRT_EVEN);
 
-#q_list=[q_2_even,q_1_even,q0_even,q1_even,q2_even]
 #qchi_list=[q_2_even,q_1_even,q0_even,q1_even,q2_even]
 #qchi_list=[q_2_even,q_1_even,q0_even,q1_even,q2_even]
-
-#q_list=[q_1_even,q0_even,q1_even]
+#qchi_list=[q_3_even,q_2_even,q_1_even,q0_even,q1_even,q2_even,q3_even]
 qchi_list=[q_1_even,q0_even,q1_even]
+#qchi_list=[q_4_even,q_3_even,q_2_even,q_1_even,q0_even,q1_even,q2_even,q3_even,q4_even]
+#qchi_list=[q_1_even,q1_even]
+
 q_list=[q_1_even,q0_even,q1_even]
 #q_list=[q_1_even,q0_even]
-q_phys=[q_1_even,q1_even]
+#q_list=[q_2_even,q_1_even,q0_even,q1_even, q2_even]
+#q_list=[q_1_even,q1_even]
 
+q_phys=[q_1_even,q1_even]
 
 ##########################  Z2*U(1)  ################################
 #q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
@@ -121,7 +131,7 @@ q_phys=[q_1_even,q1_even]
 #qchi_list=[q_1_even,q_1_odd,q0_even,q0_odd,q1_even,q1_odd]
 #q_list=[q_1_even,q_1_odd,q0_even,q0_odd,q1_even,q1_odd]
 #q_phys=[q_1_odd,q1_even]
-##############################################################################
+#############################################################################
 
 
 
@@ -134,19 +144,13 @@ for i in xrange(len(D)):
   q_D.append(q_list[i])
 
 
-
-
 for i in xrange(len(chi)):
  for q in xrange(chi[i]):
   q_chi.append(qchi_list[i])
 
-file = open("Data/varianceAll.txt", "w")
-
 bdi = uni10.Bond(uni10.BD_IN, q_D)
 bdo = uni10.Bond(uni10.BD_OUT, q_D)
 bdi_pys = uni10.Bond(uni10.BD_IN, q_phys)
-
-#print '\n','\n',bdi_pys.combine(bdi_pys.combine(bdi_pys))
 
 Gamma_a=uni10.UniTensor([bdi_pys,bdi,bdi,bdo,bdo], "Gamma_a")
 Gamma_b=uni10.UniTensor([bdi_pys,bdi,bdi,bdo,bdo], "Gamma_b")
@@ -199,10 +203,10 @@ for h , J1, J2 in zip( h_list, J1_list, J2_list):
  h=[h, J1, J2]
 #########################################################################################
  
- #Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
- #Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,q_phys,D,N_iteritebd,h,Model,q_D)
+ Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
+# Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,q_phys,D,N_iteritebd,h,Model,q_D)
  
- #basic.Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8)
+ basic.Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8)
 
 
 # print Landa_1#,Landa_1[0],Landa_1[3],Landa_1[4],Landa_1[7]
@@ -226,7 +230,8 @@ for h , J1, J2 in zip( h_list, J1_list, J2_list):
  Landa=[Landa_6,Landa_8,Landa_5,Landa_7]
  d_u,d=basic.makeab(Landa,Gamma_d)
  #print "a",a.printDiagram()
- 
+ Env=[c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4]
+ #Env=basic.positve_Env(Env,a,b,c,d)
  #E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,q_phys,chi,Corner_method,Model)
 
  #print 'E_toal=', E_value
@@ -235,51 +240,20 @@ for h , J1, J2 in zip( h_list, J1_list, J2_list):
 
 ############################################################################
  Gauge='Fixed'
- #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
- #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
- #a_u,b_u,c_u,d_u,a,b,c,d=basic.slighty_random(a_u,b_u,c_u,d_u,a,b,c,d)
- a_u,b_u,c_u,d_u,a,b,c,d=basic.total_random(a_u,b_u,c_u,d_u,a,b,c,d)
- #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
- #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
 
- #print a_u.printDiagram(), b_u.printDiagram() 
+ #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
+ #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
+ #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
+ a_u,b_u,c_u,d_u,a,b,c,d=basic.slighty_random(a_u,b_u,c_u,d_u,a,b,c,d)
+ #a_u,b_u,c_u,d_u,a,b,c,d=basic.total_random(a_u,b_u,c_u,d_u,a,b,c,d)
+ #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
+
  a_u,b_u,c_u,d_u,a,b,c,d,Env=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,q_phys,D,delta,h,Env,Env1,Env2,Env3,Gauge,Positive,Corner_method,N_iterF,Acc_E,Steps,Model)
 
- E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,q_phys,chi,Corner_method,Model)
+ #E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,q_phys,chi,Corner_method,Model)
+# print "E_final", E_value
 
-# zlist1.append(z_value)
-# Elist1.append(E_value)
  basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
- print "E_final", E_value
-
-###########################################################################################
-
-
-
-##########################################################################################
-
-##plt.plot( hlist, zlist,'b*',label='Ising, D=2, simple',markersize=np.sqrt(200.))
-#plt.plot( hlist, zlist1,'g>',label='Ising, D=2, FU',markersize=np.sqrt(200.))
-#plt.plot( hlist, zlist2,'r<',label='Ising, D=2, FU, Guage',markersize=np.sqrt(200.))
-##plt.plot( hlist, zlist4,'m^',label='Ising, D=5',markersize=np.sqrt(200.))
-
-#plt.xlabel('h', fontsize=25)
-#plt.ylabel('Z', fontsize=25)
-#plt.legend(loc='upper right')
-#plt.savefig('Z.pdf')
-#plt.show()
-#plt.clf()
-
-##plt.plot( hlist, Elist,'b*',label='Ising, D=2, simple',markersize=np.sqrt(200.))
-#plt.plot( hlist, Elist1,'g>',label='Ising, D=2, FU',markersize=np.sqrt(200.))
-#plt.plot( hlist, Elist2,'r<',label='Ising, D=2, FU, Guage',markersize=np.sqrt(200.))
-##plt.plot( hlist, Elist4,'m^',label='Ising, D=5',markersize=np.sqrt(200.))
-#plt.xlabel('h', fontsize=25)
-#plt.ylabel('E', fontsize=25)
-#plt.legend(loc='upper right')
-#plt.savefig('E.pdf')
-#plt.show()
-#plt.clf()
 
 
 

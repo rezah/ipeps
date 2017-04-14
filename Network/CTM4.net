@@ -15,7 +15,7 @@ U2xb: 40 , 39, -39 ; 36
 U1xb_trans: 35;  31, 32 , -32
 U2xb_trans: 36;  34, 33 , -33
 TOUT: 100, 300, -300 ; 400, 200 ,-200
-ORDER: ((((((c4 Ta3) Ta4p) cp) U1xb)   ((((c3 Tb3) Tb2p) dp) U2xb))     ((Tb4p  ap)  U1xb_trans)  )     ((Ta2p U2xb_trans) bp)
+ORDER: ((((((c4 Ta3) Ta4p) cp) U1xb)   ((((c3 Tb3) Tb2p) dp) U2xb))     ((Tb4p  U1xb_trans)  ap)  )     ((Ta2p U2xb_trans) bp)
 
 
 

@@ -26,7 +26,7 @@ def norm_CTM(c):
  if ( (abs(MaxAbs(c)) < 0.50e-1) or (abs(MaxAbs(c)) > 0.50e+1)   ):
   c*=(1.00/MaxAbs(c)); 
  return c;
- 
+  
 def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  chi_dim=0
  for i in xrange(len(chi)):
@@ -220,14 +220,14 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  a.setLabel([1,-1,3,-3,4,-4,5,-5])
  U3x.setLabel([2,5,-5,6])
  U1x_trans.setLabel([7,0,3,-3])
- Tb4bar=((Tb4*a)*U3x)*U1x_trans
+ Tb4bar=((Tb4*U3x)*a)*U1x_trans
  Tb4bar.permute([7,4,-4,6],1)
  ###########################
  Ta4.setLabel([0,1,-1,2])
  c.setLabel([1,-1,3,-3,4,-4,5,-5])
  U1x.setLabel([2,5,-5,6])
  U3x_trans.setLabel([7,0,3,-3])
- Ta4bar=((Ta4*c)*U3x_trans)*U1x
+ Ta4bar=((Ta4*U3x_trans)*c)*U1x
  Ta4bar.permute([7,4,-4,6],1)
 #############################
 ###############################
@@ -262,14 +262,14 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  b.setLabel([4,-4,5,-5,1,-1,3,-3])
  U4x.setLabel([2,3,-3,7])
  U2x_trans.setLabel([6,0,5,-5])
- Ta2bar=((Ta2*b)*U4x)*U2x_trans
+ Ta2bar=((Ta2*U4x)*b)*U2x_trans
  Ta2bar.permute([6,4,-4,7],3)
  ###########################
  Tb2.setLabel([0,1,-1,2])
  d.setLabel([4,-4,5,-5,1,-1,3,-3])
  U2x.setLabel([2,3,-3,7])
  U4x_trans.setLabel([6,0,5,-5])
- Tb2bar=((Tb2*d)*U4x_trans)*U2x
+ Tb2bar=((Tb2*U4x_trans)*d)*U2x
  Tb2bar.permute([6,4,-4,7],3)
  ###########################
  ###########################
@@ -280,17 +280,6 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
 
  return c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
  
  
  
@@ -475,14 +464,3 @@ def permuteN1(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  Tb4.setLabel([0,1,-1,2])
  Tb4.permute([2,1,-1,0],1)
  Tb4.setLabel([0,1,-1,2])
- 
-
-
-
- 
- 
- 
- 
- 
- 
- 

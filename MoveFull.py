@@ -37,51 +37,34 @@ def distance(theta,A):
      if abs(T1[i]) > 1.00e-11:  
       val=val+abs((T1[i]-T2[i]) / T1[i])
       #if abs((T1[i]-T2[i]) / T1[i]) > 1.00e+1: print "hi", T1[i], T2[i], i 
-     else: val=val+(T1[i]-T2[i]); #print T1[i]-T2[i] 
+     else: val=val+(T1[i]-T2[i]); #print T1[i]-T2[i]
    return val 
-      
+
 def produce_projectives(theta,theta1,chi_dim):
  theta=copy.copy(theta)
  theta1=copy.copy(theta1)
  
  theta.setLabel([1,2,20,3,4,40])
  theta.permute([1,2,20,3,4,40],3) 
- #print theta.printDiagram()
-#  R, Q=TruncateU.lq_parity(theta)
-
+# t0=time.time()
  U, s, V=TruncateU.svd_parity1(theta)
+# print time.time() - t0, "svd"
+
  U.setLabel([1,2,20,-1,-2,-3])
  s.setLabel([-1,-2,-3,3,4,5])
  R=U*s
-
-####test#############
-# V.setLabel([3,4,5,-11,-21,-31])
-# A=U*s*V
-# A.permute([1,2,20,-11,-21,-31],0)
-# A.setLabel([1,2,20,3,4,40])
-# theta.permute([1,2,20,3,4,40],0)
-# print "Print", A.elemCmp(theta),  distance(theta,A)
-################################### 
-# try: 
-#  U, s, V=TruncateU.svd_parity1(theta)
-#  U.setLabel([1,2,20,-1,-2,-3])
-#  s.setLabel([-1,-2,-3,3,4,5])
-#  R=U*s
-# except:
-#  U, s, V=TruncateU.svd_parity2(theta)
-#  U.setLabel([1,2,20,-1,-2,-3])
-#  s.setLabel([-1,-2,-3,3,4,5])
-#  R=U*s
-
-  
  R.permute([1,2,20,3,4,5],3)
- 
+
 
 
  theta1.setLabel([1,2,20,3,4,40])
  theta1.permute([1,2,20,3,4,40],3) 
-# Rb, Qb=TruncateU.lq_parity(theta1)
+
+# t0=time.time()
  U, s, V=TruncateU.svd_parity1(theta1)
+# print time.time() - t0, "svd1"
+
+
  U.setLabel([1,2,20,-1,-2,-3])
  s.setLabel([-1,-2,-3,6,7,8])
  Rb=U*s
@@ -89,19 +72,20 @@ def produce_projectives(theta,theta1,chi_dim):
  Rb.permute([6,7,8,1,2,20],3)
  
  
- 
- 
- 
+  
  A=R*Rb
  A.permute([6,7,8,3,4,5],3)
+
+# t0=time.time()
  V, U, s=TruncateU.setTruncation(A, chi_dim) 
+# print time.time() - t0, "svd2"
+
+
  U.setLabel([-1,3,4,5])
  V.setLabel([6,7,8,-1])
- #print s
  s=s*(1.00/MaxAbs(s)) 
  s=TruncateU.inverse(s)
  s=TruncateU.Sqrt(s)
- #print s
  
  s.setLabel([6,-1])
  U=s*U
@@ -136,6 +120,8 @@ def produce_projectives(theta,theta1,chi_dim):
 
 
 def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
+
+# t0=time.time()
  chi_dim=0
  for i in xrange(len(chi)):
   chi_dim+=chi[i]
@@ -150,10 +136,11 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  CTM_1.putTensor('b',b)
  theta=CTM_1.launch()
  theta.permute([100, 300, -300 , 400, 200 ,-200],3)
+# print time.time() - t0, "up"
 
 
 
-
+# t0=time.time()
  CTM_2 = uni10.Network("Network/CTM2.net")
  CTM_2.putTensor('c3',c3)
  CTM_2.putTensor('c4',c4)
@@ -165,8 +152,11 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  CTM_2.putTensor('d',d)
  theta1=CTM_2.launch()
  theta1.permute([100, 300, -300 , 400, 200 ,-200],3)
+# print time.time() - t0, "down"
 
+# t0=time.time()
  U1x, U1x_trans=produce_projectives(theta,theta1, chi_dim)
+# print time.time() - t0, "produce_projectives"
 
  theta.permute([  400, 200 ,-200, 100, 300, -300], 3)
  theta1.permute([  400, 200 ,-200, 100, 300, -300], 3)
@@ -176,6 +166,7 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
 
 
+# t0=time.time()
 
  Ta4p=copy.copy(Ta4)
  Ta4p.setName("Ta4p")
@@ -211,6 +202,9 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  theta=CTM_3.launch() 
  theta.permute([100, 300, -300 , 400, 200 ,-200],3)
 
+# print time.time() - t0, "upup"
+
+# t0=time.time()
  CTM_4 = uni10.Network("Network/CTM4.net")
  CTM_4.putTensor('c3',c3)
  CTM_4.putTensor('c4',c4)
@@ -230,6 +224,8 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  CTM_4.putTensor('U2xb_trans',U2xb_trans)
  theta1=CTM_4.launch() 
  theta1.permute([100, 300, -300 , 400, 200 ,-200],3)
+ #print "hi", Ta4.printDiagram(), Tb4p.printDiagram()
+# print time.time() - t0, "dodo"
 
  U3x, U3x_trans=produce_projectives(theta,theta1, chi_dim)
 
@@ -237,7 +233,6 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  theta1.permute([  400, 200 ,-200, 100, 300, -300], 3)
 
  U4x, U4x_trans=produce_projectives(theta,theta1, chi_dim)
-
 
 
 ###############################################################################
@@ -259,19 +254,28 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  U3x.setLabel([0,2,-2,4])
  c4bar=c4bar*U3x
  c4bar.permute([4,3],0)
+
+# t0=time.time()
  #############################
  Tb4.setLabel([0,1,-1,2])
  a.setLabel([1,-1,3,-3,4,-4,5,-5])
  U3x.setLabel([2,5,-5,6])
  U1x_trans.setLabel([7,0,3,-3])
- Tb4bar=((Tb4*a)*U3x)*U1x_trans
+ Tb4bar=((Tb4*U3x)*a)*U1x_trans
  Tb4bar.permute([7,4,-4,6],1)
+# absorb_1 = uni10.Network("Network/absorb1.net")
+# absorb_1.putTensor('Tb4',Tb4)
+# absorb_1.putTensor('a',a)
+# absorb_1.putTensor('U3x',U3x)
+# absorb_1.putTensor('U1x_trans',U1x_trans)
+# Tb4bar=absorb_1.launch() 
+# print time.time() - t0, "try2"
  ###########################
  Ta4.setLabel([0,1,-1,2])
  c.setLabel([1,-1,3,-3,4,-4,5,-5])
  U1x.setLabel([2,5,-5,6])
  U3x_trans.setLabel([7,0,3,-3])
- Ta4bar=((Ta4*c)*U3x_trans)*U1x
+ Ta4bar=((Ta4*U3x_trans)*c)*U1x
  Ta4bar.permute([7,4,-4,6],1)
 #############################
 ###############################
@@ -279,19 +283,16 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  c4=norm_CTM(c4bar)
  Ta4=norm_CTM(Ta4bar)
  Tb4=norm_CTM(Tb4bar)
-
  #################3################################
  c2.setLabel([0,1])
  Ta1.setLabel([3,2,-2,0])
  c2bar=c2*Ta1
  c2bar.permute([1,2,-2,3],3)
- 
 # c3.setLabel([0,1])
  c3.setLabel([1,0])
  Tb3.setLabel([3,2,-2,1])
  c3bar=c3*Tb3
  c3bar.permute([3,0,2,-2],1)
- 
  ##############################
  U4x_trans.setLabel([4,1,2,-2])
  c2bar=c2bar*U4x_trans
@@ -306,22 +307,25 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  b.setLabel([4,-4,5,-5,1,-1,3,-3])
  U4x.setLabel([2,3,-3,7])
  U2x_trans.setLabel([6,0,5,-5])
- Ta2bar=((Ta2*b)*U4x)*U2x_trans
+ Ta2bar=((Ta2*U4x)*b)*U2x_trans
  Ta2bar.permute([6,4,-4,7],3)
  ###########################
  Tb2.setLabel([0,1,-1,2])
  d.setLabel([4,-4,5,-5,1,-1,3,-3])
  U2x.setLabel([2,3,-3,7])
  U4x_trans.setLabel([6,0,5,-5])
- Tb2bar=((Tb2*d)*U4x_trans)*U2x
+ Tb2bar=((Tb2*U4x_trans)*d)*U2x
  Tb2bar.permute([6,4,-4,7],3)
  ###########################
  ###########################
+ #print time.time() - t0, "corner4"
+
  c3=norm_CTM(c3bar)
  c2=norm_CTM(c2bar)
  Ta2=norm_CTM(Ta2bar)
  Tb2=norm_CTM(Tb2bar)
 
+# print time.time() - t0, "last_steps"
 
  return c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3
  

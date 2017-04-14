@@ -1,10 +1,7 @@
 import pyUni10 as uni10
-import sys
-import numpy as np
 #import matplotlib.pyplot as plt
 #import matplotlib
 #import pylab
-import random
 import copy
 import time
 import basicitebd
@@ -17,21 +14,28 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
    
  if Model is "Heisenberg":
    H0=basic.Heisenberg0(h[0],h[1])
+   H00=basic.Heisenberg00(h[0],h[1])
    H1=basic.Heisenberg1(h[2])
  if Model is "Heisenberg_Z2":
    H0=basic.Heisenberg0_Z2(h[0],h[1],d_phys)
+   H00=basic.Heisenberg00_Z2(h[0],h[1],d_phys)
    H1=basic.Heisenberg1_Z2(h[2],d_phys)
  if Model is "Heisenberg_U1":
    H0=basic.Heisenberg0_U1(h[0],h[1],d_phys)
+   H00=basic.Heisenberg0_U1(h[0],h[1],d_phys)
    H1=basic.Heisenberg1_U1(h[2],d_phys)
-
+ if Model is "Heisenberg_U1Z2":
+   H0=basic.Heisenberg0_U1Z2(h[0],h[1],d_phys)
+   H00=basic.Heisenberg0_U1Z2(h[0],h[1],d_phys)
+   H1=basic.Heisenberg1_U1(h[2],d_phys)
   
  U = uni10.UniTensor(H0.bond(), "U");
+ U0 = uni10.UniTensor(H00.bond(), "U");
 
   
  for i in xrange(1,600):
 
-   delta=1.00/pow(5,i) 
+   delta=1.00/pow(4,i) 
 
    if delta>1.0e-1:
     N_iter=N_iterF
@@ -59,6 +63,12 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
         U.putBlock(qnum, uni10.takeExp(-delta, H0.getBlock(qnum)))
 
 
+    U0 = uni10.UniTensor(H00.bond(), "U");
+    blk_qnums = H00.blockQnum()
+    for qnum in blk_qnums:
+     U0.putBlock(qnum, uni10.takeExp(-delta, H00.getBlock(qnum)))
+
+
 
 
 
@@ -71,9 +81,8 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
   #ulink
     Gamma=[Gamma_a, Gamma_c]
     Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
-    basicitebd.update_ulink_eff(Gamma,Landa,U,D,d_phys,q_D)
+    basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D)
     #print Landa_2.printDiagram(),Gamma_a.printDiagram(),Gamma_c.printDiagram()
-
 
 
   #rlink
@@ -83,7 +92,7 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
   #ulink
     Gamma=[ Gamma_b,Gamma_d]
     Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
-    basicitebd.update_ulink_eff(Gamma,Landa,U,D,d_phys,q_D)
+    basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D)
 
 
     Gamma=[Gamma_c,Gamma_d]
@@ -93,7 +102,7 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
   #ulink
     Gamma=[ Gamma_c,Gamma_a]
     Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_7,Landa_8]
-    basicitebd.update_ulink_eff(Gamma,Landa,U,D,d_phys,q_D)
+    basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D)
 
 
   #rlink
@@ -103,14 +112,7 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
  #ulink
     Gamma=[ Gamma_d,Gamma_b]
     Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_2,Landa_4]
-    basicitebd.update_ulink_eff(Gamma,Landa,U,D,d_phys,q_D)
-
-
-#################################################################################
-
-
-
-
+    basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D)
 
 
 
