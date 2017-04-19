@@ -1,14 +1,17 @@
 import pyUni10 as uni10
-import sys
-import numpy as np
+#import sys
+#import numpy as np
 #import matplotlib.pyplot as plt
 #import matplotlib
 #import pylab
-import random
+#import random
 import copy
-import time
+#import line_profiler
 import TruncateU
- 
+import basicB
+#import time
+
+
 def MaxAbs(c):
  blk_qnums = c.blockQnum()
  max_list=[]
@@ -22,9 +25,11 @@ def MaxAbs(c):
  return max(max_list_f)
 
 def norm_CTM(c):
- if ( (abs(MaxAbs(c)) < 0.50e-1) or (abs(MaxAbs(c)) > 0.50e+1)   ):
-  c*=(1.00/MaxAbs(c)); 
- return c;
+ Max_val=abs(MaxAbs(c))
+ if ( Max_val < 0.50e-1) or (Max_val > 0.50e+1):
+  c*=(1.00/Max_val) 
+ return c
+
 
 def distance(theta,A):
    blk_qnums = theta.blockQnum()
@@ -40,15 +45,17 @@ def distance(theta,A):
      else: val=val+(T1[i]-T2[i]); #print T1[i]-T2[i]
    return val 
 
+#@profile 
 def produce_projectives(theta,theta1,chi_dim):
  theta=copy.copy(theta)
  theta1=copy.copy(theta1)
  
  theta.setLabel([1,2,20,3,4,40])
  theta.permute([1,2,20,3,4,40],3) 
-# t0=time.time()
+
+ 
  U, s, V=TruncateU.svd_parity1(theta)
-# print time.time() - t0, "svd"
+ 
 
  U.setLabel([1,2,20,-1,-2,-3])
  s.setLabel([-1,-2,-3,3,4,5])
@@ -60,9 +67,9 @@ def produce_projectives(theta,theta1,chi_dim):
  theta1.setLabel([1,2,20,3,4,40])
  theta1.permute([1,2,20,3,4,40],3) 
 
-# t0=time.time()
+ 
  U, s, V=TruncateU.svd_parity1(theta1)
-# print time.time() - t0, "svd1"
+
 
 
  U.setLabel([1,2,20,-1,-2,-3])
@@ -76,14 +83,15 @@ def produce_projectives(theta,theta1,chi_dim):
  A=R*Rb
  A.permute([6,7,8,3,4,5],3)
 
-# t0=time.time()
+# print A
  V, U, s=TruncateU.setTruncation(A, chi_dim) 
-# print time.time() - t0, "svd2"
+
 
 
  U.setLabel([-1,3,4,5])
  V.setLabel([6,7,8,-1])
- s=s*(1.00/MaxAbs(s)) 
+ if MaxAbs(s) > 1.0e-8:
+  s=s*(1.00/MaxAbs(s)) 
  s=TruncateU.inverse(s)
  s=TruncateU.Sqrt(s)
  
@@ -118,13 +126,16 @@ def produce_projectives(theta,theta1,chi_dim):
 
 
 
-
+#@profile 
 def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
-# t0=time.time()
+ 
  chi_dim=0
  for i in xrange(len(chi)):
   chi_dim+=chi[i]
+
+# t0=time.time()
+
  CTM_1 = uni10.Network("Network/CTM1.net")
  CTM_1.putTensor('c1',c1)
  CTM_1.putTensor('c2',c2)
@@ -136,11 +147,12 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  CTM_1.putTensor('b',b)
  theta=CTM_1.launch()
  theta.permute([100, 300, -300 , 400, 200 ,-200],3)
+
 # print time.time() - t0, "up"
 
 
 
-# t0=time.time()
+ 
  CTM_2 = uni10.Network("Network/CTM2.net")
  CTM_2.putTensor('c3',c3)
  CTM_2.putTensor('c4',c4)
@@ -152,12 +164,12 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  CTM_2.putTensor('d',d)
  theta1=CTM_2.launch()
  theta1.permute([100, 300, -300 , 400, 200 ,-200],3)
-# print time.time() - t0, "down"
 
-# t0=time.time()
+
+ 
  U1x, U1x_trans=produce_projectives(theta,theta1, chi_dim)
-# print time.time() - t0, "produce_projectives"
 
+ 
  theta.permute([  400, 200 ,-200, 100, 300, -300], 3)
  theta1.permute([  400, 200 ,-200, 100, 300, -300], 3)
 
@@ -166,6 +178,7 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
 
 
+ 
 # t0=time.time()
 
  Ta4p=copy.copy(Ta4)
@@ -204,7 +217,9 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
 # print time.time() - t0, "upup"
 
-# t0=time.time()
+ 
+
+ 
  CTM_4 = uni10.Network("Network/CTM4.net")
  CTM_4.putTensor('c3',c3)
  CTM_4.putTensor('c4',c4)
@@ -225,7 +240,7 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  theta1=CTM_4.launch() 
  theta1.permute([100, 300, -300 , 400, 200 ,-200],3)
  #print "hi", Ta4.printDiagram(), Tb4p.printDiagram()
-# print time.time() - t0, "dodo"
+ 
 
  U3x, U3x_trans=produce_projectives(theta,theta1, chi_dim)
 
@@ -255,7 +270,7 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  c4bar=c4bar*U3x
  c4bar.permute([4,3],0)
 
-# t0=time.time()
+ 
  #############################
  Tb4.setLabel([0,1,-1,2])
  a.setLabel([1,-1,3,-3,4,-4,5,-5])
@@ -269,7 +284,7 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 # absorb_1.putTensor('U3x',U3x)
 # absorb_1.putTensor('U1x_trans',U1x_trans)
 # Tb4bar=absorb_1.launch() 
-# print time.time() - t0, "try2"
+
  ###########################
  Ta4.setLabel([0,1,-1,2])
  c.setLabel([1,-1,3,-3,4,-4,5,-5])
@@ -318,14 +333,13 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  Tb2bar.permute([6,4,-4,7],3)
  ###########################
  ###########################
- #print time.time() - t0, "corner4"
 
  c3=norm_CTM(c3bar)
  c2=norm_CTM(c2bar)
  Ta2=norm_CTM(Ta2bar)
  Tb2=norm_CTM(Tb2bar)
 
-# print time.time() - t0, "last_steps"
+
 
  return c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3
  
@@ -333,9 +347,9 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  
  
  
+#@profile 
  
 def  magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
-
 
  CTM_net = uni10.Network("Network/CTM.net")
  CTM_net.putTensor('c1',c1)
@@ -373,8 +387,31 @@ def  magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
 # c.setLabel([15,-15,19,-19,16,-16,12,-12])
 # d.setLabel([16,-16,20,-20,17,-17,13,-13])
 # norm=(((((c3*Tb2)*Tb3)*(d))*(((c4*Ta3)*Ta4)*c))*(((c2*Ta2)*Ta1)*b))*(((c1*Tb1)*Tb4)*a) 
- #print 'hi1', '\n',norm,
+#print 'hi1', '\n',norm,
  return norm
+
+
+def  Env_energy_h(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,H0,D,d_phys):
+
+ E1, E2, E3, E4, E5, E6, E7, E8=basicB.produce_Env(a,b,c,d,c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4, Tb4,D,d_phys)
+ 
+ E_ab=basicB.Energy_ab(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0, a_u, b_u)
+
+ return E_ab
+
+def  Env_energy_v(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,c_u,a_u,H0,D,d_phys):
+
+ E1, E2, E3, E4, E5, E6, E7, E8=basicB.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+
+ E_ca=basicB.Energy_ca(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0,c_u,a_u)
+
+ return E_ca
+
+
+
+
+
+#@profile 
  
 def permuteN(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  

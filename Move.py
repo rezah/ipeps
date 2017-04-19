@@ -274,12 +274,13 @@ def decompos_r(Vec_uni):
  V1.setLabel([1,2,-2,3,-3,0])
  V1=V1*s
  V1.permute([1,2,-2,3,-3,4],3)
- chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
- chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
- if chi_dim1 >= chi_dim2:
-   chi_dim=chi_dim2
- else:  
-   chi_dim=chi_dim1
+
+# chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
+# chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
+# if chi_dim1 >= chi_dim2:
+#   chi_dim=chi_dim2
+# else:  
+#   chi_dim=chi_dim1
 
  chi_dim1=(Vec_uni.bond(0).dim())
  chi_dim2=(Vec_uni.bond(5).dim())
@@ -330,12 +331,13 @@ def decompos_u(Vec_uni):
  V1.setLabel([1,2,-2,3,-3,0])
  V1=V1*s
  V1.permute([1,2,-2,3,-3,4],3)
- chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
- chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
- if chi_dim1 >= chi_dim2:
-   chi_dim=chi_dim2
- else:  
-   chi_dim=chi_dim1
+
+# chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
+# chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
+# if chi_dim1 >= chi_dim2:
+#   chi_dim=chi_dim2
+# else:  
+#   chi_dim=chi_dim1
 
  chi_dim1=(Vec_uni.bond(0).dim())
  chi_dim2=(Vec_uni.bond(5).dim())
@@ -385,12 +387,13 @@ def decompos_l(Vec_uni):
  V1.setLabel([1,2,-2,3,-3,0])
  V1=V1*s
  V1.permute([1,2,-2,3,-3,4],3)
- chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
- chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
- if chi_dim1 >= chi_dim2:
-   chi_dim=chi_dim2
- else:  
-   chi_dim=chi_dim1
+
+# chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
+# chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
+# if chi_dim1 >= chi_dim2:
+#   chi_dim=chi_dim2
+# else:  
+#   chi_dim=chi_dim1
 
  chi_dim1=(Vec_uni.bond(0).dim())
  chi_dim2=(Vec_uni.bond(5).dim())
@@ -444,12 +447,14 @@ def decompos_d(Vec_uni):
  V1.setLabel([1,2,-2,3,-3,0])
  V1=V1*s
  V1.permute([1,2,-2,3,-3,4],3)
- chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
- chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
- if chi_dim1 >= chi_dim2:
-   chi_dim=chi_dim2
- else:  
-   chi_dim=chi_dim1
+
+
+# chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
+# chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
+# if chi_dim1 >= chi_dim2:
+#   chi_dim=chi_dim2
+# else:  
+#   chi_dim=chi_dim1
 
 
  chi_dim1=(Vec_uni.bond(0).dim())
@@ -520,7 +525,7 @@ def ED_right(c2,Ta2,Tb2,c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3):
   D_eig=eig_np(h)
   Lambda, index=find_maxindex(D_eig[0])
   eigvec=return_vec(D_eig[1], index )
-  print 'r', Lambda
+  #print 'r', Lambda
   Q=make_Q(q_vec)
   Q.resize(D,m)
   Vec_F=Q*eigvec
@@ -594,7 +599,7 @@ def ED_left(c1,Tb4,Ta4,c4, a, b, c, d, Tb1, Ta1, Ta3, Tb3):
   D_eig=eig_np(h)
   Lambda, index=find_maxindex(D_eig[0])
   eigvec=return_vec(D_eig[1], index )
-  print "l", Lambda
+  #print "l", Lambda
 
   Q=make_Q(q_vec)
   Q.resize(D,m)
@@ -670,7 +675,7 @@ def ED_up(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4):
   D_eig=eig_np(h)
   Lambda, index=find_maxindex(D_eig[0])
   eigvec=return_vec(D_eig[1], index )
-  print "u", Lambda
+  #print "u", Lambda
 
   Q=make_Q(q_vec)
   Q.resize(D,m)
@@ -746,7 +751,7 @@ def ED_down(c4,Ta3, Tb3,c3, a, b, c, d, Tb2, Ta2, Ta4, Tb4):
   D_eig=eig_np(h)
   Lambda, index=find_maxindex(D_eig[0])
   eigvec=return_vec(D_eig[1], index )
-  print "d", Lambda
+  #print "d", Lambda
 
   Q=make_Q(q_vec)
   Q.resize(D,m)
@@ -792,45 +797,31 @@ def ED_down(c4,Ta3, Tb3,c3, a, b, c, d, Tb2, Ta2, Ta4, Tb4):
 def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
 
-
- c4,Ta3,Tb3,c3=ED_down(c4,Ta3,Tb3,c3, a, b, c, d, Tb2, Ta2, Ta4, Tb4)
- Vec_uni=make_vec_down(c4,Ta3,Tb3,c3)
- Vec_uni_u=make_vec_up(c1,Tb1, Ta1,c2)
- A=Vec_uni*Vec_uni_u
- print "Norm", A[0]
-
-
-
- c1,Tb1,Ta1,c2=ED_up(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4)
-
-
-
- Vec_uni=make_vec_down(c4,Ta3,Tb3,c3)
- Vec_uni_u=make_vec_up(c1,Tb1, Ta1,c2)
- A=Vec_uni*Vec_uni_u
- print "Norm", A[0]
-
-
-
-
-
-
  c2,Ta2,Tb2,c3=ED_right(c2,Ta2,Tb2,c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3)
-
- Vec_uni=make_vec_right(c2,Ta2,Tb2,c3)
- Vec_uni_l=make_vec_left(c1,Tb4,Ta4,c4)
- A=Vec_uni*Vec_uni_l
- print "Norm", A[0]
-
  c1,Tb4,Ta4,c4=ED_left(c1,Tb4,Ta4,c4, a, b, c, d, Tb1, Ta1, Ta3, Tb3)
-
- Vec_uni=make_vec_right(c2,Ta2,Tb2,c3)
- Vec_uni_l=make_vec_left(c1,Tb4,Ta4,c4)
- A=Vec_uni*Vec_uni_l
- print "Norm", A[0]
+ c1,Tb1,Ta1,c2=ED_up(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4)
+ c4,Ta3,Tb3,c3=ED_down(c4,Ta3,Tb3,c3, a, b, c, d, Tb2, Ta2, Ta4, Tb4)
 
 
+# Vec_uni=make_vec_down(c4,Ta3,Tb3,c3)
+# Vec_uni_u=make_vec_up(c1,Tb1, Ta1,c2)
+# A=Vec_uni*Vec_uni_u
+# print "Norm", A[0]
 
+# Vec_uni=make_vec_down(c4,Ta3,Tb3,c3)
+# Vec_uni_u=make_vec_up(c1,Tb1, Ta1,c2)
+# A=Vec_uni*Vec_uni_u
+# print "Norm", A[0]
+
+# Vec_uni=make_vec_right(c2,Ta2,Tb2,c3)
+# Vec_uni_l=make_vec_left(c1,Tb4,Ta4,c4)
+# A=Vec_uni*Vec_uni_l
+# print "Norm", A[0]
+
+# Vec_uni=make_vec_right(c2,Ta2,Tb2,c3)
+# Vec_uni_l=make_vec_left(c1,Tb4,Ta4,c4)
+# A=Vec_uni*Vec_uni_l
+# print "Norm", A[0]
 
 # print "c1", c1.printDiagram()
 # print "c2", c2.printDiagram()
@@ -846,10 +837,8 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 # print "Ta3", Ta3.printDiagram()
 # print "Tb3", Tb3.printDiagram()
 
-
 # print "Ta4", Ta4.printDiagram()
 # print "Tb4", Tb4.printDiagram()
-
 
  return c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4
  

@@ -1,14 +1,17 @@
 import pyUni10 as uni10
-import sys
-import numpy as np
+#import sys
+#import numpy as np
 #import matplotlib.pyplot as plt
 #import matplotlib
 #import pylab
-import random
+#import random
 import copy
-import time
+#import line_profiler
 import TruncateU
- 
+import basicB
+#import time
+
+
 def MaxAbs(c):
  blk_qnums = c.blockQnum()
  max_list=[]
@@ -21,16 +24,22 @@ def MaxAbs(c):
  #print max_list_f, max(max_list_f)
  return max(max_list_f)
 
-def norm_CTM(c):
 
- if ( (abs(MaxAbs(c)) < 0.50e-1) or (abs(MaxAbs(c)) > 0.50e+1)   ):
-  c*=(1.00/MaxAbs(c)); 
- return c;
-  
+def norm_CTM(c):
+ Max_val=abs(MaxAbs(c))
+ if ( Max_val < 0.50e-1) or (Max_val > 0.50e+1):
+  c*=(1.00/Max_val) 
+ return c
+
+#@profile  
 def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  chi_dim=0
  for i in xrange(len(chi)):
   chi_dim+=chi[i]
+
+ 
+ #t0=time.time()
+
  CTM_1 = uni10.Network("Network/CTM_1.net")
  CTM_1.putTensor('c1',c1)
  CTM_1.putTensor('c2',c2)
@@ -50,10 +59,19 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  CTM_1.putTensor('d',d)
  theta=CTM_1.launch()
  theta.permute([100,300,-300,200,400,-400],3)
+ 
+ #print time.time() - t0, "up"
+
+
  #print theta.trace()#, Contract.printDiagram()
  #print theta.printDiagram(),MaxAbs(theta)
  #print theta.printDiagram() 
+
+ #t0=time.time()
+
  U1x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
+
+ #print time.time() - t0, "svd"
 
 
  U1x_trans=copy.copy(U1x)
@@ -63,6 +81,8 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
 # print "U1x_trans", U1x_trans.printDiagram()
 # print "U1x", U1x.printDiagram()
+ 
+# t0=time.time()
 
  CTM_2 = uni10.Network("Network/CTM_2.net")
  CTM_2.putTensor('c1',c1)
@@ -85,13 +105,20 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
  theta.permute([100,300,-300,200,400,-400],3)
  #print theta.trace()#, Contract.printDiagram()
+# print time.time() - t0, "du"
 
+ 
  U2x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
+
+
  U2x_trans=copy.copy(U2x)
  U2x_trans.transpose()
 
 # print "U2x_trans", U2x_trans.printDiagram()
 # print "U2x", U2x.printDiagram()
+
+ 
+ #t0=time.time()
 
  Ta4p=copy.copy(Ta4)
  Ta4p.setName("Ta4p")
@@ -144,11 +171,18 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  #print CTM_3, CTM_3.profile()
  #print theta.printDiagram()
  theta.permute([100,300,-300,200,400,-400],3)
+ #print time.time() - t0, "upup"
+ 
+
  #print theta.trace()#, Contract.printDiagram()
  U3x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
  U3x_trans=copy.copy(U3x)
  U3x_trans.transpose()
  #print "U3x_trans", U3x_trans.printDiagram()
+
+ 
+
+# t0=time.time()
 
  CTM_4 = uni10.Network("Network/CTM_4.net")
  CTM_4.putTensor('c1',c1)
@@ -187,6 +221,9 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  #print CTM_4, CTM_4.profile()
  #print theta.printDiagram()
  theta.permute([100,300,-300,200,400,-400],3)
+# print time.time() - t0, "dudu"
+
+ 
  #print theta.trace()#, Contract.printDiagram()
  U4x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
 
@@ -206,6 +243,8 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  Ta3.setLabel([1,2,-2,3])
  c4bar=c4*Ta3
  c4bar.permute([0,2,-2,3],1)
+
+ 
 
  ##############################
  U3x_trans.setLabel([4,0,2,-2])
@@ -278,12 +317,11 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  Ta2=norm_CTM(Ta2bar)
  Tb2=norm_CTM(Tb2bar)
 
-
  return c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3
  
  
  
- 
+#@profile 
 def  magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
 
 
@@ -324,10 +362,37 @@ def  magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
 # d.setLabel([16,-16,20,-20,17,-17,13,-13])
 # norm=(((((c3*Tb2)*Tb3)*(d))*(((c4*Ta3)*Ta4)*c))*(((c2*Ta2)*Ta1)*b))*(((c1*Tb1)*Tb4)*a) 
  #print 'hi1', '\n',norm,
- return norm
+ return norm[0]
  
+
+
+
+
+
+def  Env_energy_h(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,H0,D,d_phys):
+
+ E1, E2, E3, E4, E5, E6, E7, E8=basicB.produce_Env(a,b,c,d,c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4, Tb4,D,d_phys)
+ 
+ E_ab=basicB.Energy_ab(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0, a_u, b_u)
+
+ return E_ab
+
+def  Env_energy_v(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,c_u,a_u,H0,D,d_phys):
+
+ E1, E2, E3, E4, E5, E6, E7, E8=basicB.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+
+ E_ca=basicB.Energy_ca(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0,c_u,a_u)
+
+ return E_ca
+
+
+
+
+
+
+ 
+#@profile 
 def permuteN(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
- 
  ##print'a', a
  a.setLabel([0,10,1,-1,2,-2,3,-3])
  a.permute([3,-3,2,-2,1,-1,0,10],4)
@@ -395,7 +460,7 @@ def permuteN(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  Tb4.permute([2,1,-1,0],3)
  Tb4.setLabel([0,1,-1,2])
 
- 
+#@profile 
 def permuteN1(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  
  ##print'a', a

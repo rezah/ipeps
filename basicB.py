@@ -4,7 +4,7 @@ import time
 import basic
 
 
-def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
+def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic.Init_env(Env)
 
@@ -12,51 +12,56 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
 
  Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.rebond_corner(a,b,c,d,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
 
+
  #t0=time.time()
  if Corner_method is 'CTM':
 #  c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1=basic.make_equall_bond(c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1)
-  c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=basic.corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4,D)
+  c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=basic.corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4,D,H0,d_phys)
  if Corner_method is'CTMRG':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'h')
   #basic.Store_Env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4) 
  if Corner_method is'CTMFull':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'h')
  #print time.time() - t0, "CTM-H, Left"
+
 
  Env=basic.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
 
 
- t0=time.time()
+# t0=time.time()
  E1, E2, E3, E4, E5, E6, E7, E8=produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
- print time.time() - t0, "produce_env"
+# print time.time() - t0, "produce_env"
 
- t0=time.time()
+# t0=time.time()
  N_u, l_u, r_u, q_u, qq_u = Qr_lQ_decom(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u)
- print time.time() - t0, "Qr_lQ_decom"
+# print time.time() - t0, "Qr_lQ_decom"
 
- t0=time.time()
+# t0=time.time()
  if Gauge is 'Fixed':
   N_u=N_Positiv(N_u)
- print time.time() - t0, "Positive"
+# print time.time() - t0, "Positive"
  
  l_up=copy.copy(l_u)
  r_up=copy.copy(r_u)
 
- t0=time.time() 
-# l_up, r_up=Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U)
- l_up, r_up=Do_optimization_grad(N_u, l_u, r_u, l_up, r_up, U)
-
- print time.time() - t0, "optimization"
+# l_up,r_up=svd_init(l_up,r_up,U)
 
 
- Dis_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U )
- print "DisFFF", Dis_val
+# t0=time.time() 
+ l_up, r_up=Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U)
+# l_up, r_up=Do_optimization_grad(N_u, l_u, r_u, l_up, r_up, U)
+
+# print time.time() - t0, "optimization"
+
+
+# Dis_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U )
+# print "DisFFF", Dis_val
 
  a_up, b_up =reproduce_ab(r_up, l_up, q_u, qq_u)
- a_up, b_up=equall_dis(a_up,b_up) 
+# a_up, b_up=equall_dis(a_up,b_up) 
 
- Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u,a_up,b_up)
- print "Dis_final", Dis_val
+# Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u,a_up,b_up)
+# print "Dis_final", Dis_val
 
 
  a_up=basic.max_ten(a_up)
@@ -69,7 +74,7 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
 
 
 
-def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
+def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic.Init_env(Env)
 
@@ -77,14 +82,19 @@ def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
 
  Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
+
+ #t0=time.time()
  if Corner_method is 'CTM':
 #  c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1=basic.make_equall_bond(c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1)
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+  c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=basic.corner_transfer_matrix_twosite(c_u, a_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4,D,H0,d_phys)
  if Corner_method is'CTMRG':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(c_u, a_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'v')
+  #basic.Store_Env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4) 
  if Corner_method is'CTMFull':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(c_u, a_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'v')
  #print time.time() - t0, "CTM-H, Left"
+
+
 
  Env=basic.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
 
@@ -100,20 +110,23 @@ def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
  l_up=copy.copy(l_u)
  r_up=copy.copy(r_u)
  
- Dis_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U )
- print "Dis", Dis_val
+ #l_up,r_up=svd_init_1(l_up,r_up,U)
 
-# l_up, r_up=Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U)
- l_up, r_up=Do_optimization_grad_1(N_u, l_u, r_u, l_up, r_up, U)
+ 
+# Dis_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U )
+# print "Dis", Dis_val
 
- Dis_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U )
- print "DisFFF", Dis_val
+ l_up, r_up=Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U)
+# l_up, r_up=Do_optimization_grad_1(N_u, l_u, r_u, l_up, r_up, U)
+
+# Dis_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U )
+# print "DisFFF", Dis_val
 
  c_up,a_up = reproduce_ca(r_up, l_up, q_u, qq_u)
- c_up, a_up=equall_dis_1(c_up,a_up) 
+# c_up, a_up=equall_dis_1(c_up,a_up) 
  
- Dis_val=Dis_f_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u,c_up,a_up)
- print "Dis_final", Dis_val
+# Dis_val=Dis_f_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u,c_up,a_up)
+# print "Dis_final", Dis_val
 
 
  c_up=basic.max_ten(c_up)
@@ -296,17 +309,17 @@ def Qr_lQ_decom(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u):
  #print N.printDiagram()
  #print r.printDiagram(), l.printDiagram() 
  ###testing####
- r_d=copy.copy(r)
- r_d.transpose()
- l_d=copy.copy(l)
- l_d.transpose()
- 
- 
- r_d.setLabel([-18,-82,-83,53])
- l_d.setLabel([-80,-81,54,-18])
+# r_d=copy.copy(r)
+# r_d.transpose()
+# l_d=copy.copy(l)
+# l_d.transpose()
+# 
+# 
+# r_d.setLabel([-18,-82,-83,53])
+# l_d.setLabel([-80,-81,54,-18])
+# Norm=((N*(r*l))*(r_d*l_d))
+# print "Norm-QR", Norm[0]
 
- Norm=((N*(r*l))*(r_d*l_d))
- print "Norm-QR", Norm[0]
  return N, l, r, q, qq
 
 
@@ -354,22 +367,71 @@ def Qr_lQ_decom_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u):
  N.permute([-80,-81,82,83,80,81,-82,-83],4)
  #print N.printDiagram() 
 
-# ###testing####
- r_d=copy.copy(r)
- r_d.transpose()
- l_d=copy.copy(l)
- l_d.transpose()
- ##############
- 
- r_d.setLabel([-17,-80,-81,53])
- l_d.setLabel([-82,-83,54,-17])
+## ###testing####
+# r_d=copy.copy(r)
+# r_d.transpose()
+# l_d=copy.copy(l)
+# l_d.transpose()
+# ##############
+# 
+# r_d.setLabel([-17,-80,-81,53])
+# l_d.setLabel([-82,-83,54,-17])
 
- Norm=((N*(r*l))*(r_d*l_d))
- print "Norm-QR", Norm[0]
+# Norm=((N*(r*l))*(r_d*l_d))
+# print "Norm-QR", Norm[0]
  return N, l, r, q, qq
 
 
 
+#def Energy_ab_positive(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U, a_u, b_u):
+# N, l, r, q, qq=Qr_lQ_decom(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u)
+# N=N_Positiv(N)
+# U.setLabel([51,52,53,54])
+# Iden=uni10.UniTensor(U.bond())
+# Iden.identity()
+# Iden.setLabel([51,52,53,54])
+
+# r_d=copy.copy(r)
+# l_d=copy.copy(l)
+# l_d.transpose()
+# r_d.transpose()
+# r_d.setLabel([-18,-82,-83,51])
+# l_d.setLabel([-80,-81,52,-18])
+
+# Val=((N*(r*l))*(r_d*l_d)*U)
+# print Val
+# Val1=((N*(r*l))*(r_d*l_d)*Iden)
+# print Val1
+# return Val[0]/Val1[0]
+# 
+#def Energy_ca_positive(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u):
+# N, l, r, q, qq=Qr_lQ_decom_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u)
+# N=N_Positiv_1(N)
+
+# U.setLabel([51,52,53,54])
+# Iden=uni10.UniTensor(U.bond())
+# Iden.identity()
+# Iden.setLabel([51,52,53,54])
+
+# r_d=copy.copy(r)
+# l_d=copy.copy(l)
+# l_d.transpose()
+# r_d.transpose()
+# 
+# 
+# r_d.setLabel([-17,-80,-81,51])
+# l_d.setLabel([-82,-83,52,-17])
+
+
+# Val=((N*(r*l))*(r_d*l_d)*U)
+# print Val
+# Val1=((N*(r*l))*(r_d*l_d)*Iden)
+# print Val1
+# return Val[0]/Val1[0]
+
+
+
+ 
  
 def reproduce_ab(r_u, l_u, q_u, qq_u):
 
@@ -636,23 +698,31 @@ def MaxAbs(c):
 
 def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U):
  
- Res=1
- Res1=2
+ r_up_first=copy.copy(r_up)
+ l_up_first=copy.copy(l_up)
+ checking_val=0
+ 
+ Res=10
+ Res1=20
  count=0
  #Distance_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
- for q in xrange(20):
+ for q in xrange(30):
   #print "\n", "\n"
   Distance_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
   print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
   r_up=optimum_0(N_u, l_u, r_u, l_up, r_up, U)
   l_up=optimum_1(N_u, l_u, r_u, l_up, r_up, U)
 
+
   Res=Res1
   Res1=Distance_val
+
+  if (q>1) and (Res1 > Res) and ((abs(Res1-Res) / abs(Res)) > 1.00e-4): checking_val=1;
+
   count+=1
-  if count > 20: print 'Num_Opt > 50'; break;
+  if count > 30: print 'Num_Opt > 30'; break;
   if abs(Res) > 1.00e-10:
-   if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < 8.00e-9): 
+   if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
     #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     break
   else:
@@ -662,27 +732,45 @@ def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U):
  Distance_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
  #print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
 
+
+ if checking_val != 0:
+  r_up=copy.copy(r_up_first)
+  l_up=copy.copy(l_up_first)
+  l_up, r_up=Do_optimization_grad(N_u, l_u, r_u, l_up, r_up, U)
+
+
  return l_up, r_up
 
 def Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U):
  
- Res=1
- Res1=2
+ 
+ 
+ r_up_first=copy.copy(r_up)
+ l_up_first=copy.copy(l_up)
+ checking_val=0
+ 
+ 
+ Res=10
+ Res1=20
  count=0
  #Distance_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
- for q in xrange(20):
+ for q in xrange(30):
   #print "\n", "\n"
   Distance_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
   print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
   r_up=optimum_00(N_u, l_u, r_u, l_up, r_up, U)
   l_up=optimum_11(N_u, l_u, r_u, l_up, r_up, U)
 
+
   Res=Res1
   Res1=Distance_val
+
+  if (q>1) and (Res1 > Res) and ((abs(Res1-Res) / abs(Res)) > 1.00e-4): checking_val=1;
+
   count+=1
-  if count > 20: print 'Num_Opt > 50'; break;
+  if count > 30: print 'Num_Opt > 30'; break;
   if abs(Res) > 1.00e-10:
-   if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < 8.00e-9): 
+   if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
     #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     break
   else:
@@ -691,6 +779,12 @@ def Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U):
      break
  Distance_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
  #print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
+
+
+ if checking_val != 0:
+  r_up=copy.copy(r_up_first)
+  l_up=copy.copy(l_up_first)
+  l_up, r_up=Do_optimization_grad_1(N_u, l_u, r_u, l_up, r_up, U)
 
  return l_up, r_up
 
@@ -1055,7 +1149,7 @@ def Obtain_grad_r_1(N, l, r, lp, rp, U):
  D_r=D_r+(-1.00)*A3p
 
  D_r.transpose()
- D_r.permute([80,81,53,18],3)
+ D_r.permute([80,81,53,17],3)
  return D_r
 
 
@@ -1091,7 +1185,7 @@ def Obtain_grad_l_1(N, l, r, lp, rp, U):
  A2.permute([54,17,82,83],4)
  D_l=copy.copy(A2)
 
- A2=(((rp*r_dp)*N)*Iden)*l_p
+ A2=(((rp*r_dp)*N)*Iden)*lp
  A2.permute([52,-17,-82,-83],0)
  A2.transpose()
  D_l=D_l+A2
@@ -1109,26 +1203,7 @@ def Obtain_grad_l_1(N, l, r, lp, rp, U):
  D_l.transpose()
 
  D_l.permute([54,17,82,83],2)
-
-
  return D_l
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1195,7 +1270,6 @@ def optimum_11(N, l, r, lp, rp, U):
  A.setLabel([54,17,82,83])
  A.permute([54,17,82,83],2)
 
-
  lf=copy.copy(A)
 
  return lf
@@ -1212,7 +1286,7 @@ def Do_optimization_grad(N_u, l_u, r_u, l_up, r_up, U):
   Gamma=1.0
   E_previous=0
   count=0
-  for i in xrange(40):
+  for i in xrange(150):
    count+=1
    E1_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
    Ef=E1_val
@@ -1287,7 +1361,6 @@ def Do_optimization_grad(N_u, l_u, r_u, l_up, r_up, U):
    r_up=r_u_first
    l_up=l_u_first
 
-
   return  l_up, r_up
 
 
@@ -1301,7 +1374,7 @@ def Do_optimization_grad_1(N_u, l_u, r_u, l_up, r_up, U):
   Gamma=1.0
   E_previous=0
   count=0
-  for i in xrange(40):
+  for i in xrange(150):
    count+=1
    E1_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
    Ef=E1_val
@@ -1383,8 +1456,47 @@ def Do_optimization_grad_1(N_u, l_u, r_u, l_up, r_up, U):
 
 
 
+def svd_init(l_up,r_up,H):
+ #print l_up.printDiagram(),  r_up.printDiagram()
+ H.setLabel([51,52,53,54])
+ D_dim=int(r_up.bond(3).dim())
+ #print D_dim
+ 
+ Teta=r_up*l_up*H
+ Teta.permute([82,83,51,80,81,52],3)
+ 
+ U, V, s=setTruncation(Teta,D_dim)
+ U.setLabel([82,83,53,17])
+ V.setLabel([18,80,81,54])
+ s.setLabel([17,18])
+ U=U*s
+ U.permute([82,83,53,18],3)
+ V.permute([54,18,80,81],2)
 
+ #print U.printDiagram(), V.printDiagram()
 
+ return V, U
+
+def svd_init_1(l_up,r_up,H):
+ #print l_up.printDiagram(),  r_up.printDiagram()
+ H.setLabel([51,52,53,54])
+ D_dim=int(r_up.bond(3).dim())
+ #print D_dim
+ 
+ Teta=r_up*l_up*H
+ Teta.permute([80,81,51,82,83,52],3)
+ 
+ U, V, s=setTruncation(Teta,D_dim)
+ U.setLabel([80,81,53,16])
+ V.setLabel([17,82,83,54])
+ s.setLabel([16,17])
+ U=U*s
+ U.permute([80,81,53,17],3)
+ V.permute([54,17,82,83],2)
+
+ #print U.printDiagram(), V.printDiagram()
+
+ return V, U
 
 
 
@@ -1401,7 +1513,6 @@ def equall_dis(a_up, b_up):
  l.setLabel([18,80])
  qq.setLabel([80,20,6,4,54])
  
-
 
 
  A=copy.copy(a_up)
@@ -1620,8 +1731,8 @@ def svd_parity(theta):
         LA.putBlock(qnum, svds[qnum][1])
         GB.putBlock(qnum, svds[qnum][2])
 
-#    print LA
     return GA, LA, GB
+
 def inverse(Landa2):
  invLanda2=uni10.UniTensor(Landa2.bond())
  blk_qnums=Landa2.blockQnum()
@@ -1636,6 +1747,7 @@ def inverse(Landa2):
      invL2[i*D1+j] = 0 if ((invLt[i*D1+j].real) < 1.0e-12) else (1.00 / (invLt[i*D1+j].real))
   invLanda2.putBlock(qnum,invL2)
  return invLanda2
+
 def svd_parity2(theta):
 
     LA=uni10.UniTensor([theta.bond(0), theta.bond(1)])
@@ -1669,6 +1781,7 @@ def   Sqrt(Landa):
       Landa_cpm[i*D+j]=0
    Landa_cp.putBlock(qnum,Landa_cpm)
   return Landa_cp 
+
 def lq_parity1(theta):
     #bd1=copy.copy(theta.bond(0))
     #bd1.change(uni10.BD_OUT)
@@ -1708,6 +1821,7 @@ def qr_parity1(theta):
 #    print LA
     return GA, LA
     
+    
 def lq_parity(theta):
 #    bd1=copy.copy(theta.bond(0))
 #    bd2=copy.copy(theta.bond(1))
@@ -1715,7 +1829,6 @@ def lq_parity(theta):
 #    bd2.change(uni10.BD_OUT)
     bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
     bd2=uni10.Bond(uni10.BD_OUT,theta.bond(1).Qlist())    
-    
     
     LA=uni10.UniTensor([theta.bond(0),theta.bond(1),bd1,bd2])
     GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3),theta.bond(4)])
@@ -1745,8 +1858,6 @@ def qr_parity(theta):
     bd1=uni10.Bond(uni10.BD_IN,theta.bond(3).Qlist())
     bd2=uni10.Bond(uni10.BD_IN,theta.bond(4).Qlist())
     
-    
-    
     GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3),theta.bond(4)])
     LA=uni10.UniTensor([bd1,bd2, theta.bond(3),theta.bond(4)])
 
@@ -1760,6 +1871,8 @@ def qr_parity(theta):
 
 #    print LA
     return GA, LA
+
+
 def sqrt_general(N2):
   N_init=copy.copy(N2)
   blk_qnums = N2.blockQnum()
@@ -1811,4 +1924,92 @@ def N_Positiv_1(N):
  N_final=sqrt_general(N)
  N_final.setLabel([-80,-81,-82,-83,80,81,82,83])
  N_final.permute([-80,-81,82,83,80,81,-82,-83], 4)
- return N_final               
+ return N_final    
+ 
+ 
+ 
+def setTruncation(theta, chi):
+    LA=uni10.UniTensor(theta.bond())
+    GA=uni10.UniTensor(theta.bond())
+    GB=uni10.UniTensor(theta.bond())
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        M_tem=theta.getBlock(qnum)
+        svds[qnum] = M_tem.svd()
+        dim_svd.append(int(svds[qnum][1].col()))
+    svs = []
+    bidxs = []
+    for bidx in xrange(len(blk_qnums)):
+        svs, bidxs = sv_merge(svs, bidxs, bidx, svds[blk_qnums[bidx]][1], chi,len(blk_qnums))
+    dims = [0] * len(blk_qnums)
+    for bidx in bidxs:
+        dims[bidx] += 1  
+    qnums = []
+    for bidx in xrange(len(blk_qnums)):
+        qnums += [blk_qnums[bidx]] * dims[bidx]
+    bdi_mid = uni10.Bond(uni10.BD_IN, qnums)
+    #print bdi_mid
+    bdo_mid = uni10.Bond(uni10.BD_OUT, qnums)
+    GA.assign([theta.bond(0), theta.bond(1),theta.bond(2), bdo_mid])
+    GB.assign([bdi_mid, theta.bond(3), theta.bond(4),theta.bond(5)])
+    LA.assign([bdi_mid, bdo_mid])
+    degs = bdi_mid.degeneracy()
+    for qnum, dim in degs.iteritems():
+        if qnum not in svds:
+            raise Exception("In setTruncaton(): Fatal error.")
+        svd = svds[qnum]
+        GA.putBlock(qnum, svd[0].resize(svd[0].row(), dim))
+        GB.putBlock(qnum, svd[2].resize(dim, svd[2].col()))
+        LA.putBlock(qnum, svd[1].resize(dim, dim)  )
+    return GA, GB, LA
+
+def sv_merge(svs, bidxs, bidx, sv_mat, chi, len_qn):
+    if(len(svs)):
+        length = len(svs) + sv_mat.elemNum()
+        length = length if length < chi else chi
+        ori_svs = svs
+        ori_bidxs = bidxs
+        svs = [0] * length
+        bidxs = [0] * length
+        svs = []
+        bidxs = []
+        cnt  = 0
+        cur1 = 0
+        cur2 = 0
+        while cnt < length:
+            if(cur1 < len(ori_svs)) and cur2 < sv_mat.elemNum():
+                if ori_svs[cur1] >= sv_mat[cur2]:
+                    if (ori_svs[cur1] > 1.0e-12):
+                     svs.append(ori_svs[cur1]) 
+                     bidxs.append(ori_bidxs[cur1])
+                    cur1 += 1
+                else:
+                    if (sv_mat[cur2] > 1.0e-12):
+                     svs.append( sv_mat[cur2])
+                     bidxs.append(bidx) 
+                    cur2 += 1
+            elif cur2 < sv_mat.elemNum() :
+                for i in xrange(cnt, length):
+                    if (sv_mat[cur2] > 1.0e-12):
+                     svs.append(sv_mat[cur2]) 
+                     bidxs.append(bidx) 
+                    cur2 += 1
+                break
+            else:
+                for i in xrange(cur1, len(ori_svs)):
+                 svs.append(ori_svs[i])
+                 bidxs.append(ori_bidxs[i]) 
+                break
+            cnt += 1
+    else:
+       if (len_qn is 1):
+        bidxs = [bidx] * chi  
+        svs = [sv_mat[i] for i in xrange(chi)]
+       elif (sv_mat[0] > 1.0e-12):
+        bidxs = [bidx] * sv_mat.elemNum()
+        svs = [sv_mat[i] for i in xrange(sv_mat.elemNum())]
+       else: bidxs = [bidx];  svs = [sv_mat[0]];  
+    return svs, bidxs
+            

@@ -1,13 +1,16 @@
 import pyUni10 as uni10
-import sys
-import numpy as np
+#import sys
+#import numpy as np
 #import matplotlib.pyplot as plt
 #import matplotlib
 #import pylab
-import random
+#import random
 import copy
-import time
+#import time
+#import line_profiler
 
+
+#@profile
 def setTruncation(theta, chi):
     LA=uni10.UniTensor(theta.bond())
     GA=uni10.UniTensor(theta.bond())
@@ -16,7 +19,8 @@ def setTruncation(theta, chi):
     blk_qnums = theta.blockQnum()
     dim_svd=[]
     for qnum in blk_qnums:
-        svds[qnum] = theta.getBlock(qnum).svd()
+        M_tem=theta.getBlock(qnum)
+        svds[qnum] = M_tem.svd()
         dim_svd.append(int(svds[qnum][1].col()))
     svs = []
     bidxs = []
@@ -29,6 +33,7 @@ def setTruncation(theta, chi):
     for bidx in xrange(len(blk_qnums)):
         qnums += [blk_qnums[bidx]] * dims[bidx]
     bdi_mid = uni10.Bond(uni10.BD_IN, qnums)
+    #print bdi_mid
     bdo_mid = uni10.Bond(uni10.BD_OUT, qnums)
     GA.assign([theta.bond(0), theta.bond(1),theta.bond(2), bdo_mid])
     GB.assign([bdi_mid, theta.bond(3), theta.bond(4),theta.bond(5)])
@@ -280,7 +285,7 @@ def inverse(Landa2):
   invLt=Landa2.getBlock(qnum)
   for i in xrange(D):
     for j in xrange(D1):
-     invL2[i*D1+j] = 0 if ((invLt[i*D1+j].real) < 1.0e-12) else (1.00 / (invLt[i*D1+j].real))
+     invL2[i*D1+j] = 1.0e-13 if ((invLt[i*D1+j].real) < 1.0e-12) else (1.00 / (invLt[i*D1+j].real))
   invLanda2.putBlock(qnum,invL2)
  return invLanda2
 
@@ -303,15 +308,6 @@ def lq_parity(theta):
 
 #    print LA
     return  LA, GA
-
-
-
-
-
-
-
-
-
 
 
 
