@@ -1,442 +1,899 @@
 import pyUni10 as uni10
 import sys
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib
-import pylab
+from numpy import linalg as LA
 import random
 import copy
 import time
-
-def  add_right(c2,Ta2,Tb2,c3,Ta1,Tb3,b,d,chi,D):
- bdo = uni10.Bond(uni10.BD_OUT, chi)
- #################3################################
- c2.setLabel([0,1])
- Ta1.setLabel([3,2,0])
- c2bar=c2*Ta1
- c2bar.permute([1,2,3],2)
+import TruncateU
  
- c3.setLabel([0,1])
- Tb3.setLabel([3,2,1])
- c3bar=c3*Tb3
- c3bar.permute([3,0,2],1)
+def MaxAbs(c):
+ blk_qnums = c.blockQnum()
+ max_list=[]
+ for qnum in blk_qnums:
+    c_mat=c.getBlock(qnum)
+    max_list.append(c_mat.absMax())
+ #sv_mat = uni10.Matrix( len(max_list), len(max_list), max_list, True)
+ #return sv_mat.absMax()
+ max_list_f=[abs(x) for x in max_list]
+ #print max_list_f, max(max_list_f)
+ return max(max_list_f)
+
+def norm_CTM(c):
+
+ if ( (abs(MaxAbs(c)) < 0.50e-1) or (abs(MaxAbs(c)) > 0.50e+1)   ):
+  c*=(1.00/MaxAbs(c)); 
+ return c;
+
+
+def Mat_np_to_Uni(Mat_np):
+ d0=np.size(Mat_np,0)
+ d1=np.size(Mat_np,1)
+ Mat_uni=uni10.Matrix(d0,d1)
+ for i in xrange(d0):
+  for j in xrange(d1):
+   Mat_uni[i*d1+j]=Mat_np[i,j]
+ return  Mat_uni
+
+
+def Mat_nptoUni(Mat_np):
+ d0=np.size(Mat_np,0)
+ Mat_uni=uni10.Matrix(d0,d0, True)
+ for i in xrange(d0):
+   Mat_uni[i]=Mat_np[i]
+ return  Mat_uni
+
  
- Mc2=c2bar.getBlock()
- Mc2_trans=copy.copy(Mc2)
- Mc2_trans.transpose()
+def Mat_uni_to_np(Mat_uni):
+ dim0=int(Mat_uni.row())
+ dim1=int(Mat_uni.col())
+ Mat_np=np.zeros((dim0,dim1))
+ for i in xrange(dim0):
+  for j in xrange(dim1):
+   Mat_np[i,j]=Mat_uni[i*dim1+j]
+ return  Mat_np
 
- Mc3=c3bar.getBlock()
- Mc3_trans=copy.copy(Mc3)
- Mc3_trans.transpose()
- Mfinal=Mc2*Mc2_trans+Mc3_trans*Mc3
- svd=Mfinal.svd()
- Z=uni10.UniTensor([c2bar.bond()[0],c2bar.bond()[1] ,bdo] )
- Z.putBlock(svd[0].resize(svd[0].row(), chi))
+def eig_np(A):
+ D_eig=[A]*2
+ A_np=Mat_uni_to_np(A)
+ w, v = LA.eig(A_np)
+ D_eig[0]=Mat_nptoUni(w)
+ D_eig[1]=Mat_np_to_Uni(v)
+ return D_eig
 
- Z_trans=copy.copy(Z)
- Z_trans.transpose()
+def  make_Q(q_vec): 
+ D=int(q_vec[0].row())
+ m=len(q_vec)
+ Q=uni10.Matrix(D, m)
+ for i in xrange(m):
+  for j in xrange(D):
+    Q[j*m+i]=q_vec[i][j]
+ return Q
 
- c2.setLabel([0,1])
- Ta2.setLabel([3,2,1])
- Ta1.setLabel([4,5,0])
- b.setLabel([6,7,2,5])
- Q=((c2*Ta2)*(Ta1))*b
- Q.permute([3,7,4,6],2)
+def return_vec(A, index ):
+ D=int(A.row())
+ vec_tem=uni10.Matrix(D,1)
+ for i in xrange(D): 
+  vec_tem[i]=A[i*D+index].real
+ return vec_tem
+
+
+def find_maxindex(A):
+ D=int(A.row())
+ max_val=0
+ index=0
+ for i in xrange(D):
+  if (i == 0) or ( max_val < abs(A[i]) ):
+   max_val = abs(A[i])
+   index=i
+ return max_val, index
+
+
+
+def Multi_r(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3):
+ CTM_1 = uni10.Network("Network/Right.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([21,14,-14 , 7,-7,0],6)
+ #print vec.printDiagram() 
+ Vec_M=vec.getBlock()
+ return Vec_M
+
+
+def Multi_u(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
+ CTM_1 = uni10.Network("Network/Up.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([17, 18, -18, 19, -19,  20],6)
+ Vec_M=vec.getBlock()
+ return Vec_M
+
+
+def Multi_d(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
+
+ Vec_uni1=copy.copy(Vec_uni)
+ Vec_uni1.transpose()
+
+ CTM_1 = uni10.Network("Network/Down.net")
+ CTM_1.putTensor('Vec_uni1',Vec_uni1)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([3, 4, -4 , 5, -5 , 6],0)
+
+ vec.transpose()
+ Vec_M=vec.getBlock()
+
+ return Vec_M
+
+
+
+
+
+
+def Multi_l(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3):
+
+ Vec_uni1=copy.copy(Vec_uni)
+ Vec_uni1.transpose()
+ #print Vec_uni1.printDiagram()
+ CTM_1 = uni10.Network("Network/Left.net")
+ CTM_1.putTensor('Vec_uni1',Vec_uni1)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec.permute([23, 16, -16 , 9,-9, 2],0)
+ vec.transpose()
+ Vec_M=vec.getBlock()
+ return Vec_M
+
+
+def make_vec_right(c2,Ta2,Tb2,c3):
+
+ Ta2.setLabel([-5,3,-3,4])
+ Tb2.setLabel([1,2,-2,-5])
+ c2.setLabel([6,4])
+ c3.setLabel([5,1])
+ vec_right=(Ta2*Tb2)*(c2*c3)
+ vec_right.permute([5,2,-2,3,-3,6],6)
+ return vec_right
+
+def make_vec_left(c1,Tb4,Ta4,c4):
+
+ Tb4.setLabel([-5,3,-3,4])
+ Ta4.setLabel([1,2,-2,-5])
+ c1.setLabel([4,6])
+ c4.setLabel([1,5])
+ vec_left=(Tb4*Ta4)*(c1*c4)
+ vec_left.permute([5,2,-2,3,-3,6],0)
+ vec_left.transpose()
+ return vec_left
+
+def make_vec_down(c4,Ta3, Tb3,c3):
+
+ Tb3.setLabel([-5,3,-3,4])
+ Ta3.setLabel([1,2,-2,-5])
+ c3.setLabel([4,6])
+ c4.setLabel([5,1])
+ vec_down=(Tb3*Ta3)*(c3*c4)
+ vec_down.permute([5, 2, -2 , 3, -3 , 6],0)
+ vec_down.transpose()
+ return vec_down
+
+
+
+def make_vec_up(c1,Tb1, Ta1,c2):
+
+ Ta1.setLabel([-5,3,-3,4])
+ Tb1.setLabel([1,2,-2,-5])
+ c2.setLabel([4,6])
+ c1.setLabel([5,1])
+ vec_up=(Ta1*Tb1)*(c1*c2)
+ vec_up.permute([5,2,-2,3,-3,6],6)
+ return vec_up
+
+def distance(theta,A):
+   blk_qnums = theta.blockQnum()
+   val=0
+   for qnum in blk_qnums:
+    T1=theta.getBlock(qnum)
+    T2=A.getBlock(qnum)
+    print "row", theta.getBlock(qnum).row(), qnum 
+    for  i  in xrange( int(theta.getBlock(qnum).row()) ):
+     if abs(T1[i]) > 1.00e-11:  
+      val=val+abs((T1[i]-T2[i]) / T1[i])
+      #if abs((T1[i]-T2[i]) / T1[i]) > 0.00004: print "hi", T1[i], T2[i], i 
+     else: val=val+(T1[i]-T2[i]); #print "hi",  T1[i]-T2[i] 
+   return val 
  
- c3.setLabel([0,1])
- Tb2.setLabel([0,2,3])
- Tb3.setLabel([5,4,1])
- d.setLabel([7,4,2,6])
- Q1=((c3*Tb2)*(Tb3))*d
- Q1.permute([5,7,3,6],2)
- 
- 
- Mc1=Q.getBlock()
- Mc1_trans=copy.copy(Mc1)
- Mc1_trans.transpose()
-
- Mc4=Q1.getBlock()
- Mc4_trans=copy.copy(Mc4)
- Mc4_trans.transpose()
- Mfinal=Mc1*Mc1_trans+Mc4_trans*Mc4
-
- svd=Mfinal.svd()
- W=uni10.UniTensor([Q.bond()[0],Q.bond()[1] ,bdo] )
- W.putBlock(svd[0].resize(svd[0].row(), chi))
-
- W_trans=copy.copy(W)
- W_trans.transpose()
- Sum=0
-
- ##############################
- Z_trans.setLabel([4,1,2])
- c2bar=c2bar*Z_trans
- c2bar.permute([3,4],1)
- ############################
- Z.setLabel([0,2,4])
- c3bar=c3bar*Z
- c3bar.permute([4,3],1)
- #############################
- Ta2.setLabel([0,1,2])
- b.setLabel([4,5,1,3])
- Z.setLabel([2,3,7])
- W_trans.setLabel([6,0,5])
- Ta2bar=((Ta2*b)*Z)*W_trans
- Ta2bar.permute([6,4,7],2)
- ###########################
- Tb2.setLabel([0,1,2])
- d.setLabel([4,5,1,3])
- W.setLabel([2,3,7])
- Z_trans.setLabel([6,0,5])
- Tb2bar=((Tb2*d)*Z_trans)*W
- Tb2bar.permute([6,4,7],2)
- ###########################
- ###########################
- if ( (abs(c3bar.getBlock().absMax()) < 0.50e-1) or (abs(c3bar.getBlock().absMax()) > 0.50e+1)   ):
-  c3=c3bar*(1.00/c3bar.getBlock().absMax()); 
- else: c3=c3bar;
- #print 'norm000', c3.norm(), c3.getBlock().absMax()
- 
- if ( (abs(c2bar.getBlock().absMax()) < 0.50e-1) or (abs(c2bar.getBlock().absMax()) > 0.50e+1) ):
-  c2=c2bar*(1.00/c2bar.getBlock().absMax()); 
- else: c2=c2bar;
- #print 'norm111', c2.norm(), c2.getBlock().absMax()
- 
- if ( (abs(Ta2bar.getBlock().absMax()) < 0.50e-1) or (abs(Ta2bar.getBlock().absMax()) > 0.50e+1) ):
-  Ta2=Ta2bar*(1.00/Ta2bar.getBlock().absMax()); 
- else: Ta2=Ta2bar;
- #print 'norm222', Ta2.norm(), Ta2.getBlock().absMax()
-
- if ( (abs(Tb2bar.getBlock().absMax()) < 0.50e-1) or (abs(Tb2bar.getBlock().absMax()) > 0.50e+1) ):
-  Tb2=Tb2bar*(1.00/Tb2bar.getBlock().absMax()); 
- else: Tb2=Tb2bar;
- #print 'norm333', Tb2.norm(), Tb2.getBlock().absMax()
- 
- return c2, Ta2, Tb2, c3
-
-
-
-def  add_left(c1,Tb4,Ta4,c4,Tb1,Ta3,a,c,chi,D,Truncation):
-
-
- bdo = uni10.Bond(uni10.BD_OUT, chi)
- c1.setLabel([0,1])
- Tb1.setLabel([1,2,3])
- c1bar=c1*Tb1
- c1bar.permute([0,2,3],2)
-
- c4.setLabel([0,1])
- Ta3.setLabel([1,2,3])
- c4bar=c4*Ta3
- c4bar.permute([3,0,2],1)
-
- Mc1=c1bar.getBlock()
- Mc1_trans=copy.copy(Mc1)
- Mc1_trans.transpose()
-
- Mc4=c4bar.getBlock()
- Mc4_trans=copy.copy(Mc4)
- Mc4_trans.transpose()
- 
- Mfinal=Mc1*Mc1_trans+Mc4_trans*Mc4
- svd=Mfinal.svd()
-
- Z=uni10.UniTensor([c1bar.bond()[0],c1bar.bond()[1] ,bdo])
- Z.putBlock(svd[0].resize(svd[0].row(), chi))
-
- Z_trans=copy.copy(Z)
- Z_trans.transpose()
- Sum=0
- norm_trace=svd[1].trace()
- 
- #s=svd[1]*(1.00/norm_trace)
- 
- for i in xrange(svd[1].row()):
-   if (i>=chi):
-    Sum=svd[1][i]+Sum
- #print'truncation0=', Sum
- 
- Truncation[0]=Sum
-####################################
- 
- c1.setLabel([0,1])
- Tb1.setLabel([1,2,3])
- Tb4.setLabel([4,5,0])
- a.setLabel([5,6,7,2])
- Q=((c1*Tb1)*(Tb4))*a
- Q.permute([4,6,3,7],2)
- 
- c4.setLabel([0,1])
- Ta3.setLabel([1,4,5])
- Ta4.setLabel([0,2,3])
- c.setLabel([2,4,6,7])
- Q1=((c4*Ta3)*(Ta4))*c
- Q1.permute([5,6,3,7],2)
- 
- 
- Mc1=Q.getBlock()
- Mc1_trans=copy.copy(Mc1)
- Mc1_trans.transpose()
-
- Mc4=Q1.getBlock()
- Mc4_trans=copy.copy(Mc4)
- Mc4_trans.transpose()
- Mfinal=Mc1*Mc1_trans+Mc4_trans*Mc4
-
- svd=Mfinal.svd()
- W=uni10.UniTensor([Q.bond()[0],Q.bond()[1] ,bdo] )
- W.putBlock(svd[0].resize(svd[0].row(), chi))
-
- W_trans=copy.copy(W)
- W_trans.transpose()
- Sum=0
- for i in xrange(svd[1].row()):
-   if (i>=chi):
-    Sum=svd[1][i]+Sum
-# print'truncation1=', Sum
-
- ##############################
- Z_trans.setLabel([4,0,2])
- c1bar=c1bar*Z_trans
- c1bar.permute([4,3],1)
- ############################
- Z.setLabel([0,2,4])
- c4bar=c4bar*Z
- c4bar.permute([4,3],1)
- #############################
- Tb4.setLabel([0,1,2])
- a.setLabel([1,3,4,5])
- Z.setLabel([2,5,6])
- W_trans.setLabel([7,0,3])
- Tb4bar=((Tb4*a)*Z)*W_trans
- Tb4bar.permute([7,4,6],2)
- ###########################
- Ta4.setLabel([0,1,2])
- c.setLabel([1,3,4,5])
- W.setLabel([2,5,6])
- Z_trans.setLabel([7,0,3])
- Ta4bar=((Ta4*c)*Z_trans)*W
- Ta4bar.permute([7,4,6],2)
-#############################
- if ( (abs(c1bar.getBlock().absMax()) < 0.50e-1) or (abs(c1bar.getBlock().absMax()) > 0.50e+1)   ):
-  c1=c1bar*(1.00/c1bar.getBlock().absMax()); 
- else: c1=c1bar;
- #print 'norm0', c1.norm(), c1.getBlock().absMax()
- 
- if ( (abs(c4bar.getBlock().absMax()) < 0.50e-1) or (abs(c4bar.getBlock().absMax()) > 0.50e+1) ):
-  c4=c4bar*(1.00/c4bar.getBlock().absMax()); 
- else: c4=c4bar;
- #print 'norm1', c4.norm(), c4.getBlock().absMax()
- 
- if ( (abs(Ta4bar.getBlock().absMax()) < 0.50e-1) or (abs(Ta4bar.getBlock().absMax()) > 0.50e+1) ):
-  Ta4=Ta4bar*(1.00/Ta4bar.getBlock().absMax()); 
- else: Ta4=Ta4bar;
- #print 'norm2', Ta4.norm(), Ta4.getBlock().absMax()
-
- if ( (abs(Tb4bar.getBlock().absMax()) < 0.50e-1) or (abs(Tb4bar.getBlock().absMax()) > 0.50e+1) ):
-  #print 'norm3', Tb4bar.norm(), Tb4bar.getBlock().absMax()
-  Tb4=Tb4bar*(1.00/Tb4bar.getBlock().absMax()); 
- else: Tb4=Tb4bar;
- #print 'norm3', Tb4.norm(), Tb4.getBlock().absMax()
+def distance1(theta,A):
+   blk_qnums = theta.blockQnum()
+   val=0
+   for qnum in blk_qnums:
+    T1=theta.getBlock(qnum)
+    T2=A.getBlock(qnum)
+    print "col", theta.getBlock(qnum).col(), qnum 
+    for  i  in xrange( int(theta.getBlock(qnum).col()) ):
+     if abs(T1[i]) > 1.00e-11:  
+      val=val+abs((T1[i]-T2[i]) / T1[i])
+      #if abs((T1[i]-T2[i]) / T1[i]) > 1.00e+1: print "hi", T1[i], T2[i], i 
+     else: val=val+(T1[i]-T2[i]); #print T1[i]-T2[i] 
+   return val 
  
  
-###############################
- return c1, Ta4, Tb4, c4
- 
+def decompos_r(Vec_uni):
+ Vec_uni.setLabel([1,2,-2,3,-3,4])
+ Vec_uni.permute([1,2,-2,3,-3,4],1)
+ chi_dim=Vec_uni.bond(0).dim()
 
+
+ c3, V, s=TruncateU.setTruncation1(Vec_uni,chi_dim )
+ s.setLabel([1,0])
+ V.setLabel([0,2,-2,3,-3,4])
+ c3.setLabel([1,-10])
+ c3.permute([1,-10],1)
+
+ V=s*V
+ V.permute([1,2,-2,3,-3,4],5)
+ chi_dim=Vec_uni.bond(5).dim()
+ V1, c2, s =TruncateU.setTruncation2(V,chi_dim )
+ c2.setLabel([-20,4])
+ c2.permute([4,-20],2)
+ #print c2.printDiagram()
+ s.setLabel([0,4])
+ V1.setLabel([1,2,-2,3,-3,0])
+ V1=V1*s
+ V1.permute([1,2,-2,3,-3,4],3)
+
+# chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
+# chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
+# if chi_dim1 >= chi_dim2:
+#   chi_dim=chi_dim2
+# else:  
+#   chi_dim=chi_dim1
+
+ chi_dim1=(Vec_uni.bond(0).dim())
+ chi_dim2=(Vec_uni.bond(5).dim())
+ if chi_dim1 >= chi_dim2:
+   chi_dim=chi_dim2
+ else:  
+   chi_dim=chi_dim1
+
+
+
+ Tb2, Ta2, s =TruncateU.setTruncation(V1,chi_dim )
+ Tb2.setLabel([-10,2,-2,10])
+ s.setLabel([10,11])
+ Tb2=Tb2*s
+ Tb2.permute([-10,2,-2,11],3)
+ Ta2.setLabel([11,3,-3,-20])
+ Ta2.permute([11,3,-3,-20],3)
+ 
+# vec_tem=Ta2*Tb2*c2*c3
+# vec_tem.permute([1,2,-2,3,-3,4],6)
+# Vec_uni.permute([1,2,-2,3,-3,4],6)
+# print "hi", vec_tem[10], Vec_uni[10], distance(vec_tem, Vec_uni), "end" 
+ #print Ta2.printDiagram(), Tb2.printDiagram() 
+ return c2,Ta2,Tb2,c3
+
+def decompos_u(Vec_uni):
+ Vec_uni.setLabel([1,2,-2,3,-3,4])
+ Vec_uni.permute([1,2,-2,3,-3,4],1)
+ chi_dim=Vec_uni.bond(0).dim()
+
+
+ c1, V, s=TruncateU.setTruncation1(Vec_uni,chi_dim )
+ s.setLabel([1,0])
+ V.setLabel([0,2,-2,3,-3,4])
+ c1.setLabel([1,-10])
+ c1.permute([1,-10],1)
+ #print "c1", c1.printDiagram()
+ V=s*V
+ V.permute([1,2,-2,3,-3,4],5)
+ chi_dim=Vec_uni.bond(5).dim()
+ V1,c2,s =TruncateU.setTruncation2(V,chi_dim )
+ c2.setLabel([-20,4])
+ c2.permute([-20,4],2)
+
+ #print "c2", c2.printDiagram()
+
+ s.setLabel([0,4])
+ V1.setLabel([1,2,-2,3,-3,0])
+ V1=V1*s
+ V1.permute([1,2,-2,3,-3,4],3)
+
+# chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
+# chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
+# if chi_dim1 >= chi_dim2:
+#   chi_dim=chi_dim2
+# else:  
+#   chi_dim=chi_dim1
+
+ chi_dim1=(Vec_uni.bond(0).dim())
+ chi_dim2=(Vec_uni.bond(5).dim())
+ if chi_dim1 >= chi_dim2:
+   chi_dim=chi_dim2
+ else:  
+   chi_dim=chi_dim1
+
+ Tb1, Ta1, s =TruncateU.setTruncation(V1,chi_dim )
+ Tb1.setLabel([-10,2,-2,10])
+ s.setLabel([10,11])
+ Tb1=Tb1*s
+ Tb1.permute([-10,2,-2,11],3)
+ Ta1.setLabel([11,3,-3,-20])
+ Ta1.permute([11,3,-3,-20],3)
+ 
+# vec_tem=Ta1*Tb1*c1*c2
+# vec_tem.permute([1,2,-2,3,-3,4],6)
+# Vec_uni.permute([1,2,-2,3,-3,4],6)
+# print "hi", vec_tem[0], Vec_uni[0],  distance(vec_tem, Vec_uni), "end" 
+ return c1,Tb1,Ta1,c2
+
+
+def decompos_l(Vec_uni):
+ Vec_uni.transpose()
+ Vec_uni.setLabel([1,2,-2,3,-3,4])
+ Vec_uni.permute([1,2,-2,3,-3,4],1)
+ chi_dim=Vec_uni.bond(0).dim()
+
+ c4, V, s=TruncateU.setTruncation1(Vec_uni,chi_dim )
+ s.setLabel([1,0])
+ V.setLabel([0,2,-2,3,-3,4])
+ c4.setLabel([1,-10])
+ c4.permute([-10,1],0)
+ #print "c4", c4.printDiagram()
+ V=s*V
+ V.permute([1,2,-2,3,-3,4],5)
+ chi_dim=Vec_uni.bond(5).dim()
+ V1, c1, s =TruncateU.setTruncation2(V,chi_dim )
+ c1.setLabel([-20,4])
+ c1.permute([-20,4],1)
+ 
+ #print "c1", c1.printDiagram()
+ 
+ 
+ s.setLabel([0,4])
+ V1.setLabel([1,2,-2,3,-3,0])
+ V1=V1*s
+ V1.permute([1,2,-2,3,-3,4],3)
+
+# chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
+# chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
+# if chi_dim1 >= chi_dim2:
+#   chi_dim=chi_dim2
+# else:  
+#   chi_dim=chi_dim1
+
+ chi_dim1=(Vec_uni.bond(0).dim())
+ chi_dim2=(Vec_uni.bond(5).dim())
+ if chi_dim1 >= chi_dim2:
+   chi_dim=chi_dim2
+ else:  
+   chi_dim=chi_dim1
+
+
+ Ta4, Tb4, s =TruncateU.setTruncation(V1,chi_dim )
+ Ta4.setLabel([-10,2,-2,10])
+ s.setLabel([10,11])
+ Ta4=Ta4*s
+ #print "hi0", Ta4.printDiagram(), s.printDiagram()
+
+ Ta4.permute([-10,2,-2,11],1)
+ Tb4.setLabel([11,3,-3,-20])
+ Tb4.permute([11,3,-3,-20],1)
+ #print "hi", Ta4.printDiagram(), Tb4.printDiagram()
+# vec_tem=Ta4*Tb4*c4*c1
+# vec_tem.permute([1,2,-2,3,-3,4],0)
+# Vec_uni.permute([1,2,-2,3,-3,4],0)
+# print "hi", vec_tem[10], Vec_uni[10], distance1(vec_tem, Vec_uni), "end" 
+ return c1,Tb4,Ta4,c4
+
+
+
+def decompos_d(Vec_uni):
+ Vec_uni.transpose()
+ Vec_uni.setLabel([1,2,-2,3,-3,4])
+ Vec_uni.permute([1,2,-2,3,-3,4],1)
+ chi_dim=Vec_uni.bond(0).dim()
+
+
+ c4, V, s=TruncateU.setTruncation1(Vec_uni,chi_dim )
+ s.setLabel([1,0])
+ V.setLabel([0,2,-2,3,-3,4])
+ c4.setLabel([1,-10])
+ c4.permute([1,-10],0)
+
+ V=s*V
+ V.permute([1,2,-2,3,-3,4],5)
+ chi_dim=Vec_uni.bond(5).dim()
+ V1,c3, s =TruncateU.setTruncation2(V,chi_dim )
+ c3.setLabel([-20,4])
+ c3.permute([-20,4],1)
+ 
+ 
+ 
+ s.setLabel([0,4])
+ V1.setLabel([1,2,-2,3,-3,0])
+ V1=V1*s
+ V1.permute([1,2,-2,3,-3,4],3)
+
+
+# chi_dim1=(Vec_uni.bond(0).dim())*(Vec_uni.bond(1).dim())*(Vec_uni.bond(2).dim())
+# chi_dim2=(Vec_uni.bond(5).dim())*(Vec_uni.bond(4).dim())*(Vec_uni.bond(3).dim())
+# if chi_dim1 >= chi_dim2:
+#   chi_dim=chi_dim2
+# else:  
+#   chi_dim=chi_dim1
+
+
+ chi_dim1=(Vec_uni.bond(0).dim())
+ chi_dim2=(Vec_uni.bond(5).dim())
+ if chi_dim1 >= chi_dim2:
+   chi_dim=chi_dim2
+ else:  
+   chi_dim=chi_dim1
+
+
+
+ Ta3, Tb3, s =TruncateU.setTruncation(V1,chi_dim )
+ Ta3.setLabel([-10,2,-2,10])
+ s.setLabel([10,11])
+ Ta3=Ta3*s
+ Ta3.permute([-10,2,-2,11],1)
+ Tb3.setLabel([11,3,-3,-20])
+ Tb3.permute([11,3,-3,-20],1)
+ 
+# vec_tem=Ta3*Tb3*c4*c3
+# vec_tem.permute([1,2,-2,3,-3,4],0)
+# Vec_uni.permute([1,2,-2,3,-3,4],0)
+# print "hi", vec_tem[10], Vec_uni[10], distance1(vec_tem, Vec_uni), "end" 
+ return c4,Ta3,Tb3,c3
+
+
+
+
+
+
+def ED_right(c2,Ta2,Tb2,c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3):
+
+ Vec_uni=make_vec_right(c2,Ta2,Tb2,c3)
+
+ Vec_F=Vec_uni.getBlock()
+ D=Vec_F.row()
+ #print "D=",  D
+
+ m=5
+ W=1
+ num=0
+ E1=0
+ p=0
+
+ while p  <  (W+1):
+  #print "norm", p, Vec_F.norm(),Vec_F[0], Vec_F[1], Vec_F[2], Vec_F[3] 
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(vec_tem)
+   r=Multi_r(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3)
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  D_eig=eig_np(h)
+  Lambda, index=find_maxindex(D_eig[0])
+  eigvec=return_vec(D_eig[1], index )
+  #print 'r', Lambda
+  Q=make_Q(q_vec)
+  Q.resize(D,m)
+  Vec_F=Q*eigvec
+  if p==W and num==0:
+   p=-1
+   m+=5
+   E1=copy.copy(Lambda)
+   num+=1
+  elif p==W:
+   num+=1
+   if abs(Lambda) > 1.e-9: 
+    if  (((abs(Lambda-E1))/(abs(Lambda)))< 1.e-9): num+=1
+    elif m<=20:
+     p=-1
+     m+=5
+     E1=Lambda
+   else:
+    if  (abs(Lambda-E1))< 1.e-9:
+     num+=1
+    elif m<=20: 
+     p=-1
+     m+=5
+     E1=Lambda
+  p+=1
+ #Vec_F=Vec_F*(1.00/Vec_F.norm())
+ Vec_uni.putBlock(Vec_F)
+ c2,Ta2,Tb2,c3=decompos_r(Vec_uni)
+ return c2,Ta2,Tb2,c3
+
+def ED_left(c1,Tb4,Ta4,c4, a, b, c, d, Tb1, Ta1, Ta3, Tb3):
+
+ Vec_uni=make_vec_left(c1,Tb4,Ta4,c4)
+
+ Vec_F=Vec_uni.getBlock()
+ D=Vec_F.row()
+ #print "D", D
+
+ m=5
+ W=1
+ num=0
+ E1=0
+ p=0
+
+ while p  <  (W+1):
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+
+  for j in xrange(m):
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(vec_tem)
+   r=Multi_l(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3)
+   #r.resize(D,1)
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+
+  D_eig=eig_np(h)
+  Lambda, index=find_maxindex(D_eig[0])
+  eigvec=return_vec(D_eig[1], index )
+  #print "l", Lambda
+
+  Q=make_Q(q_vec)
+  Q.resize(D,m)
+  Vec_F=Q*eigvec
+  if p==W and num==0:
+   p=-1
+   m+=5
+   E1=copy.copy(Lambda)
+   num+=1
+  elif p==W:
+   num+=1
+   if abs(Lambda) > 1.e-9: 
+    if  (((abs(Lambda-E1))/(abs(Lambda)))< 1.e-9): num+=1
+    elif m<=20:
+     p=-1
+     m=m+5
+     E1=Lambda
+   else:
+    if  (abs(Lambda-E1))< 1.e-9:
+     num+=1
+    elif m<=20: 
+     p=-1
+     m=m+5
+     E1=Lambda
+  p+=1
+ #Vec_F=Vec_F*(1.00/Vec_F.norm())
+ Vec_uni.putBlock(Vec_F)
+ c1,Tb4,Ta4,c4=decompos_l(Vec_uni)
+ return c1,Tb4,Ta4,c4
+
+def ED_up(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4):
+
+ Vec_uni=make_vec_up(c1,Tb1, Ta1,c2)
+
+ Vec_F=Vec_uni.getBlock()
+ D=Vec_F.row()
+ #print "D=",  D
+
+ m=5
+ W=1
+ num=0
+ E1=0
+ p=0
+
+ while p  <  (W+1):
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+
+  for j in xrange(m):
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(vec_tem)
+   r=Multi_u(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4)
+   #r.resize(D,1)
+   for i in xrange(j+1):
+
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+
+  D_eig=eig_np(h)
+  Lambda, index=find_maxindex(D_eig[0])
+  eigvec=return_vec(D_eig[1], index )
+  #print "u", Lambda
+
+  Q=make_Q(q_vec)
+  Q.resize(D,m)
+  Vec_F=Q*eigvec
+  if p==W and num==0:
+   p=-1
+   m+=5
+   E1=copy.copy(Lambda)
+   num+=1
+  elif p==W:
+   num+=1
+   if abs(Lambda) > 1.e-9: 
+    if  (((abs(Lambda-E1))/(abs(Lambda)))< 1.e-9): num+=1
+    elif m<=20:
+     p=-1
+     m=m+5
+     E1=Lambda
+   else:
+    if  (abs(Lambda-E1))< 1.e-9:
+     num+=1
+    elif m<=20: 
+     p=-1
+     m=m+5
+     E1=Lambda
+  p+=1
+ #Vec_F=Vec_F*(1.00/Vec_F.norm())
+ Vec_uni.putBlock(Vec_F)
+ c1,Tb1,Ta1,c2=decompos_u(Vec_uni)
+ return c1,Tb1,Ta1,c2
+
+
+def ED_down(c4,Ta3, Tb3,c3, a, b, c, d, Tb2, Ta2, Ta4, Tb4):
+
+ Vec_uni=make_vec_down(c4,Ta3,Tb3,c3)
+
+ Vec_F=Vec_uni.getBlock()
+ D=Vec_F.row()
+ #print "D", D
+
+ m=5
+ W=1
+ num=0
+ E1=0
+ p=0
+
+ while p  <  (W+1):
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+
+  for j in xrange(m):
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(vec_tem)
+   r=Multi_d(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4)
+
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+
+  D_eig=eig_np(h)
+  Lambda, index=find_maxindex(D_eig[0])
+  eigvec=return_vec(D_eig[1], index )
+  #print "d", Lambda
+
+  Q=make_Q(q_vec)
+  Q.resize(D,m)
+  Vec_F=Q*eigvec
+  if p==W and num==0:
+   p=-1
+   m+=5
+   E1=copy.copy(Lambda)
+   num+=1
+  elif p==W:
+   num+=1
+   if abs(Lambda) > 1.e-9: 
+    if  (((abs(Lambda-E1))/(abs(Lambda)))< 1.e-9): num+=1
+    elif m<=20:
+     p=-1
+     m=m+5
+     E1=Lambda
+   else:
+    if  (abs(Lambda-E1))< 1.e-9:
+     num+=1
+    elif m<=20: 
+     p=-1
+     m=m+5
+     E1=Lambda
+  p+=1
+ #Vec_F=Vec_F*(1.00/Vec_F.norm())
+ Vec_uni.putBlock(Vec_F)
+ c4,Ta3,Tb3,c3=decompos_d(Vec_uni)
+ 
+ 
+ 
+ return c4,Ta3,Tb3,c3
+
+
+
+
+
+
+
+
+
+
+def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
+
+
+ c2,Ta2,Tb2,c3=ED_right(c2,Ta2,Tb2,c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3)
+ c1,Tb4,Ta4,c4=ED_left(c1,Tb4,Ta4,c4, a, b, c, d, Tb1, Ta1, Ta3, Tb3)
+ c1,Tb1,Ta1,c2=ED_up(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4)
+ c4,Ta3,Tb3,c3=ED_down(c4,Ta3,Tb3,c3, a, b, c, d, Tb2, Ta2, Ta4, Tb4)
+
+
+# Vec_uni=make_vec_down(c4,Ta3,Tb3,c3)
+# Vec_uni_u=make_vec_up(c1,Tb1, Ta1,c2)
+# A=Vec_uni*Vec_uni_u
+# print "Norm", A[0]
+
+# Vec_uni=make_vec_down(c4,Ta3,Tb3,c3)
+# Vec_uni_u=make_vec_up(c1,Tb1, Ta1,c2)
+# A=Vec_uni*Vec_uni_u
+# print "Norm", A[0]
+
+# Vec_uni=make_vec_right(c2,Ta2,Tb2,c3)
+# Vec_uni_l=make_vec_left(c1,Tb4,Ta4,c4)
+# A=Vec_uni*Vec_uni_l
+# print "Norm", A[0]
+
+# Vec_uni=make_vec_right(c2,Ta2,Tb2,c3)
+# Vec_uni_l=make_vec_left(c1,Tb4,Ta4,c4)
+# A=Vec_uni*Vec_uni_l
+# print "Norm", A[0]
+
+# print "c1", c1.printDiagram()
+# print "c2", c2.printDiagram()
+# print "c3", c3.printDiagram()
+# print "c4", c4.printDiagram()
+
+# print "Tb1", Tb1.printDiagram()
+# print "Ta1", Ta1.printDiagram()
+
+# print "Tb2", Tb2.printDiagram()
+# print "Ta2", Ta2.printDiagram()
+
+# print "Ta3", Ta3.printDiagram()
+# print "Tb3", Tb3.printDiagram()
+
+# print "Ta4", Ta4.printDiagram()
+# print "Tb4", Tb4.printDiagram()
+
+ return c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4
+ 
+ 
+ 
  
  
  
 def  magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
- c1.setLabel([0,1])
- c2.setLabel([5,6])
- c3.setLabel([7,8])
- c4.setLabel([11,10])
-
- Ta1.setLabel([21,20,5])
- Ta2.setLabel([22,19,6])
- Ta3.setLabel([10,12,13])
- Ta4.setLabel([11,17,18])
-
- Tb1.setLabel([1,2,21])
- Tb2.setLabel([7,15,22])
- Tb3.setLabel([13,14,8])
- Tb4.setLabel([18,3,0])
 
 
- a.setLabel([3,9,4,2])
- b.setLabel([4,23,19,20])
- d.setLabel([16,14,15,23])
- c.setLabel([17,12,16,9])
+ CTM_net = uni10.Network("Network/CTM.net")
+ CTM_net.putTensor('c1',c1)
+ CTM_net.putTensor('c2',c2)
+ CTM_net.putTensor('c3',c3)
+ CTM_net.putTensor('c4',c4)
+ CTM_net.putTensor('Ta1',Ta1)
+ CTM_net.putTensor('Ta2',Ta2)
+ CTM_net.putTensor('Ta3',Ta3)
+ CTM_net.putTensor('Ta4',Ta4)
+ CTM_net.putTensor('Tb1',Tb1)
+ CTM_net.putTensor('Tb2',Tb2)
+ CTM_net.putTensor('Tb3',Tb3)
+ CTM_net.putTensor('Tb4',Tb4)
+ CTM_net.putTensor('a',a)
+ CTM_net.putTensor('b',b)
+ CTM_net.putTensor('c',c)
+ CTM_net.putTensor('d',d)
+ norm=CTM_net.launch()
  
- norm=((((((c4*Ta4)*Ta3)*c)*(((c3*Tb3)*Tb2)*d)))*((((c2*Ta2)*Ta1)*b)*(((c1*Tb1)*Tb4)*a)))
+# c1.setLabel([4,1])
+# c2.setLabel([3,7])
+# c3.setLabel([24,4])
+# c4.setLabel([18,22])
+# Ta1.setLabel([2,6,-6,3]) 
+# Ta2.setLabel([14,10,-10,7]) 
+# Ta3.setLabel([22,19,-19,23]) 
+# Ta4.setLabel([18,15,-15,11]) 
+# Tb1.setLabel([1,5,-5,2]) 
+# Tb2.setLabel([4,17,-17,14]) 
+# Tb3.setLabel([23,20,-20,24]) 
+# Tb4.setLabel([11,8,-8,4])
+# a.setLabel([8,-8,12,-12,9,-9,5,-5])
+# b.setLabel([9,-9,13,-13,10,-10,6,-6])
+# c.setLabel([15,-15,19,-19,16,-16,12,-12])
+# d.setLabel([16,-16,20,-20,17,-17,13,-13])
+# norm=(((((c3*Tb2)*Tb3)*(d))*(((c4*Ta3)*Ta4)*c))*(((c2*Ta2)*Ta1)*b))*(((c1*Tb1)*Tb4)*a) 
  #print 'hi1', '\n',norm,
  return norm
-def permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  
- ##print'a', a
- a.setLabel([0,1,2,3])
- a.permute([3,2,1,0],2)
- a.setLabel([0,1,2,3])
- ##print'a', a
- b.setLabel([0,1,2,3])
- b.permute([3,2,1,0],2)
- b.setLabel([0,1,2,3])
-
- c.setLabel([0,1,2,3])
- c.permute([3,2,1,0],2)
- c.setLabel([0,1,2,3])
-
- d.setLabel([0,1,2,3])
- d.permute([3,2,1,0],2)
- d.setLabel([0,1,2,3])
 
  
- c1.setLabel([0,1])
- c1.permute([1,0],1)
- c1.setLabel([0,1])
-
-# c2.setLabel([0,1])
-# c2.permute([1,0],1)
-# c2.setLabel([0,1])
  
- c3.setLabel([0,1])
- c3.permute([1,0],1)
- c3.setLabel([0,1])
-
-# c4.setLabel([0,1])
-# c4.permute([1,0],1)
-# c4.setLabel([0,1])
-
-
- Ta1.setLabel([0,1,2])
- Ta1.permute([2,1,0],2)
- Ta1.setLabel([0,1,2])
  
- Ta2.setLabel([0,1,2])
- Ta2.permute([2,1,0],2)
- Ta2.setLabel([0,1,2])
  
- Ta3.setLabel([0,1,2])
- Ta3.permute([2,1,0],2)
- Ta3.setLabel([0,1,2])
-
- Ta4.setLabel([0,1,2])
- Ta4.permute([2,1,0],2)
- Ta4.setLabel([0,1,2])
-
- Tb1.setLabel([0,1,2])
- Tb1.permute([2,1,0],2)
- Tb1.setLabel([0,1,2])
  
- Tb2.setLabel([0,1,2])
- Tb2.permute([2,1,0],2)
- Tb2.setLabel([0,1,2])
  
- Tb3.setLabel([0,1,2])
- Tb3.permute([2,1,0],2)
- Tb3.setLabel([0,1,2])
-
- Tb4.setLabel([0,1,2])
- Tb4.permute([2,1,0],2)
- Tb4.setLabel([0,1,2])
-
-def test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4):
- Rand_ten=copy.copy(c1)
- Rand_ten.randomize()
- if ( c1.getBlock().norm()  < 1.0e-5 ) or ( c1.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, c1', c1.getBlock().norm()
-  c1=c1*(1.00/c1.getBlock().norm())+(0.001)*Rand_ten(); 
- if ( c2.getBlock().norm()  < 1.0e-5 ) or ( c2.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, c2', c2.getBlock().norm()
-  c2=c2*(1.00/c2.getBlock().norm())+(0.001)*Rand_ten(); 
- if ( c3.getBlock().norm()  < 1.0e-5 ) or ( c3.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, c3', c3.getBlock().norm()
-  c3=c3*(1.00/c3.getBlock().norm())+(0.001)*Rand_ten(); 
- if ( c4.getBlock().norm()  < 1.0e-5 ) or ( c4.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, c4', c4.getBlock().norm()
-  c4=c4*(1.00/c4.getBlock().norm())+(0.001)*Rand_ten(); 
- Rand_ten=copy.copy(Ta1)
- Rand_ten.randomize()
- if ( Ta1.getBlock().norm()  < 1.0e-5 ) or ( Ta1.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, Ta1', Ta1.getBlock().norm()
-  Ta1=Ta1*(1.00/Ta1.getBlock().norm())+(0.001)*Rand_ten(); 
- if ( Ta2.getBlock().norm()  < 1.0e-5 ) or ( Ta2.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, Ta2', Ta2.getBlock().norm()
-  Ta2=Ta2*(1.00/Ta2.getBlock().norm())+(0.001)*Rand_ten(); 
- if ( Ta3.getBlock().norm()  < 1.0e-5 ) or ( Ta3.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, Ta3', Ta3.getBlock().norm()
-  Ta3=Ta3*(1.00/Ta3.getBlock().norm())+(0.001)*Rand_ten(); 
- if ( Ta4.getBlock().norm()  < 1.0e-5 ) or ( Ta4.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, Ta4', Ta4.getBlock().norm()
-  Ta4=Ta4*(1.00/Ta4.getBlock().norm())+(0.001)*Rand_ten(); 
-
-
- if ( Tb1.getBlock().norm()  < 1.0e-5 ) or ( Tb1.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, Tb1', Tb1.getBlock().norm()
-  Tb1=Tb1*(1.00/Tb1.getBlock().norm())+(0.001)*Rand_ten(); 
- if ( Tb2.getBlock().norm()  < 1.0e-5 ) or ( Tb2.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, Tb2', Tb2.getBlock().norm()
-  Tb2=Tb2*(1.00/Tb2.getBlock().norm())+(0.001)*Rand_ten(); 
- if ( Tb3.getBlock().norm()  < 1.0e-5 ) or ( Tb3.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, Tb3', Tb3.getBlock().norm()
-  Tb3=Tb3*(1.00/Tb3.getBlock().norm())+(0.001)*Rand_ten(); 
- if ( Tb4.getBlock().norm()  < 1.0e-5 ) or ( Tb4.getBlock().norm()  > 1.0e+5 )   :
-  print 'Warning, norm, Tb4', Tb4.getBlock().norm()
-  Tb4=Tb4*(1.00/Tb4.getBlock().norm())+(0.001)*Rand_ten(); 
-
- return c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4
-
-
-
-
-def  distance(c1,c2,c3,c4,c1_f,c2_f,c3_f,c4_f):
-
- c1=c1*(1.00/c1.norm())
- c2=c2*(1.00/c2.norm())
- c3=c3*(1.00/c3.norm())
- c4=c4*(1.00/c4.norm())
-
- c1_f=c1_f*(1.00/c1_f.norm())
- c2_f=c2_f*(1.00/c2_f.norm())
- c3_f=c3_f*(1.00/c3_f.norm())
- c4_f=c4_f*(1.00/c4_f.norm())
-
- sum=0.0
- s1=c1.getBlock().svd()
- s1_f=c1_f.getBlock().svd()
- dis_val1=dis(s1[1],s1_f[1] )
- sum+=s1[1].trace()+s1_f[1].trace()
-
- #print dis_val1, s1[1].trace(),s1_f[1].trace()
- s1=c2.getBlock().svd()
- s1_f=c2_f.getBlock().svd()
- dis_val2=dis(s1[1],s1_f[1] )
- sum+=s1[1].trace()+s1_f[1].trace()
-
- #print dis_val2, s1[1].trace(),s1_f[1].trace()
- s1=c3.getBlock().svd()
- s1_f=c3_f.getBlock().svd()
- dis_val3=dis(s1[1],s1_f[1] )
- sum+=s1[1].trace()+s1_f[1].trace()
-
- #print dis_val3, s1[1].trace(),s1_f[1].trace()
- s1=c4.getBlock().svd()
- s1_f=c4_f.getBlock().svd()
- dis_val4=dis(s1[1],s1_f[1] )
- sum+=s1[1].trace()+s1_f[1].trace()
- #print dis_val4, s1[1].trace(),s1_f[1].trace()
- return (dis_val1+dis_val2+dis_val3+dis_val4) / (4.00)
-
-
-
-def dis(s1,s2):
- sum=0
- for q in xrange(int(s1.row())):
-  sum=sum+abs(s1[q]-s2[q])
- return sum
-
-
-
-
  
