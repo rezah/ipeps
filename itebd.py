@@ -96,17 +96,6 @@ def itebd_eff(Gamma_a,Gamma_b,Landa_1,Landa_2,Landa_3,Landa_4,chi,d_phys,D,N_ite
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 ##    H0=basic.threebody_U1(h,d_phys)
 #    H0=basic.threebody(h,d_phys)
 #    blk_qnums = H0.blockQnum()

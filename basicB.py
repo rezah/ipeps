@@ -110,7 +110,7 @@ def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
  l_up=copy.copy(l_u)
  r_up=copy.copy(r_u)
  
- #l_up,r_up=svd_init_1(l_up,r_up,U)
+# l_up,r_up=svd_init_1(l_up,r_up,U)
 
  
 # Dis_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U )
@@ -722,7 +722,7 @@ def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U):
   count+=1
   if count > 20: print 'Num_Opt > 20'; break;
   if abs(Res) > 1.00e-10:
-   if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
+   if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < 1.00e-8): 
     #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     break
   else:
@@ -770,7 +770,7 @@ def Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U):
   count+=1
   if count > 20: print 'Num_Opt > 20'; break;
   if abs(Res) > 1.00e-10:
-   if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
+   if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < 1.00e-8): 
     #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     break
   else:
@@ -1286,7 +1286,7 @@ def Do_optimization_grad(N_u, l_u, r_u, l_up, r_up, U):
   Gamma=1.0
   E_previous=0
   count=0
-  for i in xrange(150):
+  for i in xrange(50):
    count+=1
    E1_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
    Ef=E1_val
@@ -1306,7 +1306,7 @@ def Do_optimization_grad(N_u, l_u, r_u, l_up, r_up, U):
    print 'Norm', Norm_Z
    if (E1_val<E_previous) or (i is 0):
     if (abs(E1_val) > 1.0e-10):
-     if abs((E_previous-E1_val)/E1_val) < 1.0e-15:
+     if abs((E_previous-E1_val)/E1_val) < 1.0e-10:
       print 'Differnance Satisfied!', E_previous, E1_val, abs((E_previous-E1_val)/E1_val), i
       break
      else: 
@@ -1316,7 +1316,7 @@ def Do_optimization_grad(N_u, l_u, r_u, l_up, r_up, U):
       
    E_previous=E1_val
    
-   if Norm_Z < 1.0e-16:
+   if Norm_Z < 1.0e-10:
     print 'Break Norm=', Norm_Z
     break
    Break_loop=1
@@ -1374,7 +1374,7 @@ def Do_optimization_grad_1(N_u, l_u, r_u, l_up, r_up, U):
   Gamma=1.0
   E_previous=0
   count=0
-  for i in xrange(150):
+  for i in xrange(50):
    count+=1
    E1_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
    Ef=E1_val
@@ -1394,7 +1394,7 @@ def Do_optimization_grad_1(N_u, l_u, r_u, l_up, r_up, U):
    print 'Norm', Norm_Z
    if (E1_val<E_previous) or (i is 0):
     if (abs(E1_val) > 1.0e-10):
-     if abs((E_previous-E1_val)/E1_val) < 1.0e-15:
+     if abs((E_previous-E1_val)/E1_val) < 1.0e-10:
       print 'Differnance Satisfied!', E_previous, E1_val, abs((E_previous-E1_val)/E1_val), i
       break
      else: 
@@ -1404,7 +1404,7 @@ def Do_optimization_grad_1(N_u, l_u, r_u, l_up, r_up, U):
       
    E_previous=E1_val
    
-   if Norm_Z < 1.0e-16:
+   if Norm_Z < 1.0e-10:
     print 'Break Norm=', Norm_Z
     break
    Break_loop=1

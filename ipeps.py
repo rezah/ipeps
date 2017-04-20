@@ -31,8 +31,8 @@ Model="Heisenberg_U1"         #Heisenberg, Ising
 #chi=[10,10]
 #d_phys=[4,4]
 
-D=[2,2,1]
-chi=[10,10,10,10,10]
+D=[1,2,1]
+chi=[5,5,10,5,5]
 d_phys=[1,1]
 
 #D=[2,2,2,2,2,2]
@@ -88,6 +88,7 @@ qchi_list=[q_2_even,q_1_even,q0_even,q1_even,q2_even]
 #qchi_list=[q_1_even,q1_even]
 
 q_list=[q_1_even,q0_even,q1_even]
+#q_list=[q_1_even,q0_even,q1_even,q2_even]
 #q_list=[q_1_even,q0_even]
 #q_list=[q_2_even,q_1_even,q0_even,q1_even, q2_even]
 #q_list=[q_3_even,q_2_even,q_1_even,q0_even,q1_even, q2_even,q3_even]
@@ -152,8 +153,6 @@ Landa1=[Landa[0],Landa[3],Landa[2],Landa[1]]
 b_u,b=basic.makeab(Landa1,Gamma_b)
 
 
-
-
 Env=basic.produce_env_init(q_chi,q_D)
 Env1=basic.Rand_env_total(Env)
 
@@ -174,10 +173,10 @@ for h , J1, J2 in zip( h_list, J1_list, J2_list):
  basic.Store_itebd(Gamma_a,Gamma_b,Landa_1,Landa_2,Landa_3,Landa_4)
 
 
- print Landa_1#,Landa_1[0],Landa_1[3],Landa_1[4],Landa_1[7]
- print Landa_2#,Landa_2[0],Landa_2[3],Landa_2[4],Landa_2[7]
- print Landa_3#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
- print Landa_4#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
+# print Landa_1#,Landa_1[0],Landa_1[3],Landa_1[4],Landa_1[7]
+# print Landa_2#,Landa_2[0],Landa_2[3],Landa_2[4],Landa_2[7]
+# print Landa_3#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
+# print Landa_4#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
 
 
  Landa=[Landa_3,Landa_2,Landa_1,Landa_4]
@@ -186,13 +185,12 @@ for h , J1, J2 in zip( h_list, J1_list, J2_list):
  b_u,b=basic.makeab(Landa,Gamma_b)
 
 
- #print a.printDiagram(), b.printDiagram() 
+# print a_u.printDiagram(), b_u.printDiagram() 
+# print  a_u.blockQnum()
  
- #print "a",a.printDiagram()
  #Env=basic.positve_Env(Env,a,b,c,d)
  
  #E_value=basic.E_total(a_u,b_u,a,b,Env,Env1,D,h,q_phys,chi,Corner_method,Model)
-
  #print 'E_toal=', E_value
  #break
 #########################################################################################
@@ -202,14 +200,15 @@ for h , J1, J2 in zip( h_list, J1_list, J2_list):
  #basic.Store_Full(a_u,b_u,a,b)
  #a_u,b_u,a,b=basic.Reload_Full()
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.slighty_random(a_u,b_u,c_u,d_u,a,b,c,d)
- #a_u,b_u,c_u,d_u,a,b,c,d=basic.total_random(a_u,b_u,c_u,d_u,a,b,c,d)
+ a_u,b_u,a,b=basic.total_random(a_u,b_u,a,b)
  #basic.Store_Full(a_u,b_u,a,b)
- a_u,b_u,a,b=basic.Reload_Full_previous(a_u, b_u)
-
+# print a_u.printDiagram()
+ #a_u,b_u,a,b=basic.Reload_Full_previous(a_u, b_u)
+# print a_u.printDiagram()
  a_u,b_u,a,b,Env=Fullupdate.Full_Update(a_u,b_u,a,b,chi,q_phys,D,delta,h,Env,Env1,Gauge,Corner_method,N_iterF,Acc_E,Steps,Model)
 
- #E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,q_phys,chi,Corner_method,Model)
-# print "E_final", E_value
+# E_value=basic.E_total(a_u,b_u,a,b,Env,Env1,D,h,q_phys,chi,Corner_method,Model)
+# print 'E_toal=', E_value
 
  basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
 

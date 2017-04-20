@@ -1559,29 +1559,21 @@ def slighty_random(a_u,b_u,c_u,d_u,a,b,c,d):
  
  return a_u,b_u,c_u,d_u,a,b,c,d
 
-def total_random(a_u,b_u,c_u,d_u,a,b,c,d):
+def total_random(a_u,b_u,a,b):
  a_u.randomize()
  b_u.randomize()
- c_u.randomize()
- d_u.randomize()
 
 
  a_u=a_u*(1.00/MaxAbs(a_u)) 
  b_u=b_u*(1.00/MaxAbs(b_u)) 
- c_u=c_u*(1.00/MaxAbs(c_u)) 
- d_u=d_u*(1.00/MaxAbs(d_u)) 
  
  a=make_ab(a_u)
  b=make_ab(b_u)
- c=make_ab(c_u)
- d=make_ab(d_u)
 
  a=a*(1.00/MaxAbs(a)) 
  b=b*(1.00/MaxAbs(b)) 
- c=c*(1.00/MaxAbs(c)) 
- d=d*(1.00/MaxAbs(d)) 
  
- return a_u,b_u,c_u,d_u,a,b,c,d
+ return a_u,b_u,a,b
 
 
 def max_ten(a):

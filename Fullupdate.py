@@ -16,7 +16,7 @@ import basicC
 def Full_Update(a_u,b_u,a,b,chi,d_phys,D,delta,h,Env,Env1,Gauge,Corner_method,N_iterF,Acc_E,Steps,Model):
  Steps_copy=copy.copy(Steps)
 
- basic.Reload_EnvEnv(Env,Env1)
+ #basic.Reload_EnvEnv(Env,Env1)
 
  if Model is "Heisenberg":
    H0=basic.Heisenberg0(h[0],h[1])
@@ -95,15 +95,18 @@ def Full_Update(a_u,b_u,a,b,chi,d_phys,D,delta,h,Env,Env1,Gauge,Corner_method,N_
    b_u, a_u, b, a=basicB.Var_ab(b_u,a_u,b,a,d,c,Env1,D,U,d_phys,chi,Gauge,Corner_method,H0)
 
 #########
-   c=copy.copy(b)
-   d=copy.copy(a)
-
-   a_u, b_u, a, b=basicB.Var_ca(a_u,b_u,b,a,d,c,Env1,D,U0,d_phys,chi,Gauge,Corner_method,H00)
 
    c=copy.copy(b)
    d=copy.copy(a)
 
    b_u, a_u, b, a=basicB.Var_ca(b_u,a_u,a,b,c,d,Env,D,U0,d_phys,chi,Gauge,Corner_method,H00)
+
+
+   c=copy.copy(b)
+   d=copy.copy(a)
+
+   a_u, b_u, a, b=basicB.Var_ca(a_u,b_u,b,a,d,c,Env1,D,U0,d_phys,chi,Gauge,Corner_method,H00)
+
 
 
 ####################################################################################################
