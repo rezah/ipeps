@@ -58,7 +58,7 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 # print "DisFFF", Dis_val
 
  a_up, b_up =reproduce_ab(r_up, l_up, q_u, qq_u)
-# a_up, b_up=equall_dis(a_up,b_up) 
+ a_up, b_up=equall_dis(a_up,b_up) 
 
 # Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u,a_up,b_up)
 # print "Dis_final", Dis_val
@@ -123,7 +123,7 @@ def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 # print "DisFFF", Dis_val
 
  c_up,a_up = reproduce_ca(r_up, l_up, q_u, qq_u)
-# c_up, a_up=equall_dis_1(c_up,a_up) 
+ c_up, a_up=equall_dis_1(c_up,a_up) 
  
 # Dis_val=Dis_f_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u,c_up,a_up)
 # print "Dis_final", Dis_val

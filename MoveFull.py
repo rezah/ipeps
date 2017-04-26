@@ -26,7 +26,7 @@ def MaxAbs(c):
 
 def norm_CTM(c):
  Max_val=abs(MaxAbs(c))
- if ( Max_val < 0.50e-1) or (Max_val > 0.50e+1):
+ if ( Max_val < 0.50e-1) or (Max_val > 0.50e+1) and abs(Max_val)>1.0e-12:
   c*=(1.00/Max_val) 
  return c
 

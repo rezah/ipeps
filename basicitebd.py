@@ -8,13 +8,6 @@ import random
 import copy
 import time
 import Move
-
-
-
-
-
-
-
  
 def inverse(Landa2):
  invLanda2=uni10.UniTensor(Landa2.bond())
@@ -30,12 +23,7 @@ def inverse(Landa2):
      invL2[i*D1+j] = 0 if ((invLt[i*D1+j].real) < 1.0e-12) else (1.00 / (invLt[i*D1+j].real))
   invLanda2.putBlock(qnum,invL2)
  return invLanda2
- 
 
-
-
-
- 
 def Renew_dim(dims,dims_val,chi,dim_svd):
    free_par=chi-dims_val
    #print "free_par", free_par
