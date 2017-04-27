@@ -303,6 +303,8 @@ def threebody_U1(h,d_phys):
     ham =ham + 0.25*h[1]*(h[0]*uni10.otimes(iden,szt)+uni10.otimes(iden,sxt)+uni10.otimes(iden,syt))
     ham =ham + 0.25*2.00*h[2]*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+uni10.otimes(sy,sytt))
 
+    #ham = 0.25*2.00*h[2]*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+uni10.otimes(sy,sytt))
+
     H.setRawElem(ham)
     #print ham, H
 
@@ -1421,10 +1423,10 @@ def total_random(a_u,b_u,c_u,d_u,a,b,c,d):
  c=make_ab(c_u)
  d=make_ab(d_u)
 
- a=a*(1.00/MaxAbs(a)) 
- b=b*(1.00/MaxAbs(b)) 
- c=c*(1.00/MaxAbs(c)) 
- d=d*(1.00/MaxAbs(d)) 
+# a=a*(1.00/MaxAbs(a)) 
+# b=b*(1.00/MaxAbs(b)) 
+# c=c*(1.00/MaxAbs(c)) 
+# d=d*(1.00/MaxAbs(d)) 
  
  return a_u,b_u,c_u,d_u,a,b,c,d
 
@@ -2200,13 +2202,13 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  c_dp.setLabel([-19,-17,-54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- t0=time.time()
+# t0=time.time()
 
  A=((((((E2*E3)*(b_up*b_d)))*((E4*E5)*(d_up*d_d))))*((E7*E6)*(c_up*c_d)*U))*((E1*E8)*(a_d))
  A.permute([55,16,17,18,2],3)
  D_a=D_a+(-1.0)*A
 
- print "1", time.time() - t0
+# print "1", time.time() - t0
 
 
  A=((((((E2*E3)*(b_u*b_dp)))*((E4*E5)*(d_u*d_dp))))*((E7*E6)*(c_u*c_dp)*U))*((E1*E8)*(a_u))
@@ -2237,12 +2239,13 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  c_dp.setLabel([-19,-17,-54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- t0=time.time()
+# t0=time.time()
 
  A=(((((E1*E8)*(a_up*a_d)*U)*((E7*E6)*(c_up*c_d))))*((E4*E5)*(d_up*d_d)))*(((E2*E3)*(b_d)))
  A.permute([56,18,20,6,4],3)
  D_b=D_b+(-1.0)*A
- print "2", time.time() - t0
+
+# print "2", time.time() - t0
 
 
  A=(((((E1*E8)*(a_u*a_dp)*U)*((E7*E6)*(c_u*c_dp))))*((E4*E5)*(d_u*d_dp)))*(((E2*E3)*(b_u)))
@@ -2273,13 +2276,13 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  c_dp.setLabel([-19,-17,-54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- t0=time.time()
+# t0=time.time()
 
  A=(((((E1*E8)*(a_up*a_d))*((E2*E3)*(b_up*b_d)))*U)*(((E4*E5)*(d_up*d_d))))*((E7*E6)*(c_d))
  A.permute([54,14,12,19,17],3)
  D_c=D_c+(-1.0)*A
 
- print "3", time.time() - t0
+# print "3", time.time() - t0
 
 
  A=(((((E1*E8)*(a_u*a_dp))*((E2*E3)*(b_u*b_dp)))*U)*(((E4*E5)*(d_u*d_dp))))*((E7*E6)*(c_u))
@@ -2310,13 +2313,13 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  c_dp.setLabel([-19,-17,-54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- t0=time.time()
+# t0=time.time()
 
  A=(((((E1*E8)*(a_up*a_d)*U)*((E7*E6)*(c_up*c_d))))*(((E2*E3)*(b_up*b_d))))*((E4*E5)*(d_d))
  A.permute([57,19,10,8,20],3)
  D_d=D_d+(-1.0)*A
 
- print "4", time.time() - t0
+# print "4", time.time() - t0
 
 
  A=(((((E1*E8)*(a_u*a_dp)*U)*((E7*E6)*(c_u*c_dp))))*(((E2*E3)*(b_u*b_dp))))*((E4*E5)*(d_u))

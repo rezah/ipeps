@@ -33,19 +33,19 @@ def Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N
  d_up=copy.copy(d_u) 
 
 
- Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
- print "Dis", Dis_val
+# Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
+# print "DisF", Dis_val
 
-
- a_up, b_up, c_up, d_up=Inite_opt(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, U)
-
+ a_up, b_up, c_up, d_up=Inite_opt(E1, E2, E3, E4, E5, E6, E7, E8, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,a, b, c, d)
 
 
  
  a_up, b_up, c_up, d_up=Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method)
 
-# c_up, b_up, a_up=equall_dis(c_up,b_up,a_up) 
-# a_up, c_up, d_up=equall_dis1(a_up, c_up, d_up)
+
+
+ c_up, b_up, a_up=equall_dis(c_up,b_up,a_up) 
+ a_up, c_up, d_up=equall_dis1(a_up, c_up, d_up)
  
  Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
  print "Dis", Dis_val
@@ -62,7 +62,7 @@ def Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N
  dp=basic.make_ab(d_up)
 
 
- return a_up, b_up,c_up,d_up, ap,bp,cp,dp
+ return a_up, b_up, c_up, d_up, ap, bp, cp, dp
 
 
 def Var_abd(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method):
@@ -95,16 +95,16 @@ def Var_abd(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N
  
 
  
- Dis_val=Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
- print "Dis", Dis_val
+# Dis_val=Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
+# print "Dis", Dis_val
  
  #plist=Reload_plist(plist)
  
  
  a_up, b_up, c_up, d_up=Do_optimization_Grad1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method)
 
-# c_up, b_up, a_up=equall_dis(c_up,b_up,a_up) 
-# a_up, c_up, d_up=equall_dis1(a_up, c_up, d_up)
+ c_up, b_up, a_up=equall_dis(c_up,b_up,a_up) 
+ a_up, c_up, d_up=equall_dis1(a_up, c_up, d_up)
  
  Dis_val=Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
  print "Dis", Dis_val
@@ -178,7 +178,7 @@ def produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phy
  a.setLabel([16,-16,17,-17,18,-18,2,-2])
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
  Norm=(((((E1*E8)*(a))*((E7*E6)*(c))))*(((E2*E3)*(b))))*((E4*E5)*d)
- print "Norm", Norm, Norm[0]
+ #print "Norm", Norm, Norm[0]
  if Norm[0] < 0: print "Norm<0"; E1=-1.0*E1;
 
  return E1, E2, E3, E4, E5, E6, E7, E8 
@@ -259,11 +259,9 @@ def energy_abd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,c_u,d_u, U):
  c_d.setLabel([-19,-17,54,-14,-12])
  d_d.setLabel([-8,-20,-57,-19,-10])
 
-
  E_val=(((((E1*E8)*(a_u*a_d))*((E7*E6)*(c_u*c_d))))*(((E2*E3)*(b_u*b_d)*U)))*((E4*E5)*(d_u*d_d))
 
  return  E_val[0]/Val[0]
-
 
 
  
@@ -300,8 +298,10 @@ def  Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
  c_d.setLabel([-19,-17,-54,-14,-12])
  d_d.setLabel([-8,-20,57,-19,-10])
 
- Val=(((((E1*E8)*(a_u*a_d))*((E7*E6)*(c_u*c_d)))*U_2)*(((E2*E3)*(b_u*b_d))))*((E4*E5)*(d_u*d_d))
+# Val=(((((E1*E8)*(a_u*a_d))*((E7*E6)*(c_u*c_d)))*U_2)*(((E2*E3)*(b_u*b_d))))*((E4*E5)*(d_u*d_d))
+# Val=(((((E1*E8)*(a_u*a_d))*((E7*E6)*(c_u*c_d)))*Iden)*(((E2*E3)*(b_u*b_d))))*((E4*E5)*(d_u*d_d))
 
+# print Val[0], Val
 ###########################################################################################
 
  a_up.setLabel([55,16,17,18,2])
@@ -324,6 +324,7 @@ def  Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
  c_dp.setLabel([-19,-17,54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
  Val1=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp))
+ #print Val1[0]
 
  a_dp.setLabel([-18,-2,-55,-16,-17])
  b_dp.setLabel([-6,-4,-56,-18,-20]) 
@@ -332,11 +333,11 @@ def  Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
 
 
  Val2=(((((E1*E8)*(a_up*a_d)*U)*((E7*E6)*(c_up*c_d))))*(((E2*E3)*(b_up*b_d))))*((E4*E5)*(d_up*d_d))
- Val3=(((((E1*E8)*(a_u*a_dp))*((E7*E6)*(c_u*c_dp)))*U)*(((E2*E3)*(b_u*b_dp))))*((E4*E5)*(d_u*d_dp))
- #print Val, Val1, Val2, Val3
- val_f=Val[0]+Val1[0]-Val2[0]-Val3[0]
+# Val3=(((((E1*E8)*(a_u*a_dp))*((E7*E6)*(c_u*c_dp)))*U)*(((E2*E3)*(b_u*b_dp))))*((E4*E5)*(d_u*d_dp))
+ #print Val2[0]
+ #val_f=Val[0]+Val1[0]-Val2[0]-Val3[0]
  #val_f=Val1[0]-Val2[0]-Val3[0]
- #val_f=Val1[0]-2.0*Val2[0]#-Val3[0]
+ val_f=Val1[0]-2.0*Val2[0]#-Val3[0]
 
  if Val1[0]<0: print "gggggggggggg"
  #print Val2[0], Val3[0]
@@ -344,7 +345,6 @@ def  Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
 
 #@profile
 def Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U, N_grad, Opt_method):
-
 
   a_uf=copy.copy(a_up) 
   b_uf=copy.copy(b_up) 
@@ -363,16 +363,19 @@ def Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c
   H_a=0; H_b=0;H_c=0;H_d=0;
   for i in xrange(N_grad):
    count+=1
+
    E1_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
    Ef=E1_val
    print 'E=', E1_val, count
-   
+
+#   if i%4==0 and i >0:
+#    a_up, b_up, c_up, d_up=Inite_opt(E1, E2, E3, E4, E5, E6, E7, E8, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U, a, b, c, d)
+
    D_a,D_b,D_c,D_d=basic.Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
    D_a=(-1.0)*D_a
    D_b=(-1.0)*D_b
    D_c=(-1.0)*D_c
    D_d=(-1.0)*D_d
-
 
    if i is 0:
     H_a=D_a
@@ -457,7 +460,7 @@ def Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c
     d_ut=d_up+(2.00)*Gamma*H_d
     E2_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_ut, b_ut, c_ut, d_ut, U)
     if abs((0.5)*Norm_Z*Gamma) > 1.0e+15 or  abs(Gamma)>1.0e+15 :
-     print "break", E1_val, abs((0.5)*Norm_Z*Gamma), E2_val, Gamma
+     print "break1", E1_val, abs((0.5)*Norm_Z*Gamma), E2_val, Gamma
      Gamma=1
      break
     if E1_val-E2_val >=(Norm_Z*Gamma):
@@ -474,7 +477,7 @@ def Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c
     d_ut=d_up+(1.00)*Gamma*H_d
     E2_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_ut, b_ut, c_ut, d_ut, U)
     if abs((0.5)*Norm_Z*Gamma) <1.0e-16 or  (abs((E1_val-E2_val)/E2_val))<1.0e-16 or abs(Gamma)<1.0e-16 :
-     print "break", E1_val, E2_val, Gamma, abs((0.5)*Norm_Z*Gamma), (abs((E1_val-E2_val)/E2_val))
+     print "break2", E1_val, E2_val, Gamma, abs((0.5)*Norm_Z*Gamma), (abs((E1_val-E2_val)/E2_val))
      break
      
     if E1_val-E2_val < (0.50)*Norm_Z*Gamma:
@@ -686,7 +689,7 @@ def Do_optimization_Grad1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, 
     d_ut=d_up+(2.00)*Gamma*H_d
     E2_val=Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_ut, b_ut, c_ut, d_ut, U)
     if abs((0.5)*Norm_Z*Gamma) > 1.0e+15 or  abs(Gamma)>1.0e+15 :
-     print "break", E1_val, abs((0.5)*Norm_Z*Gamma), E2_val, Gamma
+     print "break1", E1_val, abs((0.5)*Norm_Z*Gamma), E2_val, Gamma
      Gamma=1
      break
     if E1_val-E2_val >=(Norm_Z*Gamma):
@@ -703,7 +706,7 @@ def Do_optimization_Grad1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, 
     d_ut=d_up+(1.00)*Gamma*H_d
     E2_val=Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_ut, b_ut, c_ut, d_ut, U)
     if abs((0.5)*Norm_Z*Gamma) <1.0e-16 or  (abs((E1_val-E2_val)/E2_val))<1.0e-16 or abs(Gamma)<1.0e-16 :
-     print "break", E1_val, E2_val, Gamma, abs((0.5)*Norm_Z*Gamma), (abs((E1_val-E2_val)/E2_val))
+     print "break2", E1_val, E2_val, Gamma, abs((0.5)*Norm_Z*Gamma), (abs((E1_val-E2_val)/E2_val))
      break
      
     if E1_val-E2_val < (0.50)*Norm_Z*Gamma:
@@ -1090,68 +1093,93 @@ def sqrt_general(N2):
    N_init.putBlock(qnum,M)
   return N_init
 
-def N_Positiv(N):
- N.permute([17,-80,-81,-82,-83,84,85,-17,80,81,82,83,-84,-85],7)
- N.permute([-17,-80,-81,-82,-83,-84,-85,17,80,81,82,83,84,85], 7)
- N1=copy.copy(N)
- N1.transpose()
- N=(N+N1)*(1.00/2.00)
- N1=copy.copy(N)
- N1.setLabel([17,80,81,82,83,84,85,0,1,2,3,4,5,6])
- N=N*N1
- N.permute([-17,-80,-81,-82,-83,-84,-85,0,1,2,3,4,5,6],7)
- N_final=sqrt_general(N)
- N_final.setLabel([-17,-80,-81,-82,-83,-84,-85,17,80,81,82,83,84,85])
- N_final.permute([17,-80,-81,-82,-83,84,85,-17,80,81,82,83,-84,-85],7)
- return N_final              
+#def N_Positiv(N):
+# N.permute([17,-80,-81,-82,-83,84,85,-17,80,81,82,83,-84,-85],7)
+# N.permute([-17,-80,-81,-82,-83,-84,-85,17,80,81,82,83,84,85], 7)
+# N1=copy.copy(N)
+# N1.transpose()
+# N=(N+N1)*(1.00/2.00)
+# N1=copy.copy(N)
+# N1.setLabel([17,80,81,82,83,84,85,0,1,2,3,4,5,6])
+# N=N*N1
+# N.permute([-17,-80,-81,-82,-83,-84,-85,0,1,2,3,4,5,6],7)
+# N_final=sqrt_general(N)
+# N_final.setLabel([-17,-80,-81,-82,-83,-84,-85,17,80,81,82,83,84,85])
+# N_final.permute([17,-80,-81,-82,-83,84,85,-17,80,81,82,83,-84,-85],7)
+# return N_final              
 
-    
-def Inite_opt(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, U):
+#@profile
+def Inite_opt(E1, E2, E3, E4, E5, E6, E7, E8, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U, a, b, c, d):
 
+  r_u, r1_u, r2_u, q_u, qq_u, qqq_u = Qr_lQ_decomf(a_u,b_u,c_u)
+  r_u, r1_u, r2_ug, q_u, qq_u, qqq_ug = Qr_lQ_decomg(a_u,b_u,c_u)
+  N_up, r_up, r1_up, r2_up, q_up, qq_up, qqq_up = Qr_lQ_decomP(E1, E2, E3, E4, E5, E6, E7, E8, d_up, U,a_up,b_up,c_up)
 
- ##################################################################################################
-  N_u, r_u, r1_u, r2_u, q_u, qq_u, qqq_u = Qr_lQ_decom(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u,c_u)
-  #N_u=N_Positiv(N_u)
-  r_up=copy.copy(r_u)
-  r1_up=copy.copy(r1_u)
-  r2_up=copy.copy(r2_u)
-
-  Dis_val=Dis_fQR(N_u, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
-  print "DisFFF", Dis_val
-
-  r_up, r1_up, r2_up=Do_optimization_Full(N_u, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
-
-  Dis_val=Dis_fQR(N_u, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
-  print "DisFFF", Dis_val
-
-  a_up, b_u =reproduce_ab(r_up, l_up, q_u, qq_u)
-  a_u, b_u=equall_dis(a_u,b_u) 
-
-  a=basic.make_ab(a_u)
-  b=basic.make_ab(b_u)
-
-  a_up=copy.copy(a_u)
-  b_up=copy.copy(b_u)
-  c_up=copy.copy(c_u)
-  d_up=copy.copy(d_u)
-
-  Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
-  print "Dis_final", Dis_val
+  N_iter=20
+  E_0=1.0
+  E_1=2.0
+#  Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
+#  print "Dis_first", Dis_val
   
+  
+ ##################################################################################################
+  for i in xrange(N_iter): 
 
-  return a_u, b_u, c_u, d_u
+   N_up, r2_up, qqq_up = Qr_lQ_decomVV(E1, E2, E3, E4, E5, E6, E7, E8, d_up, U, a_up, q_up, qq_up)
 
 
-def Qr_lQ_decom(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u,c_u):
- d.setLabel([19,-19,10,-10,8,-8,20,-20])
+   N_uper, N_down = make_env_N(E1, E2, E3, E4, E5, E6, E7, E8, q_u, qq_u, qqq_u, q_up, qq_up, qqq_up,d_u, d_up)
 
+   E_0=E_1
+   E_1=Dis_fQR(N_up,N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
+   print "E=", E_1, abs((E_0-E_1) / E_0)
+
+   if (( abs((E_0-E_1) / E_0) ) < 1.0e-6): 
+    print 'break', E_0, E_1, abs((E_0-E_1) / E_0)
+    break
+
+
+#   print "M1",Dis_fQR(N_up,N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
+
+
+   r_up, r1_up, r2_up=Do_optimization_Full(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
+
+   a_up=reproduce_a(r2_up, qqq_up)
+
+#   print "E=", Dis_fQR(N_up,N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U ) 
+################################################################################################
+   N_up, r2_up, qqq_up = Qr_lQ_decomV(E1, E2, E3, E4, E5, E6, E7, E8, d_up, U,a_up,q_up,qq_up)
+
+
+   N_uper, N_down = make_env_Ng(E1, E2, E3, E4, E5, E6, E7, E8, q_u, qq_u, qqq_ug, q_up, qq_up, qqq_up,d_u, d_up)
+
+#   print "E=", Dis_fQRg(N_up,N_uper, N_down, r_u, r1_u, r2_ug,r_up, r1_up, r2_up, U ) 
+
+   r_up, r1_up, r2_up=Do_optimization_Fullg(N_up, N_uper, N_down, r_u, r1_u, r2_ug,r_up, r1_up, r2_up, U )
+
+   a_up=reproduce_a(r2_up, qqq_up)
+#   print "M2", Dis_fQRg(N_up,N_uper, N_down, r_u, r1_u, r2_ug,r_up, r1_up, r2_up, U )
+
+
+
+  b_up, c_up =reproduce_bc(r_up, r1_up,q_up, qq_up)
+
+  return a_up, b_up, c_up, d_up
+
+
+def Qr_lQ_decomP(E1, E2, E3, E4, E5, E6, E7, E8, d_u, U,a_u,b_u,c_u):
+ d_u.setLabel([57,19,10,8,20])
+ d_d=copy.copy(d_u)
+ d_d.transpose()
+ d_d.setLabel([-8,-20,57,-19,-10])
+ 
+ 
 ############################################################################
  A=copy.copy(c_u)
  A.setLabel([52,14,12,19,17])
  A.permute([14,12,19,52,17],3)
  
  q,r=qr_parity(A) 
- 
  
  q.setLabel([14,12,19,80,81])
  r.setLabel([80,81,52,17])
@@ -1194,53 +1222,409 @@ def Qr_lQ_decom(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u,c_u):
 ################################################
 
 
- 
- N=((((E4*E5)*d)*((E2*E3)*(qq*qq_d)))*((E7*E6)*(q*q_d)))*(((E1*E8)*(qqq*qqq_d)))
+ N=((((E4*E5)*(d_u*d_d))*((E2*E3)*(qq*qq_d)))*((E7*E6)*(q*q_d)))*(((E1*E8)*(qqq*qqq_d)))
 
  N.permute([17,-80,-81,-82,-83,84,85,-17,80,81,82,83,-84,-85],7)
  ###testing####
- r_d=copy.copy(r)
- r1_d=copy.copy(r1)
- r2_d=copy.copy(r2)
+# r_d=copy.copy(r)
+# r1_d=copy.copy(r1)
+# r2_d=copy.copy(r2)
 
- r_d.transpose()
- r1_d.transpose()
- r2_d.transpose()
+# r_d.transpose()
+# r1_d.transpose()
+# r2_d.transpose()
 
- r_d.setLabel([-17,-80,-81,52])
- r1_d.setLabel([-84,-85,54,-18])
- r2_d.setLabel([-18,-82,-83,53])
- 
- 
- Norm=(((N*(r*r_d))*(r1*r1_d)))*(r2*r2_d)
- print "Norm-QR", Norm[0], Norm.printDiagram()
+# r_d.setLabel([-17,-80,-81,52])
+# r1_d.setLabel([-84,-85,54,-18])
+# r2_d.setLabel([-18,-82,-83,53])
+# 
+# 
+# Norm=(((N*(r*r_d))*(r1*r1_d)))*(r2*r2_d)
+# print "Norm-QR", Norm[0], Norm.printDiagram()
 
  return N, r, r1, r2, q, qq, qqq
-     
-def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U):
+
+
+def Qr_lQ_decomVV(E1, E2, E3, E4, E5, E6, E7, E8, d_u, U, a_u, q, qq):
+ d_u.setLabel([57,19,10,8,20])
+ d_d=copy.copy(d_u)
+ d_d.transpose()
+ d_d.setLabel([-8,-20,57,-19,-10])
+############################################################################ 
+ q_d=copy.copy(q)
+ q_d.transpose()
+ q_d.setLabel([-19,-80,-81,-14,-12])
+####################################################################################
+ A=copy.copy(a_u)
+ A.setLabel([53,16,17,18,2])
+ A.permute([16,17,2,53,18],3)
  
- r_up_first=copy.copy(r_up)
- l_up_first=copy.copy(l_up)
+ qqq,r2=qr_parity(A) 
+ 
+ qqq.setLabel([16,17,2,82,83])
+ r2.setLabel([82,83,53,18])
+ qqq.permute([16,17,82,83,2],2)
+ r2.permute([82,83,53,18],3)
+ 
+ qqq_d=copy.copy(qqq)
+ qqq_d.transpose()
+ qqq_d.setLabel([-82,-83,-2,-16,-17])
+##########################################  
+ qq_d=copy.copy(qq)
+ qq_d.transpose()
+ qq_d.setLabel([-6,-4,-84,-85,-20])
+################################################
+
+
+ N=((((E4*E5)*(d_u*d_d))*((E2*E3)*(qq*qq_d)))*((E7*E6)*(q*q_d)))*(((E1*E8)*(qqq*qqq_d)))
+ N.permute([17,-80,-81,-82,-83,84,85,-17,80,81,82,83,-84,-85],7)
+
+ return N, r2, qqq
+
+
+
+
+
+
+
+
+
+
+
+
+     
+def Qr_lQ_decomV(E1, E2, E3, E4, E5, E6, E7, E8, d_u, U,a_u,q,qq):
+ d_u.setLabel([57,19,10,8,20])
+ d_d=copy.copy(d_u)
+ d_d.transpose()
+ d_d.setLabel([-8,-20,57,-19,-10])
+############################################################################
+ q_d=copy.copy(q)
+ q_d.transpose()
+ q_d.setLabel([-19,-80,-81,-14,-12])
+####################################################################################
+ A=copy.copy(a_u)
+ A.setLabel([53,16,17,18,2])
+ A.permute([53,17,16,18,2],2)
+ 
+ r2, qqq=lq_parity(A) 
+ 
+ qqq.setLabel([82,83,16,18,2])
+ r2.setLabel([53,17,82,83])
+ qqq.permute([16,82,83,18,2],3)
+ r2.permute([53,17,82,83],2)
+ 
+ qqq_d=copy.copy(qqq)
+ qqq_d.transpose()
+ qqq_d.setLabel([-18,-2,-16,-82,-83])
+########################################## 
+ qq_d=copy.copy(qq)
+ qq_d.transpose()
+ qq_d.setLabel([-6,-4,-84,-85,-20])
+################################################
+
+
+ 
+ N=((((E4*E5)*(d_u*d_d))*((E2*E3)*(qq*qq_d)))*((E7*E6)*(q*q_d)))*(((E1*E8)*(qqq*qqq_d)))
+
+ N.permute([18,-80,-81,82,83,84,85,-18,80,81,-82,-83,-84,-85],7)
+ ###testing####
+# r_d=copy.copy(r)
+# r1_d=copy.copy(r1)
+# r2_d=copy.copy(r2)
+
+# r_d.transpose()
+# r1_d.transpose()
+# r2_d.transpose()
+
+# r_d.setLabel([-17,-80,-81,52])
+# r1_d.setLabel([-84,-85,54,-18])
+# r2_d.setLabel([-82,-83,53,-17])
+# 
+# 
+# Norm=(((N*(r*r_d))*(r1*r1_d)))*(r2*r2_d)
+# print "Norm-QR", Norm[0], Norm.printDiagram()
+
+ return N, r2, qqq
+
+
+
+def Qr_lQ_decomf(a_u,b_u,c_u):
+############################################################################
+ A=copy.copy(c_u)
+ A.setLabel([52,14,12,19,17])
+ A.permute([14,12,19,52,17],3)
+ 
+ q,r=qr_parity(A) 
+ 
+ q.setLabel([14,12,19,80,81])
+ r.setLabel([80,81,52,17])
+ q.permute([14,12,19,80,81],2)
+ r.permute([80,81,52,17],3)
+ 
+####################################################################################
+ A=copy.copy(a_u)
+ A.setLabel([53,16,17,18,2])
+ A.permute([16,17,2,53,18],3)
+ 
+ qqq,r2=qr_parity(A) 
+ 
+ qqq.setLabel([16,17,2,82,83])
+ r2.setLabel([82,83,53,18])
+ qqq.permute([16,17,82,83,2],2)
+ r2.permute([82,83,53,18],3)
+ 
+########################################## 
+ A=copy.copy(b_u)
+ A.setLabel([54,18,20,6,4])
+ A.permute([54,18,20,6,4],2)
+ 
+ r1, qq=lq_parity(A) 
+ 
+ r1.setLabel([54,18,84,85])
+ qq.setLabel([84,85,20,6,4])
+ r1.permute([54,18,84,85],2)
+ qq.permute([84,85,20,6,4],3)
+ 
+ qq_d=copy.copy(qq)
+ qq_d.transpose()
+ qq_d.setLabel([-6,-4,-84,-85,-20])
+################################################
+ return r, r1, r2, q, qq, qqq
+
+
+
+
+
+def Qr_lQ_decomg(a_u,b_u,c_u):
+############################################################################
+ A=copy.copy(c_u)
+ A.setLabel([52,14,12,19,17])
+ A.permute([14,12,19,52,17],3)
+ 
+ q,r=qr_parity(A) 
+ 
+ 
+ q.setLabel([14,12,19,80,81])
+ r.setLabel([80,81,52,17])
+ q.permute([14,12,19,80,81],2)
+ r.permute([80,81,52,17],3)
+ 
+####################################################################################
+ A=copy.copy(a_u)
+ A.setLabel([53,16,17,18,2])
+ A.permute([53,17,16,18,2],2)
+ 
+ r2, qqq=lq_parity(A) 
+ 
+ qqq.setLabel([82,83,16,18,2])
+ r2.setLabel([53,17,82,83])
+ qqq.permute([16,82,83,18,2],3)
+ r2.permute([53,17,82,83],2)
+ 
+########################################## 
+ A=copy.copy(b_u)
+ A.setLabel([54,18,20,6,4])
+ A.permute([54,18,20,6,4],2)
+ 
+ r1, qq=lq_parity(A) 
+ 
+ r1.setLabel([54,18,84,85])
+ qq.setLabel([84,85,20,6,4])
+ r1.permute([54,18,84,85],2)
+ qq.permute([84,85,20,6,4],3)
+ 
+################################################
+ return r, r1, r2, q, qq, qqq
+
+
+
+#@profile
+def make_env_N(E1, E2, E3, E4, E5, E6, E7, E8, q_u, qq_u, qqq_u, q_up, qq_up, qqq_up,d_u, d_up):
+ d_u.setLabel([57,19,10,8,20])
+ d_d=copy.copy(d_u)
+ d_d.transpose()
+ d_d.setLabel([-8,-20,57,-19,-10])
+
+
+
+ d_up.setLabel([57,19,10,8,20])
+ d_dp=copy.copy(d_up)
+ d_dp.transpose()
+ d_dp.setLabel([-8,-20,57,-19,-10])
+
+ q_d=copy.copy(q_u)
+ q_d.transpose()
+ q_d.setLabel([-19,-80,-81,-14,-12])
+
+ qq_d=copy.copy(qq_u)
+ qq_d.transpose()
+ qq_d.setLabel([-6,-4,-84,-85,-20])
+
+
+ qqq_d=copy.copy(qqq_u)
+ qqq_d.transpose()
+ qqq_d.setLabel([-82,-83,-2,-16,-17])
+
+
+ q_dp=copy.copy(q_up)
+ q_dp.transpose()
+ q_dp.setLabel([-19,-80,-81,-14,-12])
+
+ qq_dp=copy.copy(qq_up)
+ qq_dp.transpose()
+ qq_dp.setLabel([-6,-4,-84,-85,-20])
+
+
+ qqq_dp=copy.copy(qqq_up)
+ qqq_dp.transpose()
+ qqq_dp.setLabel([-82,-83,-2,-16,-17])
+
+ N_upper=((((E4*E5)*(d_up*d_d))*((E2*E3)*(qq_up*qq_d)))*((E7*E6)*(q_up*q_d)))*(((E1*E8)*(qqq_up*qqq_d)))
+
+ N_down=((((E4*E5)*(d_u*d_dp))*((E2*E3)*(qq_u*qq_dp)))*((E7*E6)*(q_u*q_dp)))*(((E1*E8)*(qqq_u*qqq_dp)))
+
+
+ return N_upper, N_down
+#@profile
+def make_env_Ng(E1, E2, E3, E4, E5, E6, E7, E8, q_u, qq_u, qqq_u, q_up, qq_up, qqq_up,d_u, d_up):
+ d_u.setLabel([57,19,10,8,20])
+ d_d=copy.copy(d_u)
+ d_d.transpose()
+ d_d.setLabel([-8,-20,57,-19,-10])
+
+
+
+ d_up.setLabel([57,19,10,8,20])
+ d_dp=copy.copy(d_up)
+ d_dp.transpose()
+ d_dp.setLabel([-8,-20,57,-19,-10])
+
+ q_d=copy.copy(q_u)
+ q_d.transpose()
+ q_d.setLabel([-19,-80,-81,-14,-12])
+
+ qq_d=copy.copy(qq_u)
+ qq_d.transpose()
+ qq_d.setLabel([-6,-4,-84,-85,-20])
+
+
+ qqq_d=copy.copy(qqq_u)
+ qqq_d.transpose()
+ qqq_d.setLabel([-18,-2,-16,-82,-83])
+
+ q_dp=copy.copy(q_up)
+ q_dp.transpose()
+ q_dp.setLabel([-19,-80,-81,-14,-12])
+
+ qq_dp=copy.copy(qq_up)
+ qq_dp.transpose()
+ qq_dp.setLabel([-6,-4,-84,-85,-20])
+
+
+ qqq_dp=copy.copy(qqq_up)
+ qqq_dp.transpose()
+ qqq_dp.setLabel([-18,-2,-16,-82,-83])
+
+ N_upper=((((E4*E5)*(d_up*d_d))*((E2*E3)*(qq_up*qq_d)))*((E7*E6)*(q_up*q_d)))*(((E1*E8)*(qqq_up*qqq_d)))
+
+ N_down=((((E4*E5)*(d_u*d_dp))*((E2*E3)*(qq_u*qq_dp)))*((E7*E6)*(q_u*q_dp)))*(((E1*E8)*(qqq_u*qqq_dp)))
+
+ return N_upper, N_down
+
+
+def Do_optimization_Full(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U):
+
+ r_up_first=copy.copy(r_up) 
+ r1_up_first=copy.copy(r1_up)
+ r2_up_first=copy.copy(r2_up)
  checking_val=0
+
+ Distance_val=Dis_fQR(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
+# print 'Dis0', Distance_val 
  
  Res=10
- Res1=20
+ Res1=Distance_val
  count=0
- #Distance_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
- for q in xrange(30):
-  #print "\n", "\n"
-  Distance_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
-  print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
-  r_up=optimum_0(N_u, l_u, r_u, l_up, r_up, U)
-  l_up=optimum_1(N_u, l_u, r_u, l_up, r_up, U)
+ for q in xrange(3):
+  r_up=optimum_0(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U)
+  r1_up=optimum_1(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U)
+  r2_up=optimum_2(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U)
+
+  Distance_val=Dis_fQR(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
+#  print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
 
   Res=Res1
   Res1=Distance_val
+#  print Res, Res1, Res1 < Res 
+
+  if Res1 < Res:
+    r_up_first=copy.copy(r_up) 
+    r1_up_first=copy.copy(r1_up)
+    r2_up_first=copy.copy(r2_up)
+  else: 
+    r_up=copy.copy(r_up_first) 
+    r1_up=copy.copy(r1_up_first)
+    r2_up=copy.copy(r2_up_first)
+    break
+ 
+  count+=1
+  if count > 100: print 'Num_Opt > 30'; break;
+  if abs(Res) > 1.00e-10:
+   if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
+    #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
+    break
+  else:
+    if (abs(Distance_val) < 1.00e-8) or (  abs(Res1-Res) < 1.00e-11  ): 
+     #print 'break, Dis', Distance_val[0], abs(Res1-Res)
+     break
+
+
+ return r_up, r1_up, r2_up
+
+
+
+
+def Do_optimization_Fullg(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U):
+
+ r_up_first=copy.copy(r_up) 
+ r1_up_first=copy.copy(r1_up)
+ r2_up_first=copy.copy(r2_up)
+ checking_val=0
+
+ Distance_val=Dis_fQRg(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
+ #print 'Dis0', Distance_val
+ 
+ Res=10
+ Res1=Distance_val
+ count=0
+ for q in xrange(3):
+  #print "\n", "\n"
+  r_up=optimum_0g(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U)
+  r1_up=optimum_1g(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U)
+  r2_up=optimum_2g(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U)
+
+  Distance_val=Dis_fQRg(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
+#  print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
+
+  Res=Res1
+  Res1=Distance_val
+#  print Res, Res1, Res1 < Res 
+  if Res1 < Res:
+    r_up_first=copy.copy(r_up) 
+    r1_up_first=copy.copy(r1_up)
+    r2_up_first=copy.copy(r2_up)
+  else: 
+    r_up=copy.copy(r_up_first) 
+    r1_up=copy.copy(r1_up_first)
+    r2_up=copy.copy(r2_up_first)
+    break
+
 
   if (q>1) and (Res1 > Res) and ((abs(Res1-Res) / abs(Res)) > 1.00e-4): checking_val=1;
 
   count+=1
-  if count > 30: print 'Num_Opt > 30'; break;
+  if count > 100: print 'Num_Opt > 30'; break;
   if abs(Res) > 1.00e-10:
    if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
     #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
@@ -1249,147 +1633,21 @@ def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U):
     if (abs(Distance_val[0]) < 1.00e-8) or (  abs(Res1-Res) < 1.00e-11  ): 
      #print 'break, Dis', Distance_val[0], abs(Res1-Res)
      break
- Distance_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
- #print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
+ #Dis_val=Dis_fQRg(N_up, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U )
+ #print 'DisF', Distance_val, abs(Res1-Res) / abs(Res), q
 
 
- if checking_val != 0:
-  r_up=copy.copy(r_up_first)
-  l_up=copy.copy(l_up_first)
-  l_up, r_up=Do_optimization_grad(N_u, l_u, r_u, l_up, r_up, U)
+# if checking_val != 0:
+#  r_up=copy.copy(r_up_first) 
+#  r1_up=copy.copy(r1_up_first)
+#  r2_up=copy.copy(r2_up_first)
+
+ return r_up, r1_up, r2_up
 
 
- return l_up, r_up
-def optimum_0(N, l, r, lp, rp, U):
- U.setLabel([-60,51,52,60,53,54])
- Iden=uni10.UniTensor(U.bond())
- Iden.identity()
- Iden.setLabel([-60,51,52,60,53,54])
 
- r_d=copy.copy(r)
- l_d=copy.copy(l)
- l_d.transpose()
- r_d.transpose()
  
- 
- r_d.setLabel([-18,-82,-83,51])
- l_d.setLabel([-80,-81,52,-18])
-
- r_dp=copy.copy(rp)
- l_dp=copy.copy(lp)
- l_dp.transpose()
- r_dp.transpose()
- 
- 
- r_dp.setLabel([-18,-82,-83,51])
- l_dp.setLabel([-80,-81,52,-18])
-
- A2=(((lp*l_dp)*N)*Iden)
- A2.permute([-82,-83,51,-18,82,83,53,18],4)
-
- A2_trans=copy.copy(A2)
- A2_trans.transpose()
- A2=A2+A2_trans
- 
- A2.setLabel([-82,-83,51,-18,82,83,53,18])
- 
- A3=((r)*U*(l*l_dp))*N
- A3.permute([-82,-83,51,-18],0)
- A3p=((r_d)*U*(l_d*lp))*N
- A3p.permute([82,83,53,18],4)
- A3p.transpose()
-
- A3=A3+A3p
- 
- A3.setLabel([-82,-83,51,-18])
- 
- U, S, V=svd_parity(A2)
- U.transpose()
- V.transpose()
- S=inverse(S)
- 
- U.setLabel([8,9,10,11,12,13,14,15])
- S.setLabel([4,5,6,7,8,9,10,11])
- V.setLabel([0,1,2,3,4,5,6,7])
-
-
- A2_inv=V*S*U
- A2_inv.permute([0,1,2,3,12,13,14,15],4)
- A2_inv.setLabel([82,83,53,18,-82,-83,51,-18])
- 
- #distance_iden_val=distance_iden(A2_mat,A2_inv)
- #print 'distance1=', distance_iden_val
- #print A2.getBlock()*A2_inv
-
-
- A=A2_inv*A3
- A.setLabel([82,83,53,18])
- A.permute([82,83,53,18],3)
-
- rf=copy.copy(A)
-
- return rf
-def optimum_1(N, l, r, lp, rp, U):
-
- U.setLabel([-60,51,52,60,53,54])
- Iden=uni10.UniTensor(U.bond())
- Iden.identity()
- Iden.setLabel([-60,51,52,60,53,54])
- 
- r_d=copy.copy(r)
- l_d=copy.copy(l)
- l_d.transpose()
- r_d.transpose()
- 
- r_d.setLabel([-18,-82,-83,51])
- l_d.setLabel([-80,-81,52,-18])
- 
- r_dp=copy.copy(rp)
- l_dp=copy.copy(lp)
- l_dp.transpose()
- r_dp.transpose()
- 
- r_dp.setLabel([-18,-82,-83,51])
- l_dp.setLabel([-80,-81,52,-18])
- 
- A2=(((rp*r_dp)*N)*Iden)
- A2.permute([52,-18,-80,-81,54,18,80,81],4)
- A2_trans=copy.copy(A2)
- A2_trans.transpose()
- A2=A2+A2_trans
- A2.setLabel([52,-18,-80,-81,54,18,80,81])
- 
- A3=((l)*U*(r*r_dp))*N
- A3.permute([52,-18,-80,-81],0)
- A3p=((l_d)*U*(rp*r_d))*N
- A3p.permute([54,18,80,81],4)
- A3p.transpose()
- A3=A3+A3p
- A3.setLabel([52,-18,-80,-81])
- 
- U, S, V=svd_parity(A2)
-
- U.transpose()
- V.transpose()
- S=inverse(S)
-
- U.setLabel([8,9,10,11,12,13,14,15])
- S.setLabel([4,5,6,7,8,9,10,11])
- V.setLabel([0,1,2,3,4,5,6,7])
-
- A2_inv=V*S*U
- A2_inv.permute([0,1,2,3,12,13,14,15],4)
- A2_inv.setLabel([54,18,80,81,52,-18,-80,-81])
-
- A=A3*A2_inv
- A.setLabel([54,18,80,81])
- A.permute([54,18,80,81],2)
-
- lf=copy.copy(A)
-
- return lf
-
-def Dis_fQR(N_u, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U ):
+def Dis_fQR(N_u,N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U ):
  U.setLabel([-52,-53,-54,52,53,54])
  Iden=uni10.UniTensor(U.bond())
  Iden.identity()
@@ -1428,250 +1686,130 @@ def Dis_fQR(N_u, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U ):
  r2_dp.setLabel([-18,-82,-83,-53])
 
  #print N.printDiagram(), H.printDiagram(), r.printDiagram() 
- Val=(N_u)*((((r1_u*r1_d)*H)*(r2_u*r2_d))*((r_u*r_d)))
- print Val
- Val1=((N_u*(r_up*r_dp))*(r1_up*r1_dp)*Iden)*(r2_up*r2_dp)
- print Val1
- Val2=((N_u*(r_up*r_d))*(r1_up*r1_d)*U)*(r2_up*r2_d)
- print Val2
- Val3=((N_u*(r_u*r_dp))*(r1_u*r1_dp)*U)*(r2_u*r2_dp)
- print Val3
- Val_f=Val[0]+Val1[0]-Val2[0]-Val3[0]
+ Val=((r_d*(r2_d*r1_d)))*(N_u*(r_u*(r2_u*r1_u)*H))
+# print Val[0]
+ Val1=((r_dp*(r2_dp*r1_dp)))*(N_u*(r_up*(r2_up*r1_up)*Iden))
+# print Val1[0]
+ Val2=((r_dp*(r2_dp*r1_dp)))*(N_down*((r_u*(r2_u*r1_u))*U))
+# print Val2[0]
+ Val3=((r_d*(r2_d*r1_d)))*(N_uper*((r_up*(r2_up*r1_up))*U))
+# print Val3[0]
+# Val_f=Val[0]+Val1[0]-Val2[0]-Val3[0]
+ #Val_f=Val1[0]-Val2[0]-Val3[0]
+# Val_f=Val1[0]-2.0*Val2[0]#-Val3[0]
+ Val_f=Val1[0]-2.0*Val3[0]#-Val3[0]
 
  return Val_f
-def reproduce_ab(r_u, l_u, q_u, qq_u):
-
- a_up=q_u*r_u
- a_up.permute([53,16,17,18,2],3)
-
-
- b_up=qq_u*l_u
- b_up.permute([54,18,20,6,4],3)
-
-
- return a_up, b_up
-
-
-def equall_dis(a_up, b_up):
-
- A=copy.copy(b_up)
- A.setLabel([54,18,20,6,4])
- A.permute([18,20,6,4,54],1)
- 
- l,qq=lq_parity1(A) 
- 
- l.setLabel([18,80])
- qq.setLabel([80,20,6,4,54])
-
- A=copy.copy(a_up)
- A.setLabel([55,16,17,18,2])
- A.permute([2,16,17,55,18],4)
- 
- q,r=qr_parity1(A) 
- 
- q.setLabel([2,16,17,55,81])
- r.setLabel([81,18])
-
- Teta=l*r
- Teta.permute([81,80],1)
- U,s,V=svd_parity2(Teta)
-
- U.setLabel([81,18])
- s.setLabel([18,-18])
- V.setLabel([-18,80])
-
- s=Sqrt(s)
- 
- U=U*s
- V=s*V
-
- U.permute([81,-18],1)
- U.setLabel([81,18])
- V.permute([18,80],1)
- 
- b_up=qq*V
- a_up=q*U
- b_up.permute([54,18,20,6,4],3)
- a_up.permute([55,16,17,18,2],3)
- 
- return a_up,b_up
-
-
-
-
-
-def Qr_lQ_decom_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u,b_u):
- d.setLabel([19,-19,10,-10,8,-8,20,-20])
- b_u.setLabel([60,18,20,6,4])
- b_d=copy.copy(b_u)
- b_d.transpose()
- b_d.setLabel([-6,-4,-60,-18,-20]) 
-
-
- A=copy.copy(a_u)
- A.setLabel([54,16,17,18,2])
- A.permute([54,17,16,2,18],2)
- 
- l, qq=lq_parity(A) 
- 
- l.setLabel([54,17,82,83])
- qq.setLabel([82,83,16,2,18])
- l.permute([54,17,82,83],2)
- qq.permute([16,82,83,18,2],3)
- 
- qq_d=copy.copy(qq)
- qq_d.transpose()
- qq_d.setLabel([-18,-2,-16,-82,-83])
-
-###############################################################################
- A=copy.copy(c_u)
- A.setLabel([53,14,12,19,17])
- A.permute([14,12,19,53,17],3)
- 
- 
- 
- q,r=qr_parity(A) 
- 
- 
- q.setLabel([14,12,19,80,81])
- r.setLabel([80,81,53,17])
- q.permute([14,12,19,80,81],2)
- r.permute([80,81,53,17],3)
- 
- q_d=copy.copy(q)
- q_d.transpose()
- q_d.setLabel([-19,-80,-81,-14,-12])
- 
- 
- N=(((E4*E5)*(d))*((E7*E6)*(q*q_d)))*(((E1*E8)*(qq*qq_d))*((E2*E3)*(b_u*b_d)))
- N.permute([-80,-81,82,83,-60,80,81,-82,-83,60],5)
- #print N.printDiagram() 
-
-## ###testing####
-# r_d=copy.copy(r)
-# r_d.transpose()
-# l_d=copy.copy(l)
-# l_d.transpose()
-# ##############
-# 
-# r_d.setLabel([-17,-80,-81,53])
-# l_d.setLabel([-82,-83,54,-17])
-
-# Norm=((N*(r*l))*(r_d*l_d))
-# print "Norm-QR", Norm[0]
- return N, l, r, q, qq
-
-def N_Positiv_1(N):
- N.setLabel([-80,-81,82,83,-60,80,81,-82,-83,60])
- N.permute([-80,-81,-82,-83,-60,80,81,82,83,60], 5)
- N1=copy.copy(N)
- N1.transpose()
- N=(N+N1)*(1.00/2.00)
- N1=copy.copy(N)
- N1.setLabel( [80,81,82,83,60,0,1,2,3,4 ] )
- N=N*N1
- N.permute([-80,-81,-82,-83,-60,0,1,2,3,4],5)
- N_final=sqrt_general(N)
- N_final.setLabel([-80,-81,-82,-83,-60,80,81,82,83,60])
- N_final.permute([-80,-81,82,83,-60,80,81,-82,-83,60], 5)
- return N_final    
  
 
-def Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U):
- 
- 
- 
- r_up_first=copy.copy(r_up)
- l_up_first=copy.copy(l_up)
- checking_val=0
- 
- 
- Res=10
- Res1=20
- count=0
- #Distance_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
- for q in xrange(30):
-  #print "\n", "\n"
-  Distance_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
-  print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
-  r_up=optimum_00(N_u, l_u, r_u, l_up, r_up, U)
-  l_up=optimum_11(N_u, l_u, r_u, l_up, r_up, U)
 
-
-  Res=Res1
-  Res1=Distance_val
-
-  if (q>1) and (Res1 > Res) and ((abs(Res1-Res) / abs(Res)) > 1.00e-4): checking_val=1;
-
-  count+=1
-  if count > 30: print 'Num_Opt > 30'; break;
-  if abs(Res) > 1.00e-10:
-   if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
-    #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
-    break
-  else:
-    if (abs(Distance_val[0]) < 1.00e-7) or (  abs(Res1-Res) < 1.00e-11  ): 
-     #print 'break, Dis', Distance_val[0], abs(Res1-Res)
-     break
- Distance_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
- #print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
-
-
- if checking_val != 0:
-  r_up=copy.copy(r_up_first)
-  l_up=copy.copy(l_up_first)
-  l_up, r_up=Do_optimization_grad_1(N_u, l_u, r_u, l_up, r_up, U)
-
- return l_up, r_up
-
-
-def optimum_00(N, l, r, lp, rp, U):
- U.setLabel([51,52,-60,53,54,60])
+def Dis_fQRg(N_u,N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U ):
+ U.setLabel([-52,-53,-54,52,53,54])
  Iden=uni10.UniTensor(U.bond())
  Iden.identity()
- Iden.setLabel([51,52,-60,53,54,60])
+ Iden.setLabel([-52,-53,-54,52,53,54])
 
- r_d=copy.copy(r)
- l_d=copy.copy(l)
- l_d.transpose()
+ H1=copy.copy(U)
+ H1.transpose()
+ H1.setLabel([52,53,54,1,2,3])
+ H=U*H1
+ H.permute([-52,-53,-54,1,2,3],3)
+ H.setLabel([-52,-53,-54,52,53,54])
+
+
+ r_d=copy.copy(r_u)
+ r1_d=copy.copy(r1_u)
+ r2_d=copy.copy(r2_u)
+
  r_d.transpose()
- 
- 
- r_d.setLabel([-17,-80,-81,51])
- l_d.setLabel([-82,-83,52,-17])
+ r1_d.transpose()
+ r2_d.transpose()
 
- r_dp=copy.copy(rp)
- l_dp=copy.copy(lp)
- l_dp.transpose()
+ r_d.setLabel([-17,-80,-81,-52])
+ r1_d.setLabel([-84,-85,-54,-18])
+ r2_d.setLabel([-82,-83,-53,-17])
+
+ r_dp=copy.copy(r_up)
+ r1_dp=copy.copy(r1_up)
+ r2_dp=copy.copy(r2_up)
+
  r_dp.transpose()
- 
- 
- r_dp.setLabel([-17,-80,-81,51])
- l_dp.setLabel([-82,-83,52,-17])
+ r1_dp.transpose()
+ r2_dp.transpose()
 
- A2=(((lp*l_dp)*N)*Iden)
- #print A2.printDiagram(), r.printDiagram(),l.printDiagram()
- A2.permute([-80,-81,51,-17,80,81,53,17],4)
+ r_dp.setLabel([-17,-80,-81,-52])
+ r1_dp.setLabel([-84,-85,-54,-18])
+ r2_dp.setLabel([-82,-83,-53,-17])
+
+ #print N.printDiagram(), H.printDiagram(), r.printDiagram() 
+ Val=((r_d*(r2_d*r1_d)))*(N_u*(r_u*(r2_u*r1_u)*H))
+# print Val[0]
+ Val1=((r_dp*(r2_dp*r1_dp)))*(N_u*(r_up*(r2_up*r1_up)*Iden))
+# print  Val1[0]
+ Val2=((r_dp*(r2_dp*r1_dp)))*(N_down*((r_u*(r2_u*r1_u))*U))
+# print Val2[0]
+ Val3=((r_d*(r2_d*r1_d)))*(N_uper*((r_up*(r2_up*r1_up))*U))
+# print Val3[0]
+# Val_f=Val[0]+Val1[0]-Val2[0]-Val3[0]
+ #Val_f=Val1[0]-Val2[0]-Val3[0]
+# Val_f=Val1[0]-2.0*Val2[0]#-Val3[0]
+ Val_f=Val1[0]-2.0*Val3[0]#-Val3[0]
+
+ return Val_f
+
+
+ 
+ 
+def optimum_0(N_u, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U):
+ U.setLabel([-52,-53,-54,52,53,54])
+ Iden=uni10.UniTensor(U.bond())
+ Iden.identity()
+ Iden.setLabel([-52,-53,-54,52,53,54])
+
+ r_d=copy.copy(r_u)
+ r1_d=copy.copy(r1_u)
+ r2_d=copy.copy(r2_u)
+
+ r_d.transpose()
+ r1_d.transpose()
+ r2_d.transpose()
+
+ r_d.setLabel([-17,-80,-81,-52])
+ r1_d.setLabel([-84,-85,-54,-18])
+ r2_d.setLabel([-18,-82,-83,-53])
+
+ r_dp=copy.copy(r_up)
+ r1_dp=copy.copy(r1_up)
+ r2_dp=copy.copy(r2_up)
+
+ r_dp.transpose()
+ r1_dp.transpose()
+ r2_dp.transpose()
+
+ r_dp.setLabel([-17,-80,-81,-52])
+ r1_dp.setLabel([-84,-85,-54,-18])
+ r2_dp.setLabel([-18,-82,-83,-53])
+
+ A2=(((r2_dp*r1_dp)))*(N_u*((r2_up*r1_up)*Iden))        
+ A2.permute([-80,-81,-52,-17,80,81,52,17],4)
 
  A2_trans=copy.copy(A2)
  A2_trans.transpose()
  A2=A2+A2_trans
  
- A2.setLabel([-80,-81,51,-17,80,81,53,17])
- 
- A3=((r)*U*(l*l_dp))*N
- A3.permute([-80,-81,51,-17],0)
- A3p=((r_d)*U*(l_d*lp))*N
- A3p.permute([80,81,53,17],4)
+ A2.setLabel([-80,-81,-52,-17,80,81,52,17])
+
+ A3=(((r2_dp*r1_dp)))*(N_down*((r_u*(r2_u*r1_u))*U))        
+ A3.permute([-80,-81,-52,-17],0)
+ A3p=((r_d*(r2_d*r1_d)))*(N_uper*(((r2_up*r1_up))*U))
+ A3p.permute([80,81,52,17],4)
  A3p.transpose()
- #A3=addition_symmetric(A3,A3p)
 
  A3=A3+A3p
  
- A3.setLabel([-80,-81,51,-17])
+ A3.setLabel([-80,-81,-52,-17])
  
  U, S, V=svd_parity(A2)
- #print U.printDiagram()
  U.transpose()
  V.transpose()
  S=inverse(S)
@@ -1683,15 +1821,170 @@ def optimum_00(N, l, r, lp, rp, U):
 
  A2_inv=V*S*U
  A2_inv.permute([0,1,2,3,12,13,14,15],4)
- A2_inv.setLabel([80,81,53,17,-80,-81,51,-17])
+ A2_inv.setLabel([80,81,52,17,-80,-81,-52,-17])
  
  #distance_iden_val=distance_iden(A2_mat,A2_inv)
  #print 'distance1=', distance_iden_val
  #print A2.getBlock()*A2_inv
 
+
  A=A2_inv*A3
- A.setLabel([80,81,53,17])
- A.permute([80,81,53,17],3)
+ A.setLabel([80,81,52,17])
+ A.permute([80,81,52,17],3)
+
+ rf=copy.copy(A)
+
+ return rf
+def optimum_1(N_u, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U):
+
+ U.setLabel([-52,-53,-54,52,53,54])
+ Iden=uni10.UniTensor(U.bond())
+ Iden.identity()
+ Iden.setLabel([-52,-53,-54,52,53,54])
+
+ r_d=copy.copy(r_u)
+ r1_d=copy.copy(r1_u)
+ r2_d=copy.copy(r2_u)
+
+ r_d.transpose()
+ r1_d.transpose()
+ r2_d.transpose()
+
+ r_d.setLabel([-17,-80,-81,-52])
+ r1_d.setLabel([-84,-85,-54,-18])
+ r2_d.setLabel([-18,-82,-83,-53])
+
+ r_dp=copy.copy(r_up)
+ r1_dp=copy.copy(r1_up)
+ r2_dp=copy.copy(r2_up)
+
+ r_dp.transpose()
+ r1_dp.transpose()
+ r2_dp.transpose()
+
+ r_dp.setLabel([-17,-80,-81,-52])
+ r1_dp.setLabel([-84,-85,-54,-18])
+ r2_dp.setLabel([-18,-82,-83,-53])
+
+ A2=((r_dp*(r2_dp)))*(N_u*(r_up*(r2_up)*Iden))        
+ A2.permute([-54,-18,-84,-85,54,18,84,85],4)
+
+ A2_trans=copy.copy(A2)
+ A2_trans.transpose()
+ A2=A2+A2_trans
+ 
+ A2.setLabel([-54,-18,-84,-85,54,18,84,85])
+
+ A3=((r_dp*(r2_dp)))*(N_down*((r_u*(r2_u*r1_u))*U))        
+ A3.permute([-54,-18,-84,-85],0)
+ A3p=((r_d*(r2_d*r1_d)))*(N_uper*((r_up*(r2_up))*U))
+ A3p.permute([54,18,84,85],4)
+ A3p.transpose()
+
+ A3=A3+A3p
+ 
+ A3.setLabel([-54,-18,-84,-85])
+ 
+ U, S, V=svd_parity(A2)
+ U.transpose()
+ V.transpose()
+ S=inverse(S)
+ 
+ U.setLabel([8,9,10,11,12,13,14,15])
+ S.setLabel([4,5,6,7,8,9,10,11])
+ V.setLabel([0,1,2,3,4,5,6,7])
+
+
+ A2_inv=V*S*U
+ A2_inv.permute([0,1,2,3,12,13,14,15],4)
+ A2_inv.setLabel([54,18,84,85,-54,-18,-84,-85])
+ 
+ #distance_iden_val=distance_iden(A2_mat,A2_inv)
+ #print 'distance1=', distance_iden_val
+ #print A2.getBlock()*A2_inv
+
+
+ A=A2_inv*A3
+ A.setLabel([54,18,84,85])
+ A.permute([54,18,84,85],2)
+
+ rf=copy.copy(A)
+
+ return rf
+
+
+def optimum_2(N_u, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U):
+
+ U.setLabel([-52,-53,-54,52,53,54])
+ Iden=uni10.UniTensor(U.bond())
+ Iden.identity()
+ Iden.setLabel([-52,-53,-54,52,53,54])
+
+ r_d=copy.copy(r_u)
+ r1_d=copy.copy(r1_u)
+ r2_d=copy.copy(r2_u)
+
+ r_d.transpose()
+ r1_d.transpose()
+ r2_d.transpose()
+
+ r_d.setLabel([-17,-80,-81,-52])
+ r1_d.setLabel([-84,-85,-54,-18])
+ r2_d.setLabel([-18,-82,-83,-53])
+
+ r_dp=copy.copy(r_up)
+ r1_dp=copy.copy(r1_up)
+ r2_dp=copy.copy(r2_up)
+
+ r_dp.transpose()
+ r1_dp.transpose()
+ r2_dp.transpose()
+
+ r_dp.setLabel([-17,-80,-81,-52])
+ r1_dp.setLabel([-84,-85,-54,-18])
+ r2_dp.setLabel([-18,-82,-83,-53])
+
+ A2=((r_dp*(r1_dp)))*(N_u*(r_up*(r1_up)*Iden))        
+ A2.permute([-82,-83,-53,-18,82,83,53,18],4)
+
+ A2_trans=copy.copy(A2)
+ A2_trans.transpose()
+ A2=A2+A2_trans
+ 
+ A2.setLabel([-82,-83,-53,-18,82,83,53,18])
+
+ A3=((r_dp*(r1_dp)))*(N_down*((r_u*(r2_u*r1_u))*U))        
+ A3.permute([-82,-83,-53,-18],0)
+ A3p=((r_d*(r2_d*r1_d)))*(N_uper*((r_up*(r1_up))*U))
+ A3p.permute([82,83,53,18],4)
+ A3p.transpose()
+
+ A3=A3+A3p
+ 
+ A3.setLabel([-82,-83,-53,-18])
+ 
+ U, S, V=svd_parity(A2)
+ U.transpose()
+ V.transpose()
+ S=inverse(S)
+ 
+ U.setLabel([8,9,10,11,12,13,14,15])
+ S.setLabel([4,5,6,7,8,9,10,11])
+ V.setLabel([0,1,2,3,4,5,6,7])
+
+
+ A2_inv=V*S*U
+ A2_inv.permute([0,1,2,3,12,13,14,15],4)
+ A2_inv.setLabel([82,83,53,18,-82,-83,-53,-18])
+ 
+ #distance_iden_val=distance_iden(A2_mat,A2_inv)
+ #print 'distance1=', distance_iden_val
+ #print A2.getBlock()*A2_inv
+
+
+ A=A2_inv*A3
+ A.setLabel([82,83,53,18])
+ A.permute([82,83,53,18],3)
 
  rf=copy.copy(A)
 
@@ -1699,49 +1992,56 @@ def optimum_00(N, l, r, lp, rp, U):
 
 
 
-def optimum_11(N, l, r, lp, rp, U):
- U.setLabel([51,52,-60,53,54,60])
+def optimum_0g(N_u, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U):
+ U.setLabel([-52,-53,-54,52,53,54])
  Iden=uni10.UniTensor(U.bond())
  Iden.identity()
- Iden.setLabel([51,52,-60,53,54,60])
+ Iden.setLabel([-52,-53,-54,52,53,54])
 
- r_d=copy.copy(r)
- l_d=copy.copy(l)
- l_d.transpose()
+ r_d=copy.copy(r_u)
+ r1_d=copy.copy(r1_u)
+ r2_d=copy.copy(r2_u)
+
  r_d.transpose()
- 
- 
- r_d.setLabel([-17,-80,-81,51])
- l_d.setLabel([-82,-83,52,-17])
+ r1_d.transpose()
+ r2_d.transpose()
 
- r_dp=copy.copy(rp)
- l_dp=copy.copy(lp)
- l_dp.transpose()
+ r_d.setLabel([-17,-80,-81,-52])
+ r1_d.setLabel([-84,-85,-54,-18])
+ r2_d.setLabel([-82,-83,-53,-17])
+
+ r_dp=copy.copy(r_up)
+ r1_dp=copy.copy(r1_up)
+ r2_dp=copy.copy(r2_up)
+
  r_dp.transpose()
- 
- 
- r_dp.setLabel([-17,-80,-81,51])
- l_dp.setLabel([-82,-83,52,-17])
+ r1_dp.transpose()
+ r2_dp.transpose()
 
- A2=(((rp*r_dp)*N)*Iden)
- A2.permute([52,-17,-82,-83,54,17,82,83],4)
+ r_dp.setLabel([-17,-80,-81,-52])
+ r1_dp.setLabel([-84,-85,-54,-18])
+ r2_dp.setLabel([-82,-83,-53,-17])
+
+ A2=(((r2_dp*r1_dp)))*(N_u*((r2_up*r1_up)*Iden))        
+ A2.permute([-80,-81,-52,-17,80,81,52,17],4)
+
  A2_trans=copy.copy(A2)
  A2_trans.transpose()
  A2=A2+A2_trans
- A2.setLabel([52,-17,-82,-83,54,17,82,83])
-
-
- A3=((l)*U*(r*r_dp))*N
- A3.permute([52,-17,-82,-83],0)
- A3p=((l_d)*U*(rp*r_d))*N
- A3p.permute([54,17,82,83],4)
- A3p.transpose()
- A3=A3+A3p
- A3.setLabel([52,-17,-82,-83])
  
+ A2.setLabel([-80,-81,-52,-17,80,81,52,17])
+
+ A3=(((r2_dp*r1_dp)))*(N_down*((r_u*(r2_u*r1_u))*U))        
+ A3.permute([-80,-81,-52,-17],0)
+ A3p=((r_d*(r2_d*r1_d)))*(N_uper*(((r2_up*r1_up))*U))
+ A3p.permute([80,81,52,17],4)
+ A3p.transpose()
+
+ A3=A3+A3p
+ 
+ A3.setLabel([-80,-81,-52,-17])
  
  U, S, V=svd_parity(A2)
-
  U.transpose()
  V.transpose()
  S=inverse(S)
@@ -1753,123 +2053,248 @@ def optimum_11(N, l, r, lp, rp, U):
 
  A2_inv=V*S*U
  A2_inv.permute([0,1,2,3,12,13,14,15],4)
- A2_inv.setLabel([54,17,82,83,52,-17,-82,-83])
+ A2_inv.setLabel([80,81,52,17,-80,-81,-52,-17])
+ 
+ #distance_iden_val=distance_iden(A2_mat,A2_inv)
+ #print 'distance1=', distance_iden_val
+ #print A2.getBlock()*A2_inv
 
 
+ A=A2_inv*A3
+ A.setLabel([80,81,52,17])
+ A.permute([80,81,52,17],3)
 
+ rf=copy.copy(A)
 
- A=A3*A2_inv
- A.setLabel([54,17,82,83])
- A.permute([54,17,82,83],2)
+ return rf
+def optimum_1g(N_u, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U):
 
- lf=copy.copy(A)
-
- return lf
-
-
-def Dis_fQR_1(N, l, r, lp, rp, U ):
- U.setLabel([51,52,-60,53,54,60])
+ U.setLabel([-52,-53,-54,52,53,54])
  Iden=uni10.UniTensor(U.bond())
  Iden.identity()
- Iden.setLabel([51,52,-60,53,54,60])
+ Iden.setLabel([-52,-53,-54,52,53,54])
 
- H1=copy.copy(U)
- H1.transpose()
- H1.setLabel([53,54,60,1,2,3])
- H=U*H1
- H.permute([51,52,-60,1,2,3],3)
- H.setLabel([51,52,-60,53,54,60])
+ r_d=copy.copy(r_u)
+ r1_d=copy.copy(r1_u)
+ r2_d=copy.copy(r2_u)
 
-# r.permute([82,83,53,18],3)
-# l.permute([80,81,54,20],3)
-
- r_d=copy.copy(r)
- l_d=copy.copy(l)
- l_d.transpose()
  r_d.transpose()
- 
- 
- r_d.setLabel([-17,-80,-81,51])
- l_d.setLabel([-82,-83,52,-17])
+ r1_d.transpose()
+ r2_d.transpose()
 
- r_dp=copy.copy(rp)
- l_dp=copy.copy(lp)
- l_dp.transpose()
+ r_d.setLabel([-17,-80,-81,-52])
+ r1_d.setLabel([-84,-85,-54,-18])
+ r2_d.setLabel([-82,-83,-53,-17])
+
+ r_dp=copy.copy(r_up)
+ r1_dp=copy.copy(r1_up)
+ r2_dp=copy.copy(r2_up)
+
  r_dp.transpose()
+ r1_dp.transpose()
+ r2_dp.transpose()
+
+ r_dp.setLabel([-17,-80,-81,-52])
+ r1_dp.setLabel([-84,-85,-54,-18])
+ r2_dp.setLabel([-82,-83,-53,-17])
+
+ A2=((r_dp*(r2_dp)))*(N_u*(r_up*(r2_up)*Iden))        
+ A2.permute([-54,-18,-84,-85,54,18,84,85],4)
+
+ A2_trans=copy.copy(A2)
+ A2_trans.transpose()
+ A2=A2+A2_trans
  
+ A2.setLabel([-54,-18,-84,-85,54,18,84,85])
+
+ A3=((r_dp*(r2_dp)))*(N_down*((r_u*(r2_u*r1_u))*U))        
+ A3.permute([-54,-18,-84,-85],0)
+ A3p=((r_d*(r2_d*r1_d)))*(N_uper*((r_up*(r2_up))*U))
+ A3p.permute([54,18,84,85],4)
+ A3p.transpose()
+
+ A3=A3+A3p
  
- r_dp.setLabel([-17,-80,-81,51])
- l_dp.setLabel([-82,-83,52,-17])
-
-
- Val=((N*(r*l))*(r_d*l_d)*H)
- #print Val
- Val1=((N*(rp*lp))*(r_dp*l_dp)*Iden)
- #print Val1
- Val2=((N*(rp*lp))*(r_d*l_d)*U)
- #print Val2
- Val3=((N*(r*l))*(r_dp*l_dp)*U)
- #print Val3
- Val_f=Val[0]+Val1[0]-Val2[0]-Val3[0]
-
- return Val_f
-
-
-def reproduce_ca(r_u, l_u, q_u, qq_u):
-
- c_up=q_u*r_u
- c_up.permute([53,14,12,19,17],3)
-
-
- a_up=qq_u*l_u
- a_up.permute([54,16,17,18,2],3)
-
-
- return c_up, a_up
-def equall_dis_1(c_up,a_up):
-
- A=copy.copy(a_up)
- A.setLabel([55,16,17,18,2])
- A.permute([17,55,16,18,2],1)
+ A3.setLabel([-54,-18,-84,-85])
  
- l,qq=lq_parity1(A) 
+ U, S, V=svd_parity(A2)
+ U.transpose()
+ V.transpose()
+ S=inverse(S)
  
- l.setLabel([17,80])
- qq.setLabel([80,55,16,18,2])
- 
+ U.setLabel([8,9,10,11,12,13,14,15])
+ S.setLabel([4,5,6,7,8,9,10,11])
+ V.setLabel([0,1,2,3,4,5,6,7])
 
- A=copy.copy(c_up)
- A.setLabel([53,14,12,19,17])
- A.permute([53,14,12,19,17],4)
- 
- q,r=qr_parity1(A) 
- 
- 
- q.setLabel([53,14,12,19,81])
- r.setLabel([81,17])
 
- Teta=l*r
- Teta.permute([81,80],1)
- U,s,V=svd_parity2(Teta)
-
- U.setLabel([81,17])
- s.setLabel([17,-17])
- V.setLabel([-17,80])
-
- s=Sqrt(s)
+ A2_inv=V*S*U
+ A2_inv.permute([0,1,2,3,12,13,14,15],4)
+ A2_inv.setLabel([54,18,84,85,-54,-18,-84,-85])
  
- U=U*s
- V=s*V
+ #distance_iden_val=distance_iden(A2_mat,A2_inv)
+ #print 'distance1=', distance_iden_val
+ #print A2.getBlock()*A2_inv
 
- U.permute([81,-17],1)
- U.setLabel([81,17])
- V.permute([17,80],1)
+
+ A=A2_inv*A3
+ A.setLabel([54,18,84,85])
+ A.permute([54,18,84,85],2)
+
+ rf=copy.copy(A)
+
+ return rf
+
+
+def optimum_2g(N_u, N_uper, N_down, r_u, r1_u, r2_u,r_up, r1_up, r2_up, U):
+
+ U.setLabel([-52,-53,-54,52,53,54])
+ Iden=uni10.UniTensor(U.bond())
+ Iden.identity()
+ Iden.setLabel([-52,-53,-54,52,53,54])
+
+ r_d=copy.copy(r_u)
+ r1_d=copy.copy(r1_u)
+ r2_d=copy.copy(r2_u)
+
+ r_d.transpose()
+ r1_d.transpose()
+ r2_d.transpose()
+
+ r_d.setLabel([-17,-80,-81,-52])
+ r1_d.setLabel([-84,-85,-54,-18])
+ r2_d.setLabel([-82,-83,-53,-17])
+
+ r_dp=copy.copy(r_up)
+ r1_dp=copy.copy(r1_up)
+ r2_dp=copy.copy(r2_up)
+
+ r_dp.transpose()
+ r1_dp.transpose()
+ r2_dp.transpose()
+
+ r_dp.setLabel([-17,-80,-81,-52])
+ r1_dp.setLabel([-84,-85,-54,-18])
+ r2_dp.setLabel([-82,-83,-53,-17])
+
+ A2=((r_dp*(r1_dp)))*(N_u*(r_up*(r1_up)*Iden))        
+ A2.permute([-53,-17,-82,-83,53,17,82,83],4)
+
+ A2_trans=copy.copy(A2)
+ A2_trans.transpose()
+ A2=A2+A2_trans
  
- a_up=qq*V
- c_up=q*U
- c_up.permute([53,14,12,19,17],3)
- a_up.permute([55,16,17,18,2],3)
+ A2.setLabel([-53,-17,-82,-83,53,17,82,83])
 
- return c_up, a_up
+ A3=((r_dp*(r1_dp)))*(N_down*((r_u*(r2_u*r1_u))*U))        
+ A3.permute([-53,-17,-82,-83],0)
+ A3p=((r_d*(r2_d*r1_d)))*(N_uper*((r_up*(r1_up))*U))
+ A3p.permute([53,17,82,83],4)
+ A3p.transpose()
+
+ A3=A3+A3p
+ 
+ A3.setLabel([-53,-17,-82,-83])
+ 
+ U, S, V=svd_parity(A2)
+ U.transpose()
+ V.transpose()
+ S=inverse(S)
+ 
+ U.setLabel([8,9,10,11,12,13,14,15])
+ S.setLabel([4,5,6,7,8,9,10,11])
+ V.setLabel([0,1,2,3,4,5,6,7])
+
+
+ A2_inv=V*S*U
+ A2_inv.permute([0,1,2,3,12,13,14,15],4)
+ A2_inv.setLabel([53,17,82,83,-53,-17,-82,-83])
+ 
+ #distance_iden_val=distance_iden(A2_mat,A2_inv)
+ #print 'distance1=', distance_iden_val
+ #print A2.getBlock()*A2_inv
+
+
+ A=A2_inv*A3
+ A.setLabel([53,17,82,83])
+ A.permute([53,17,82,83],2)
+
+ rf=copy.copy(A)
+
+ return rf
+
+
+
+def reproduce_bc(r_up, r1_up,q_up, qq_up):
+
+
+ b_up=qq_up*r1_up
+ b_up.permute([54,18,20,6,4],3)
+
+
+ c_up=q_up*r_up
+ c_up.permute([52,14,12,19,17],3)
+
+
+ return b_up, c_up
+
+
+
+
+
+
+
+def reproduce_a(r2_up, qqq_up):
+
+ a_up=qqq_up*r2_up
+ a_up.permute([53,16,17,18,2],3)
+ return  a_up 
+
+#def equall_dis(a_up, b_up):
+
+# A=copy.copy(b_up)
+# A.setLabel([54,18,20,6,4])
+# A.permute([18,20,6,4,54],1)
+# 
+# l,qq=lq_parity1(A) 
+# 
+# l.setLabel([18,80])
+# qq.setLabel([80,20,6,4,54])
+
+# A=copy.copy(a_up)
+# A.setLabel([55,16,17,18,2])
+# A.permute([2,16,17,55,18],4)
+# 
+# q,r=qr_parity1(A) 
+# 
+# q.setLabel([2,16,17,55,81])
+# r.setLabel([81,18])
+
+# Teta=l*r
+# Teta.permute([81,80],1)
+# U,s,V=svd_parity2(Teta)
+
+# U.setLabel([81,18])
+# s.setLabel([18,-18])
+# V.setLabel([-18,80])
+
+# s=Sqrt(s)
+# 
+# U=U*s
+# V=s*V
+
+# U.permute([81,-18],1)
+# U.setLabel([81,18])
+# V.permute([18,80],1)
+# 
+# b_up=qq*V
+# a_up=q*U
+# b_up.permute([54,18,20,6,4],3)
+# a_up.permute([55,16,17,18,2],3)
+# 
+# return a_up,b_up
+
+
+
+
 
 

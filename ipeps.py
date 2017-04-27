@@ -22,8 +22,8 @@ Model="Heisenberg_U1"         #Heisenberg, Ising
 #Model="threebody_U1"         #Heisenberg, Ising
 #Model="threebody"         #Heisenberg, Ising
 
-#D=[2]
-#chi=[20]
+#D=[3]
+#chi=[50]
 ##d_phys=[8]
 #d_phys=[2]
 
@@ -53,10 +53,10 @@ delta=0.001
 ###################################################################
 ######################### No-symmetry #############################################
 
-#q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
-#q_list=[q0_even]
-#qchi_list=[q0_even]
-#q_phys=[q0_even]*d_phys[0]
+q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+q_list=[q0_even]
+qchi_list=[q0_even]
+q_phys=[q0_even]*d_phys[0]
 
 ###################### Z(2) ######################################
 
@@ -127,8 +127,6 @@ q_phys=[q_1_even,q1_even]
 #q_phys=[q_1_odd,q1_even]
 #############################################################################
 
-
-
 q_D=[]
 q_D2=[]
 q_chi=[]
@@ -157,8 +155,6 @@ Landa1=[Landa[4],Landa[3],Landa[5],Landa[1]]
 c_u,c=basic.makeab(Landa1,Gamma_c)
 Landa1=[Landa[5],Landa[7],Landa[4],Landa[6]]
 d_u,d=basic.makeab(Landa1,Gamma_d)
-
-
 
 
 Env=basic.produce_env_init(q_chi,q_D)
@@ -216,7 +212,7 @@ for h , J1, J2 in zip( h_list, J1_list, J2_list):
  #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.slighty_random(a_u,b_u,c_u,d_u,a,b,c,d)
- #a_u,b_u,c_u,d_u,a,b,c,d=basic.total_random(a_u,b_u,c_u,d_u,a,b,c,d)
+ a_u,b_u,c_u,d_u,a,b,c,d=basic.total_random(a_u,b_u,c_u,d_u,a,b,c,d)
  #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full_previous(a_u, b_u, c_u, d_u)
 
