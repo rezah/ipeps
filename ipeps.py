@@ -23,7 +23,7 @@ Model="Heisenberg_U1"         #Heisenberg, Ising
 #Model="threebody"         #Heisenberg, Ising
 
 #D=[3]
-#chi=[50]
+#chi=[30]
 ##d_phys=[8]
 #d_phys=[2]
 
@@ -43,7 +43,7 @@ d_phys=[1,1]
 
 N_iteritebd=100
 N_iterF=50
-N_grad=150
+N_grad=20
 Opt_method="CG"        # CG,ST
 Gauge='Fixed'
 Corner_method='CTMRG'   #CTM, CTMRG, CTMFull
@@ -173,21 +173,21 @@ for h , J1, J2 in zip( h_list, J1_list, J2_list):
  h=[h, J1, J2]
 #########################################################################################
  
- #Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
+ Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
  #Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,q_phys,D,N_iteritebd,h,Model,q_D)
  
  basic.Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8)
 
 
-# print Landa_1#,Landa_1[0],Landa_1[3],Landa_1[4],Landa_1[7]
-# print Landa_2#,Landa_2[0],Landa_2[3],Landa_2[4],Landa_2[7]
-# print Landa_3#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
-# print Landa_4#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
+ print Landa_1#,Landa_1[0],Landa_1[3],Landa_1[4],Landa_1[7]
+ print Landa_2#,Landa_2[0],Landa_2[3],Landa_2[4],Landa_2[7]
+ print Landa_3#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
+ print Landa_4#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
 
-# print Landa_5#,Landa_1[0],Landa_1[3],Landa_1[4],Landa_1[7]
-# print Landa_6#,Landa_2[0],Landa_2[3],Landa_2[4],Landa_2[7]
-# print Landa_7#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
-# print Landa_8#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
+ print Landa_5#,Landa_1[0],Landa_1[3],Landa_1[4],Landa_1[7]
+ print Landa_6#,Landa_2[0],Landa_2[3],Landa_2[4],Landa_2[7]
+ print Landa_7#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
+ print Landa_8#,Landa_8[0],Landa_8[3],Landa_8[4],Landa_8[7]
 
 
 
@@ -212,7 +212,7 @@ for h , J1, J2 in zip( h_list, J1_list, J2_list):
  #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.slighty_random(a_u,b_u,c_u,d_u,a,b,c,d)
- a_u,b_u,c_u,d_u,a,b,c,d=basic.total_random(a_u,b_u,c_u,d_u,a,b,c,d)
+ #a_u,b_u,c_u,d_u,a,b,c,d=basic.total_random(a_u,b_u,c_u,d_u,a,b,c,d)
  #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full_previous(a_u, b_u, c_u, d_u)
 

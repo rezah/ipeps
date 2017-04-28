@@ -55,6 +55,26 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Env1,Env2,Env3,
  E_0=1.0
  E_1=2.0
  E_min=1.e+14
+
+
+
+ U2 = uni10.UniTensor(H2.bond(), "U");
+ blk_qnums = H2.blockQnum()
+ for qnum in blk_qnums:
+  U2.putBlock(qnum, uni10.takeExp(-delta, H2.getBlock(qnum)))
+ MPO_list=basic.Decomposition(U2)
+
+ plist=basicC.initialize_plist(a_u, b_u, c_u, MPO_list)
+ #basicC.Reload_plist(plist)
+ plist1=basicC.initialize_plist(d_u, b_u, a_u, MPO_list)
+ plist2=basicC.initialize_plist(a_u, c_u, d_u, MPO_list)
+ plist3=basicC.initialize_plist(b_u, d_u, a_u, MPO_list)
+
+ 
+ plist00=basicC.initialize_plist1(a_u, c_u, d_u, MPO_list)
+ plist11=[copy.copy(plist00[i])  for i in xrange(len(plist00)) ]
+ plist22=[copy.copy(plist00[i])  for i in xrange(len(plist00)) ]
+ plist33=[copy.copy(plist00[i])  for i in xrange(len(plist00)) ]
  
  List_delN=basic.Short_TrotterSteps(N_iterF)
  #List_delN=basic.Short_TrotterSteps1(N_iterF)
@@ -75,6 +95,7 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Env1,Env2,Env3,
   blk_qnums = H2.blockQnum()
   for qnum in blk_qnums:
       U2.putBlock(qnum, uni10.takeExp(-delta, H2.getBlock(qnum)))
+  MPO_list=basic.Decomposition(U2)
 
   blk_qnums = H1.blockQnum()
   for qnum in blk_qnums:
@@ -111,30 +132,30 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Env1,Env2,Env3,
 
 #######################################################################################
    print "\n"
-   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method)
+   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist,MPO_list)
 
    print "\n"
-   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_cab(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method)
+   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_cab(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist1,MPO_list)
 
    print "\n"
-   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_cab(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method)
+   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_cab(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist2,MPO_list)
 
    print "\n"
-   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_cab(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method)
+   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_cab(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist3,MPO_list)
 
 ###########################
 
    print "\n"
-   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_abd(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method)
+   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_abd(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist00,MPO_list)
 
    print "\n"
-   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_abd(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method)
+   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_abd(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist11,MPO_list)
 
    print "\n"
-   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_abd(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method)
+   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_abd(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist22,MPO_list)
 
    print "\n"
-   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_abd(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method)
+   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_abd(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist33,MPO_list)
 
 
 
@@ -154,6 +175,7 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Env1,Env2,Env3,
     print "E_m=", E_min
     basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
     basic.Store_EnvEnv(Env,Env1,Env2,Env3)
+    basicC.Store_plist(plist)
    else:
     a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
     break; 
