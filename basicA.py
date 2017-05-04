@@ -7,7 +7,7 @@ import time
 import basic
 
 
-def Var_cb(c_u,a_u,b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
+def Var_cb(c_u,a_u,b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic.Init_env(Env)
 
@@ -15,11 +15,13 @@ def Var_cb(c_u,a_u,b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
 
  #t0=time.time()
  if Corner_method is 'CTM':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+#  c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1=basic.make_equall_bond(c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1)
+  c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=basic.corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4,D,H0,d_phys)
  if Corner_method is'CTMRG':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(c_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'D')
+  #basic.Store_Env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4) 
  if Corner_method is'CTMFull':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(c_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'D')
  #print time.time() - t0, "CTM-H, Left"
 
  Env=basic.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
@@ -41,16 +43,16 @@ def Var_cb(c_u,a_u,b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
  c_up, b_up =reproduce_cb(r_up, l_up, q_u, qq_u)
  a_up=copy.copy(a_u)
 
- c_up, b_up, a_up=equall_dis(c_up,b_up,a_up) 
+ #c_up, b_up, a_up=equall_dis(c_up,b_up,a_up) 
 
 
-# Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,b_u,a_u,c_up,b_up,a_up)
-# print "Dis_final", Dis_val
+ Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,b_u,a_u,c_up,b_up,a_up)
+ print "Dis_final", Dis_val
 
 
  c_up=basic.max_ten(c_up)
  b_up=basic.max_ten(b_up)
- a_up=basic.max_ten(a_up)
+ #a_up=basic.max_ten(a_up)
 
  
  cp=basic.make_ab(c_up)
@@ -61,19 +63,20 @@ def Var_cb(c_u,a_u,b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
 
 
 
-def Var_ad(a_u, b_u, d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method):
+def Var_ad(a_u, b_u, d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic.Init_env(Env)
 
  Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
- #t0=time.time()
  if Corner_method is 'CTM':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+#  c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1=basic.make_equall_bond(c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1)
+  c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=basic.corner_transfer_matrix_twosite(c_u, a_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4,D,H0,d_phys)
  if Corner_method is'CTMRG':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(a_u, d_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'D')
+  #basic.Store_Env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4) 
  if Corner_method is'CTMFull':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D)
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(a_u, d_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'D')
  #print time.time() - t0, "CTM-H, Left"
 
  Env=basic.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
@@ -98,8 +101,8 @@ def Var_ad(a_u, b_u, d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Positive,Corner_method
 
  d_up, a_up, b_up=equall_dis_1(d_up,a_up,b_up) 
  
-# Dis_val=Dis_f_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,d_u,b_u,a_up,d_up,b_up)
-# print "Dis_final", Dis_val
+ Dis_val=Dis_f_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,d_u,b_u,a_up,d_up,b_up)
+ print "Dis_final", Dis_val
 
 
  d_up=basic.max_ten(d_up)
@@ -603,7 +606,7 @@ def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U):
  for q in xrange(20):
   #print "\n", "\n"
   Distance_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
-  #print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
+  print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
   r_up=optimum_0(N_u, l_u, r_u, l_up, r_up, U)
   l_up=optimum_1(N_u, l_u, r_u, l_up, r_up, U)
 
@@ -633,7 +636,7 @@ def Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U):
  for q in xrange(20):
   #print "\n", "\n"
   Distance_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
-  #print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
+  print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
   r_up=optimum_00(N_u, l_u, r_u, l_up, r_up, U)
   l_up=optimum_11(N_u, l_u, r_u, l_up, r_up, U)
 

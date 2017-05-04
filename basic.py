@@ -233,7 +233,7 @@ def Heisenberg1(J2):
     sy = matSy()
     sz = matSz()
     iden = uni10.Matrix(2,2, [1, 0, 0, 1])
-    ham =J2*(uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy))
+    ham =J2*0.25*(uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy))
     dim = int(spin * 2 + 1)
     bdi = uni10.Bond(uni10.BD_IN, dim);
     bdo = uni10.Bond(uni10.BD_OUT, dim);
@@ -263,6 +263,8 @@ def threebody(h,d_phys):
     ham =(0.25*h[1])*(h[0]*uni10.otimes(szt,iden)+uni10.otimes(sxt,iden)+uni10.otimes(syt,iden))
     ham =ham + 0.25*h[1]*(h[0]*uni10.otimes(iden,szt)+uni10.otimes(iden,sxt)+uni10.otimes(iden,syt))
     ham =ham + 0.50*h[2]*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+uni10.otimes(sy,sytt))
+
+    #ham =(-1.0)*(uni10.otimes(szt,iden))#+uni10.otimes(iden,szt))
 
     H.putBlock(ham)
 #    H.randomize()
@@ -606,7 +608,7 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,T
    E1=abs(norm1)
    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
-  if (count > 15 ): print 'break! CTM'; break;
+  if (count > 12 ): print 'break! CTM'; break;
   print E1, abs((E0-E1)/E1),norm, count
   #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
@@ -683,7 +685,7 @@ def corner_transfer_matrix_twosite_CTMFull(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1,
  z1.identity()
  z2=copy.copy(a)
  z2.randomize()
- z1=z2#+(1.0e-1)*z2
+ z1=z2*100#+(1.0e-1)*z2
  #z1=200*z2
  
  Accuracy=1.00e-7
@@ -708,15 +710,20 @@ def corner_transfer_matrix_twosite_CTMFull(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1,
 
   
   norm=MoveFull.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
-  norm1=MoveFull.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
-  norm=norm[0]
-  norm1=norm1[0]
+#  norm1=MoveFull.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
+  norm_print=norm[0]
+#  norm=norm[0]
+#  norm1=norm1[0]
    
-#  norm=1.0
-#  if direct_env is 'h':
-#   norm1=MoveFull.Env_energy_h(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,H0,D,d_phys)
-#  elif direct_env is 'v':
-#   norm1=MoveFull.Env_energy_v(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,H0,D,d_phys)
+  norm=1.0
+  if direct_env is 'h':
+   norm1=MoveFull.Env_energy_h(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,H0,D,d_phys)
+  elif direct_env is 'v':
+   norm1=MoveFull.Env_energy_v(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,H0,D,d_phys)
+  elif direct_env is 'D':
+   norm1=MoveFull.Env_energy_D(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,H0,D,d_phys)
+  elif direct_env is 'D1':
+   norm1=MoveFull.Env_energy_D1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,H0,D,d_phys)
 
 
 
@@ -728,8 +735,10 @@ def corner_transfer_matrix_twosite_CTMFull(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1,
    E1=abs(norm1)
    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
-  if (count > 20 ): print 'break! CTMFull'; break;
-  print E1, abs((E0-E1)/E1),norm, count, time.time() - t0,"CTMFull"
+  if (count > 12 ): print 'break! CTMFull'; break;
+  #print E1, abs((E0-E1)/E1),norm, count, time.time() - t0,"CTMFull"
+  print E1, abs((E0-E1)/E1),norm_print, count, time.time() - t0,"CTMFull"
+
   #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
 
@@ -794,7 +803,7 @@ def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corne
  #return E_5
 # return (E_5+E_6+E_7+E_8)/4.00
 
-# return (E_1+E_2+E_3+E_4)/4.00 
+ #return (E_1+E_2+E_3+E_4)/4.00 
  return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/8.00
 # return (E_ab+E_ba)/2.0
 # return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
@@ -857,7 +866,7 @@ def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_met
  #return E_5
 # return (E_5+E_6+E_7+E_8)/4.00
 
-# return (E_1+E_2+E_3+E_4)/4.00 
+ #return (E_1+E_2+E_3+E_4)/4.00 
  return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/8.00
 # return (E_ab+E_ba)/2.0
 # return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
@@ -996,7 +1005,8 @@ def Energy_cab(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
   
   
  reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
- E1, E2, E3, E4, E5, E6, E7, E8=basicC.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+
+ E1, E2, E3, E4, E5, E6, E7, E8, a_u, b_u, c_u, d_u,a, b, c, d=basicC.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys,a_u, b_u,c_u,d_u)
 
 
  E=basicC.energy_cab(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,c_u,d_u, H2)
@@ -1034,18 +1044,19 @@ def Energy_abd(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model):
 
  Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
- if Corner_method is 'CTM':
-  c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4,D)
- if Corner_method is 'CTMRG':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMRG(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'h')
- if Corner_method is 'CTMFull':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'h')
-  #Store_Env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4) 
+# if Corner_method is 'CTM':
+#  c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=corner_transfer_matrix_twosite(a,b,c,d,chi,c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4,D)
+# if Corner_method is 'CTMRG':
+#  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMRG(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'h')
+# if Corner_method is 'CTMFull':
+#  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=corner_transfer_matrix_twosite_CTMFull(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'h')
+#  #Store_Env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4) 
 
   
   
  reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
- E1, E2, E3, E4, E5, E6, E7, E8=basicC.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+
+ E1, E2, E3, E4, E5, E6, E7, E8, a_u, b_u, c_u, d_u,a, b, c, d=basicC.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys,a_u, b_u,c_u,d_u)
 
 
  E=basicC.energy_abd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,c_u,d_u, H2)
@@ -1218,6 +1229,21 @@ def Store_Full(a_u,b_u,c_u,d_u,a,b,c,d):
  c.save("Store/c")
  d.save("Store/d")
 
+
+def increase_norm(a_u,b_u,c_u,d_u,a,b,c,d, N):
+ a_u=a_u*N
+ b_u=b_u*N
+ c_u=c_u*N
+ d_u=d_u*N
+ a=make_ab(a_u)
+ b=make_ab(b_u)
+ c=make_ab(c_u)
+ d=make_ab(d_u)
+ return a_u,b_u,c_u,d_u,a,b,c,d
+
+
+
+
 def Store_Fullp(a_u,b_u,c_u,d_u,a,b,c,d):
  a_u.save("Store/ap_u")
  b_u.save("Store/bp_u")
@@ -1272,6 +1298,7 @@ def Reload_Full_previous(a_u, b_u, c_u, d_u):
  c_uf=uni10.UniTensor("Store/c_u")
  d_uf=uni10.UniTensor("Store/d_u")
  a_u=reconstruct_ab(a_u, a_uf)
+
  b_u=reconstruct_ab(b_u, b_uf)
  c_u=reconstruct_ab(c_u, c_uf)
  d_u=reconstruct_ab(d_u, d_uf)
@@ -1280,19 +1307,16 @@ def Reload_Full_previous(a_u, b_u, c_u, d_u):
  b=make_ab(b_u)
  c=make_ab(c_u)
  d=make_ab(d_u)
+# print b_uf
+# print b_u
+
+# print c_uf
+# print c_u
+
+# print d_uf
+# print d_u
 
  return a_u,b_u,c_u,d_u,a,b,c,d
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2046,15 +2070,20 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
 def Short_TrotterSteps(N_iterF):
  List_delN=[]
 
- for i in xrange(6, 1, -1):
-  Delta_N=(i*(0.50/10),N_iterF)
+ for i in xrange(5, 1, -1):
+  Delta_N=(i*(1.0/10),N_iterF)
   List_delN.append(Delta_N)
 
- for i in xrange(5, 1, -1):
+ for i in xrange(10, 1, -1):
   Delta_N=(i*(1.0/100),N_iterF)
   List_delN.append(Delta_N)
 
- for i in xrange(5, 1, -1):
+
+ for i in xrange(5, 5, -1):
+  Delta_N=(i*(1.0/100),N_iterF)
+  List_delN.append(Delta_N)
+
+ for i in xrange(10, 1, -1):
   Delta_N=(i*(1.0/1000),N_iterF)
   List_delN.append(Delta_N)
 
@@ -2064,7 +2093,7 @@ def Short_TrotterSteps(N_iterF):
 
 
 ########################################
-# Delta_N=((100.0/1000),N_iterF)
+# Delta_N=((50.0/100),N_iterF)
 # List_delN.append(Delta_N)
 
 # Delta_N=((9.0/1000),N_iterF)
@@ -2328,7 +2357,8 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  D_d=D_d+(-1.0)*A
  D_d.transpose()
  D_d.permute([57,19,10,8,20],3)
- 
+# D_d=copy.copy(d_u)
+# D_d.set_zero()
 ##################################################################################################
  return D_a, D_b, D_c, D_d 
  

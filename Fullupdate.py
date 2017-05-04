@@ -17,7 +17,7 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Env1,Env2,Env3,
 
  Steps_copy=copy.copy(Steps)
 
- #basic.Reload_EnvEnv(Env,Env1,Env2,Env3)
+ basic.Reload_EnvEnv(Env,Env1,Env2,Env3)
 
  if Model is "Heisenberg":
    H0=basic.Heisenberg0(h[0],h[1])
@@ -45,17 +45,14 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Env1,Env2,Env3,
   U.putBlock(qnum, uni10.takeExp(-delta, H0.getBlock(qnum)))
 
 
-
-
  U0 = uni10.UniTensor(H00.bond(), "U0");
  U1 = uni10.UniTensor(H1.bond(), "U1");
  U2 = uni10.UniTensor(H2.bond(), "U2");
  
- 
+
  E_0=1.0
  E_1=2.0
  E_min=1.e+14
-
 
 
  U2 = uni10.UniTensor(H2.bond(), "U");
@@ -66,15 +63,15 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Env1,Env2,Env3,
 
  plist=basicC.initialize_plist(a_u, b_u, c_u, MPO_list)
  #basicC.Reload_plist(plist)
- plist1=basicC.initialize_plist(d_u, b_u, a_u, MPO_list)
- plist2=basicC.initialize_plist(a_u, c_u, d_u, MPO_list)
- plist3=basicC.initialize_plist(b_u, d_u, a_u, MPO_list)
+ plist1=basicC.initialize_plist(b_u, a_u, d_u, MPO_list)
+ plist2=basicC.initialize_plist(c_u, d_u, a_u, MPO_list)
+ plist3=basicC.initialize_plist(d_u, c_u, b_u, MPO_list)
 
  
- plist00=basicC.initialize_plist1(a_u, c_u, d_u, MPO_list)
- plist11=[copy.copy(plist00[i])  for i in xrange(len(plist00)) ]
- plist22=[copy.copy(plist00[i])  for i in xrange(len(plist00)) ]
- plist33=[copy.copy(plist00[i])  for i in xrange(len(plist00)) ]
+ plist00=basicC.initialize_plist1(a_u, b_u, d_u, MPO_list)
+ plist11=basicC.initialize_plist1(b_u, a_u, c_u, MPO_list)
+ plist22=basicC.initialize_plist1(c_u, d_u, b_u, MPO_list)
+ plist33=basicC.initialize_plist1(d_u, c_u, a_u, MPO_list)
  
  List_delN=basic.Short_TrotterSteps(N_iterF)
  #List_delN=basic.Short_TrotterSteps1(N_iterF)
@@ -127,36 +124,70 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,delta,h,Env,Env1,Env2,Env3,
 #   a_u, c_u, a, c=basicB.Var_ca(a_u,c_u,c,d,a,b,Env1,D,U0,d_phys,chi,Gauge,Corner_method,H00)
 
 #   b_u, d_u, b, d=basicB.Var_ca(b_u,d_u,d,c,b,a,Env3,D,U0,d_phys,chi,Gauge,Corner_method,H00)
-###################################################################################################
+####################################################################################################
+#################################################################################################
+#   c_u, a_u, b_u , c, a, b=basicA.Var_cb(c_u,a_u,b_u,a,b,c,d,Env,D,U1,d_phys,chi,Gauge,Corner_method,H1)
+
+#   a_u, c_u, d_u, a, c, d=basicA.Var_cb(a_u,c_u,d_u,c,d,a,b,Env1,D,U1,d_phys,chi,Gauge,Corner_method,H1)
+######
+
+#   d_u, b_u, a_u, d, b, a=basicA.Var_cb(d_u,b_u,a_u,b,a,d,c,Env2,D,U1,d_phys,chi,Gauge,Corner_method,H1)
+#   
+#   b_u, d_u, c_u, b, d, c=basicA.Var_cb(b_u,d_u,c_u,d,c,b,a,Env3,D,U1,d_phys,chi,Gauge,Corner_method,H1)
+
+######
+
+#   a_u, b_u, d_u, a, b, d=basicA.Var_ad(a_u, b_u, d_u,a,b,c,d,Env,D,U1,d_phys,chi,Gauge,Corner_method,H1)
+#   
+#   c_u, d_u, b_u, c, d, b=basicA.Var_ad(c_u, d_u, b_u,c,d,a,b,Env1,D,U1,d_phys,chi,Gauge,Corner_method,H1)
+
+######
+#   b_u, a_u, c_u, b, a, c=basicA.Var_ad(b_u, a_u, c_u,b,a,d,c,Env2,D,U1,d_phys,chi,Gauge,Corner_method,H1)
 
 
-#######################################################################################
+#   d_u, c_u, a_u, d, c, a=basicA.Var_ad(d_u, c_u, a_u,d,c,b,a,Env3,D,U1,d_phys,chi,Gauge,Corner_method,H1)
+
+#####################################################################################
+#####################################################################################
+
+######################################################################################
+
    print "\n"
-   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist,MPO_list)
-
+   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist,MPO_list)
    print "\n"
-   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_cab(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist1,MPO_list)
-
+   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_cab(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist1,MPO_list)
    print "\n"
-   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_cab(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist2,MPO_list)
-
+   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_cab(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist2,MPO_list)
    print "\n"
-   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_cab(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist3,MPO_list)
+   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_cab(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist3,MPO_list)
 
 ###########################
 
    print "\n"
-   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_abd(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist00,MPO_list)
+   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_abd(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist00,MPO_list)
 
    print "\n"
-   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_abd(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist11,MPO_list)
+   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_abd(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist11,MPO_list)
 
    print "\n"
-   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_abd(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist22,MPO_list)
+   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_abd(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist22,MPO_list)
 
    print "\n"
-   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_abd(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist33,MPO_list)
+   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_abd(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist33,MPO_list)
 
+#   print a_u, b_u, c_u, d_u
+
+#   a_u=basic.max_ten(a_u)
+#   b_u=basic.max_ten(b_u) 
+#   c_u=basic.max_ten(c_u)
+#   d_u=basic.max_ten(d_u)
+
+#   print "\n", "new", a_u, b_u, c_u, d_u
+
+#   a=basic.make_ab(a_u)
+#   b=basic.make_ab(b_u)
+#   c=basic.make_ab(c_u)
+#   d=basic.make_ab(d_u)
 
 
 #############################################################################################

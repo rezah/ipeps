@@ -30,6 +30,220 @@ def norm_CTM(c):
  if ( Max_val < 0.50e-1) or (Max_val > 0.50e+1):
   c*=(1.00/Max_val) 
  return c
+ 
+ 
+def check_eigenvalues(s):
+ M_s=s.getBlock()
+ p=0
+ for i in xrange(int(M_s.row())):
+    for j in xrange(int(M_s.col())):
+     if i==j:
+      if M_s[i*int(M_s.col())+j]<1.e-8:
+       p=i
+       #print "hiiiiiiiii", p, M_s[i*int(M_s.col())+j]
+       break
+    else:
+        continue  # executed if the loop ended normally (no break)
+    break  # executed if 'continue' was skipped (break)
+
+ return p
+ 
+ 
+ 
+def pick_vec(p,U):
+ x=int(U.row())
+ y=int(U.col())
+ #print x, y, p
+ Vec_up=uni10.Matrix(x,1)
+ for i in xrange(x):
+      Vec_up[i]=U[i*y+p]
+ #print Vec_up
+ return Vec_up
+
+
+def add_vec_to_mat(U,vec):
+ x=int(U.row())
+ y=int(U.col())
+ U_new=copy.copy(U)
+ U_new.resize(x, y+1)
+ p=y
+ for i in xrange(x):
+      U_new[i*(y+1)+p]=vec[i*(1)+0]
+ return U_new
+
+
+
+def Add_onevector(V_mat, U_mat, p, Vp, Up):
+ Up_mat=Up.getBlock()
+ Vp_mat=Vp.getBlock()
+ Vp_mat.transpose()
+
+ Vec_up=pick_vec(p,Up_mat)
+ Vec_vp=pick_vec(p,Vp_mat)
+
+# Vec_up.randomize()
+# Vec_vp.randomize()
+ #print "hi", U_mat.col(), Vec_vp.row() 
+ Vec_vp=U_mat*Vec_vp
+ V_mat.transpose()
+ Vec_up=V_mat*Vec_up
+ U_mat=add_vec_to_mat(U_mat,Vec_up)
+ V_mat=add_vec_to_mat(V_mat,Vec_vp)
+ V_mat.transpose()
+
+ A=V_mat*U_mat 
+ #print A.col(), A.row()  
+ return A, V_mat,  U_mat
+
+#@profile 
+
+def produce_projectives(theta,chi_dim):
+ theta=copy.copy(theta)
+ 
+ theta.setLabel([1,2,20,3,4,40])
+ theta.permute([1,2,20,3,4,40],3) 
+ #theta.transpose()
+ 
+ U, V, s=TruncateU.setTruncation(theta,chi_dim)
+
+ if MaxAbs(s) > 1.0e+3 or MaxAbs(s) < 1.0e-1:
+  s=s*(1.00/MaxAbs(s))
+# s=TruncateU.inverse(s)
+ s=TruncateU.Sqrt(s)
+
+# M_s=s.getBlock()
+# for i in xrange(int(M_s.row())):
+#  for j in xrange(int(M_s.col())):
+#   if i==j:
+#    print "1", M_s[i*int(M_s.col())+j]
+  
+ U.setLabel([1,2,20,0])
+ V.setLabel([0,1,2,20])
+ s.setLabel([0,-1])
+ U=U*s
+ s.setLabel([-2,0])
+ V=s*V
+ U.setLabel([1,2,20,-1])
+ V.setLabel([-2,1,2,20])
+ 
+
+ V.transpose()
+ A=V*U
+ A.permute([-2,-1],1)
+
+ Up, Vp, sp=TruncateU.setTruncation3(A, chi_dim) 
+
+# p=check_eigenvalues(sp)
+# #print "p", p
+# p=14
+# A_mat, V_mat,  U_mat=Add_onevector(V.getBlock(),U.getBlock(),p,Up, Vp)
+# 
+# print "\n"
+# M_s=sp.getBlock()
+# for i in xrange(int(M_s.row())):
+#  for j in xrange(int(M_s.col())):
+#   if i==j:
+#    print "0", M_s[i*int(M_s.col())+j]
+
+# x=int(A.bond(0).dim())+1
+# y=int(A.bond(1).dim())+1
+
+# bdi=uni10.Bond(uni10.BD_IN,x)
+# bdo=uni10.Bond(uni10.BD_OUT,y)
+# A_new=uni10.UniTensor([bdi,bdo])
+
+# A_new.putBlock(A_mat)
+
+# U=uni10.UniTensor([U.bond(0),U.bond(1), U.bond(2),bdo])
+# V=uni10.UniTensor([bdi,V.bond(1),V.bond(2), V.bond(3)])
+# #print Rb.printDiagram(), Rb_mat.col(), Rb_mat.row()
+# U.putBlock(U_mat)
+# V.putBlock(V_mat)
+# U.setLabel([1,2,20,-1])
+# V.setLabel([-2,1,2,20])
+
+# Up, Vp, sp=TruncateU.setTruncation3(A_new, chi_dim+1) 
+## print  A_new.printDiagram() 
+## print "After1", "\n"
+## M_s=sp.getBlock()
+## for i in xrange(int(M_s.row())):
+##  for j in xrange(int(M_s.col())):
+##   if i==j:
+##    print i, M_s[i*int(M_s.col())+j]
+
+
+# p=15
+# A_mat, V_mat,  U_mat=Add_onevector(V.getBlock(),U.getBlock(),p,Up, Vp)
+# 
+## print "After2"
+## M_s=sp.getBlock()
+## for i in xrange(int(M_s.row())):
+##  for j in xrange(int(M_s.col())):
+##   if i==j:
+##    print "1", M_s[i*int(M_s.col())+j]
+
+# x=int(A.bond(0).dim())+2
+# y=int(A.bond(1).dim())+2
+
+# bdi=uni10.Bond(uni10.BD_IN,x)
+# bdo=uni10.Bond(uni10.BD_OUT,y)
+# A_new=uni10.UniTensor([bdi,bdo])
+
+# A_new.putBlock(A_mat)
+
+# U=uni10.UniTensor([U.bond(0),U.bond(1), U.bond(2),bdo])
+# V=uni10.UniTensor([bdi,V.bond(1),V.bond(2), V.bond(3)])
+# #print Rb.printDiagram(), Rb_mat.col(), Rb_mat.row()
+# U.putBlock(U_mat)
+# V.putBlock(V_mat)
+# U.setLabel([1,2,20,-1])
+# V.setLabel([-2,1,2,20])
+
+# Up, Vp, sp=TruncateU.setTruncation3(A_new, chi_dim+2) 
+## print "AfterFinal", "\n"
+## M_s=sp.getBlock()
+## for i in xrange(int(M_s.row())):
+##  for j in xrange(int(M_s.col())):
+##   if i==j:
+##    print i, M_s[i*int(M_s.col())+j]
+
+
+ if MaxAbs(sp) > 1.0e+3 or MaxAbs(sp) < 1.0e-1:
+  sp=sp*(1.00/MaxAbs(s))
+
+ sp=TruncateU.inverse(sp)
+ sp=TruncateU.Sqrt(sp)
+
+ Vp.transpose()
+ Vp.setLabel([-1,0])
+ sp.setLabel([0,3])
+ #print Vp.printDiagram(), sp.printDiagram() 
+ U1x=U*Vp*sp
+ U1x.permute([1,2,20,3],3)
+
+ Up.transpose()
+ Up.setLabel([0,-2])
+ sp.setLabel([3,0])
+ U1x_trans=sp*Up*V
+ U1x_trans.permute([3,1,2,20],1)
+
+
+
+ #U1x.setLabel([1,2,20,-3])
+ #A=U1x_trans*U1x
+ #print A[0]
+
+
+ return U1x, U1x_trans  
+
+# U1x_trans.transpose()
+# U1x.transpose()
+# return U1x_trans, U1x 
+ 
+ 
+ 
+ 
+ 
 
 #@profile  
 def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
@@ -70,12 +284,15 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  #t0=time.time()
 
  U1x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
+ U1x_trans=copy.copy(U1x)
+ U1x_trans.transpose()
 
+
+
+ #U1x, U1x_trans   = produce_projectives(theta, chi_dim)
  #print time.time() - t0, "svd"
 
 
- U1x_trans=copy.copy(U1x)
- U1x_trans.transpose()
 
 
 
@@ -109,10 +326,11 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
  
  U2x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
-
-
  U2x_trans=copy.copy(U2x)
  U2x_trans.transpose()
+
+
+# U2x, U2x_trans   = produce_projectives(theta, chi_dim)
 
 # print "U2x_trans", U2x_trans.printDiagram()
 # print "U2x", U2x.printDiagram()
@@ -178,8 +396,8 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  U3x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
  U3x_trans=copy.copy(U3x)
  U3x_trans.transpose()
- #print "U3x_trans", U3x_trans.printDiagram()
 
+# U3x, U3x_trans   = produce_projectives(theta, chi_dim)
  
 
 # t0=time.time()
@@ -226,9 +444,11 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  
  #print theta.trace()#, Contract.printDiagram()
  U4x,  V,  s = TruncateU.setTruncation(theta, chi_dim)
-
  U4x_trans=copy.copy(U4x)
  U4x_trans.transpose()
+
+# U4x, U4x_trans   = produce_projectives(theta, chi_dim)
+
  #print "U4x_trans", U4x_trans.printDiagram()
 
 
