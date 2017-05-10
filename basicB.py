@@ -4,7 +4,7 @@ import time
 import basic
 
 
-def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
+def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_env,N_svd):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic.Init_env(Env)
 
@@ -18,10 +18,10 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 #  c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1=basic.make_equall_bond(c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1)
   c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=basic.corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4,D,H0,d_phys)
  if Corner_method is'CTMRG':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'h')
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(a_u,b_u,a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'h',N_env)
   #basic.Store_Env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4) 
  if Corner_method is'CTMFull':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'h')
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(a_u,b_u,a_u,b_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'h',N_env)
  #print time.time() - t0, "CTM-H, Left"
 
 
@@ -48,7 +48,7 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 
 
 # t0=time.time() 
- l_up, r_up=Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U)
+ l_up, r_up=Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U,N_svd)
 # l_up, r_up=Do_optimization_grad(N_u, l_u, r_u, l_up, r_up, U)
 
 # print time.time() - t0, "optimization"
@@ -60,8 +60,8 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
  a_up, b_up =reproduce_ab(r_up, l_up, q_u, qq_u)
  a_up, b_up=equall_dis(a_up,b_up) 
 
-# Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u,a_up,b_up)
-# print "Dis_final", Dis_val
+ Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u,a_up,b_up)
+ print "Dis_final", Dis_val
 
 
  a_up=basic.max_ten(a_up)
@@ -74,7 +74,7 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 
 
 
-def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
+def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_env,N_svd):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic.Init_env(Env)
 
@@ -88,12 +88,11 @@ def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 #  c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1=basic.make_equall_bond(c1, c2,c3,c4, Tb3, Ta3, Ta1, Tb1)
   c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=basic.corner_transfer_matrix_twosite(c_u, a_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4,D,H0,d_phys)
  if Corner_method is'CTMRG':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(c_u, a_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'v')
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMRG(c_u, a_u,c_u, a_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'v',N_env)
   #basic.Store_Env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4) 
  if Corner_method is'CTMFull':
-  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(c_u, a_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'v')
+  c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4=basic.corner_transfer_matrix_twosite_CTMFull(c_u, a_u,c_u, a_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,'v',N_env)
  #print time.time() - t0, "CTM-H, Left"
-
 
 
  Env=basic.reconstruct_env(c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4,Env)
@@ -116,7 +115,7 @@ def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
 # Dis_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U )
 # print "Dis", Dis_val
 
- l_up, r_up=Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U)
+ l_up, r_up=Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U,N_svd)
 # l_up, r_up=Do_optimization_grad_1(N_u, l_u, r_u, l_up, r_up, U)
 
 # Dis_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U )
@@ -125,8 +124,8 @@ def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0):
  c_up,a_up = reproduce_ca(r_up, l_up, q_u, qq_u)
  c_up, a_up=equall_dis_1(c_up,a_up) 
  
-# Dis_val=Dis_f_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u,c_up,a_up)
-# print "Dis_final", Dis_val
+ Dis_val=Dis_f_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u,c_up,a_up)
+ print "Dis_final", Dis_val
 
 
  c_up=basic.max_ten(c_up)
@@ -185,8 +184,79 @@ def produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phy
  E8=copy.copy(Tb4)
  E8.setLabel([15,16,-16,1])
  E8.permute([15,16,-16,1],1)
+ b.setLabel([18,-18,20,-20,6,-6,4,-4])
+ c.setLabel([14,-14,12,-12,19,-19,17,-17])
+ a.setLabel([16,-16,17,-17,18,-18,2,-2])
+ d.setLabel([19,-19,10,-10,8,-8,20,-20])
+ Norm=(((((E1*E8)*(a))*((E7*E6)*(c))))*(((E2*E3)*(b))))*((E4*E5)*d)
+ if Norm[0] < 0: E1=-1.0*E1;
 
- return E1, E2, E3, E4, E5, E6, E7, E8 
+ while Norm[0]<1.0e-2: 
+  E1, E2, E3, E4, E5, E6, E7, E8,a, b, c, d=checking_norm(E1, E2, E3, E4, E5, E6, E7, E8,a, b, c, d)
+  b.setLabel([18,-18,20,-20,6,-6,4,-4])
+  c.setLabel([14,-14,12,-12,19,-19,17,-17])
+  a.setLabel([16,-16,17,-17,18,-18,2,-2])
+  d.setLabel([19,-19,10,-10,8,-8,20,-20])
+  Norm=(((((E1*E8)*(a))*((E7*E6)*(c))))*(((E2*E3)*(b))))*((E4*E5)*d)
+  #print Norm[0]
+
+
+ while Norm[0]>1.0e+5: 
+  E1, E2, E3, E4, E5, E6, E7, E8,a, b, c, d=checking_norm(E1, E2, E3, E4, E5, E6, E7, E8,a, b, c, d)
+  b.setLabel([18,-18,20,-20,6,-6,4,-4])
+  c.setLabel([14,-14,12,-12,19,-19,17,-17])
+  a.setLabel([16,-16,17,-17,18,-18,2,-2])
+  d.setLabel([19,-19,10,-10,8,-8,20,-20])
+  Norm=(((((E1*E8)*(a))*((E7*E6)*(c))))*(((E2*E3)*(b))))*((E4*E5)*d)
+ 
+ print "Final_Norm", Norm[0]
+
+ return E1, E2, E3, E4, E5, E6, E7, E8
+
+
+def checking_norm(E1, E2, E3, E4, E5, E6, E7, E8,a, b, c, d):
+  
+ b.setLabel([18,-18,20,-20,6,-6,4,-4])
+ c.setLabel([14,-14,12,-12,19,-19,17,-17])
+ a.setLabel([16,-16,17,-17,18,-18,2,-2])
+ d.setLabel([19,-19,10,-10,8,-8,20,-20])
+ Norm=(((((E1*E8)*(a))*((E7*E6)*(c))))*(((E2*E3)*(b))))*((E4*E5)*d)
+ if Norm[0] < 0: E1=-1.0*E1;
+ if Norm[0] < 1.0e-4:
+  #print "Norm[0] < 1.0e+1 ", Norm[0]
+  E1*=1.5
+  E8*=1.5
+  E2*=1.5
+  E3*=1.5
+  E4*=1.5
+  E6*=1.5
+  E7*=1.5
+#  a_u*=5.0
+#  b_u*=5.0
+#  c_u*=5.0
+#  d_u*=5.0
+#  a=basic.make_ab(a_u)
+#  b=basic.make_ab(b_u)
+#  c=basic.make_ab(c_u)
+#  d=basic.make_ab(d_u)
+ elif Norm[0] > 1.e+5:
+  #print "Norm[0] > 1.e+8 ", Norm[0]
+  E1*=0.5
+  E8*=0.5
+  E2*=0.5
+  E3*=0.5
+  E4*=0.5
+  E6*=0.5
+  E7*=0.5
+#  a_u*=0.20
+#  b_u*=0.20
+#  c_u*=0.20
+#  d_u*=0.20
+#  a=basic.make_ab(a_u)
+#  b=basic.make_ab(b_u)
+#  c=basic.make_ab(c_u)
+#  d=basic.make_ab(d_u)
+ return E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d 
 
 def  Energy_ab(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u):
 
@@ -696,7 +766,7 @@ def MaxAbs(c):
  #print max_list_f, max(max_list_f)
  return max(max_list_f)
 
-def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U):
+def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U,N_svd):
  
  r_up_first=copy.copy(r_up)
  l_up_first=copy.copy(l_up)
@@ -706,7 +776,7 @@ def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U):
  Res1=20
  count=0
  #Distance_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
- for q in xrange(30):
+ for q in xrange(N_svd[0]):
   #print "\n", "\n"
   Distance_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
   print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
@@ -722,7 +792,7 @@ def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U):
   count+=1
   if count > 30: print 'Num_Opt > 30'; break;
   if abs(Res) > 1.00e-10:
-   if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
+   if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
     #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     break
   else:
@@ -741,7 +811,7 @@ def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U):
 
  return l_up, r_up
 
-def Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U):
+def Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U,N_svd):
  
  
  
@@ -754,7 +824,7 @@ def Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U):
  Res1=20
  count=0
  #Distance_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
- for q in xrange(30):
+ for q in xrange(N_svd[0]):
   #print "\n", "\n"
   Distance_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
   print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
@@ -770,7 +840,7 @@ def Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U):
   count+=1
   if count > 30: print 'Num_Opt > 30'; break;
   if abs(Res) > 1.00e-10:
-   if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < 1.00e-9): 
+   if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
     #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     break
   else:

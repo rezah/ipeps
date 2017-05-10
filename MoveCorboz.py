@@ -9,6 +9,7 @@ import copy
 #import line_profiler
 import TruncateU
 import basicB
+import basicC
 #import time
 
 
@@ -605,6 +606,28 @@ def  Env_energy_v(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,c_u,a_u,H0
 
  return E_ca
 
+def  Env_energy_D(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,c_u,b_u,H0,D,d_phys):
+
+ E1, E2, E3, E4, E5, E6, E7, E8=basicA.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+ E_ca=basicA.energy_cb(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0,c_u,b_u)
+ return E_ca
+
+def  Env_energy_D1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,d_u,H0,D,d_phys):
+
+ E1, E2, E3, E4, E5, E6, E7, E8=basicA.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
+ E_ca=basicA.energy_ad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0,a_u,d_u)
+ return E_ca
+
+def Env_energy_three(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,c_u,d_u,H0,D,d_phys):
+ E1, E2, E3, E4, E5, E6, E7, E8, a_u, b_u, c_u, d_u,a, b, c, d=basicC.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys,a_u, b_u,c_u,d_u)
+ E_cab=basicC.energy_cab(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,c_u,d_u, H0)
+ return E_cab
+
+
+def Env_energy_three1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,c_u,d_u,H0,D,d_phys):
+ E1, E2, E3, E4, E5, E6, E7, E8, a_u, b_u, c_u, d_u,a, b, c, d=basicC.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys,a_u, b_u,c_u,d_u)
+ E_abd=basicC.energy_abd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,c_u,d_u, H0)
+ return E_abd
 
 
 

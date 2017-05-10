@@ -121,40 +121,6 @@ def setTruncation2(theta, chi):
     return GA, GB, LA
 
 
-def setTruncation3(theta, chi):
-    LA=uni10.UniTensor(theta.bond())
-    GA=uni10.UniTensor(theta.bond())
-    GB=uni10.UniTensor(theta.bond())
-    svds = {}
-    blk_qnums = theta.blockQnum()
-    dim_svd=[]
-    for qnum in blk_qnums:
-        svds[qnum] = theta.getBlock(qnum).svd()
-        dim_svd.append(int(svds[qnum][1].col()))
-    svs = []
-    bidxs = []
-    for bidx in xrange(len(blk_qnums)):
-        svs, bidxs = sv_merge1(svs, bidxs, bidx, svds[blk_qnums[bidx]][1], chi,len(blk_qnums))
-    dims = [0] * len(blk_qnums)
-    for bidx in bidxs:
-        dims[bidx] += 1  
-    qnums = []
-    for bidx in xrange(len(blk_qnums)):
-        qnums += [blk_qnums[bidx]] * dims[bidx]
-    bdi_mid = uni10.Bond(uni10.BD_IN, qnums)
-    bdo_mid = uni10.Bond(uni10.BD_OUT, qnums)
-    GA.assign([theta.bond(0), bdo_mid])
-    GB.assign([bdi_mid, theta.bond(1)])
-    LA.assign([bdi_mid, bdo_mid])
-    degs = bdi_mid.degeneracy()
-    for qnum, dim in degs.iteritems():
-        if qnum not in svds:
-            raise Exception("In setTruncaton(): Fatal error.")
-        svd = svds[qnum]
-        GA.putBlock(qnum, svd[0].resize(svd[0].row(), dim))
-        GB.putBlock(qnum, svd[2].resize(dim, svd[2].col()))
-        LA.putBlock(qnum, svd[1].resize(dim, dim)  )
-    return GA, GB, LA
 
 
 def svd_parity(theta):
@@ -208,6 +174,8 @@ def svd_parity1(theta):
 
 
 
+
+
 def svd_parity2(theta):
 
     bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
@@ -255,29 +223,12 @@ def qr_parity1(theta):
 #    print LA
     return GA, LA
 
-#def lq_parity1(theta):
-
-#    bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
-#    bd2=uni10.Bond(uni10.BD_OUT,theta.bond(1).Qlist())
-#    GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3),theta.bond(4),theta.bond(5)])
-#    LA=uni10.UniTensor([theta.bond(0),bd1])
-#    svds = {}
-#    blk_qnums = theta.blockQnum()
-#    dim_svd=[]
-#    for qnum in blk_qnums:
-#        svds[qnum] = theta.getBlock(qnum).lq()
-#        GA.putBlock(qnum, svds[qnum][1])
-#        LA.putBlock(qnum, svds[qnum][0])
-
-
-#    return  LA, GA
-
 def lq_parity1(theta):
 
     bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
     bd2=uni10.Bond(uni10.BD_OUT,theta.bond(1).Qlist())
     GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3),theta.bond(4),theta.bond(5)])
-    LA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3),theta.bond(4),theta.bond(5)])
+    LA=uni10.UniTensor([theta.bond(0),bd1])
     svds = {}
     blk_qnums = theta.blockQnum()
     dim_svd=[]
@@ -293,6 +244,10 @@ def lq_parity1(theta):
 
 
 
+
+
+
+
 def   Sqrt(Landa):
   Landa_cp=copy.copy(Landa)
   blk_qnums=Landa.blockQnum()
@@ -302,7 +257,7 @@ def   Sqrt(Landa):
    Landam=Landa_cp.getBlock(qnum)
    for i in xrange(D):
     for j in xrange(D):
-     if Landam[i*D+j] > 1.0e-14:
+     if Landam[i*D+j] > 1.0e-12:
       Landa_cpm[i*D+j]=Landam[i*D+j]**(1.00/2.00)
      else:
       Landa_cpm[i*D+j]=0

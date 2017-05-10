@@ -10,6 +10,7 @@ import copy
 import TruncateU
 import basicB
 import basicA
+import basicC
 #import time
 
 
@@ -68,11 +69,10 @@ def check_eigenvalues(s):
 def pick_vec(p,U):
  x=int(U.row())
  y=int(U.col())
- #print x, y, p
  Vec_up=uni10.Matrix(x,1)
  for i in xrange(x):
       Vec_up[i]=U[i*y+p]
- #print Vec_up
+
  return Vec_up
 
 
@@ -83,7 +83,7 @@ def add_vec_to_mat(U,vec):
  U_new.resize(x, y+1)
  p=y
  for i in xrange(x):
-      U_new[i*(y+1)+p]=vec[i*(1)+0]
+   U_new[i*(y+1)+p]=vec[i*(1)+0]
  return U_new
 
 
@@ -106,12 +106,10 @@ def Add_onevector(Rb_mat, R_mat, p, V, U):
  Rb_mat=add_vec_to_mat(Rb_mat,Vec_up)
  Rb_mat.transpose()
 
- A=Rb_mat*R_mat 
- #print A.col(), A.row()  
+ A=Rb_mat*R_mat   
  return A, Rb_mat,  R_mat
 
 #@profile 
-
 def produce_projectives(theta,theta1,chi_dim):
  theta=copy.copy(theta)
  theta1=copy.copy(theta1)
@@ -121,27 +119,15 @@ def produce_projectives(theta,theta1,chi_dim):
 
  
  U, s, V=TruncateU.svd_parity1(theta)
-
-
+ 
  if MaxAbs(s) > 1.0e+7 or MaxAbs(s) < 1.0e-1:
   s=s*(1.00/MaxAbs(s))
 
-# M_s=s.getBlock()
-# for i in xrange(int(M_s.row())):
-#  for j in xrange(int(M_s.col())):
-#   if i==j:
-#    print "1", M_s[i*int(M_s.col())+j]
-  
  U.setLabel([1,2,20,-1,-2,-3])
  s.setLabel([-1,-2,-3,3,4,5])
  R=U*s
  R.permute([1,2,20,3,4,5],3)
 
-
-################################################
-# R, q=TruncateU.lq_parity1(theta)
-# R.setLabel([1,2,20,3,4,5])
-###############################################
 
 
  theta1.setLabel([1,2,20,3,4,40])
@@ -150,7 +136,7 @@ def produce_projectives(theta,theta1,chi_dim):
  
  U, s, V=TruncateU.svd_parity1(theta1)
 
- if MaxAbs(s) > 1.0e+5 or MaxAbs(s) < 1.0e-1:
+ if MaxAbs(s) > 1.0e+7 or MaxAbs(s) < 1.0e-1:
   s=s*(1.00/MaxAbs(s))
 
 
@@ -160,24 +146,24 @@ def produce_projectives(theta,theta1,chi_dim):
  Rb.permute([1,2,20,6,7,8],3)
  Rb.permute([6,7,8,1,2,20],3)
  
-################################################
-# Rb, q=TruncateU.lq_parity1(theta1)
-# Rb.setLabel([1,2,20,6,7,8])
-# Rb.permute([6,7,8,1,2,20],3)
-###############################################
  
- A=Rb*R
+  
+ A=R*Rb
  A.permute([6,7,8,3,4,5],3)
 
+
  V, U, s=TruncateU.setTruncation(A, chi_dim) 
+
+ if MaxAbs(s) > 1.0e+7 or MaxAbs(s) < 1.0e-1:
+  s=s*(1.00/MaxAbs(s))
+
 
  U.setLabel([-1,3,4,5])
  V.setLabel([6,7,8,-1])
 
- if MaxAbs(s) > 1.0e+5 or MaxAbs(s) < 1.0e-1:
-  #print "MaxAbs(s)1", MaxAbs(s)
-  s=s*(1.00/MaxAbs(s))
-   
+# if MaxAbs(s) > 1.0e-8:
+#  s=s*(1.00/MaxAbs(s)) 
+
  s=TruncateU.inverse(s)
  s=TruncateU.Sqrt(s)
  
@@ -199,10 +185,115 @@ def produce_projectives(theta,theta1,chi_dim):
 
  Rb.permute([6,7,8,1,2,20],3)
  V.transpose()
- U1x_trans=V*Rb
+ U1x_trans=Rb*V
  U1x_trans.permute([9,1,2,20],1)
-###############################################################
+
  return U1x, U1x_trans 
+
+
+
+
+
+
+
+
+
+
+
+
+#def produce_projectives(theta,theta1,chi_dim):
+# theta=copy.copy(theta)
+# theta1=copy.copy(theta1)
+# 
+# theta.setLabel([1,2,20,3,4,40])
+# theta.permute([1,2,20,3,4,40],3) 
+
+# 
+# U, s, V=TruncateU.svd_parity1(theta)
+
+
+# if MaxAbs(s) > 1.0e+7 or MaxAbs(s) < 1.0e-1:
+#  s=s*(1.00/MaxAbs(s))
+
+#  
+# U.setLabel([1,2,20,-1,-2,-3])
+# s.setLabel([-1,-2,-3,3,4,5])
+# R=U*s
+# R.permute([1,2,20,3,4,5],3)
+
+
+#################################################
+## R, q=TruncateU.lq_parity1(theta)
+## R.setLabel([1,2,20,3,4,5])
+################################################
+
+
+# theta1.setLabel([1,2,20,3,4,40])
+# theta1.permute([1,2,20,3,4,40],3) 
+
+# 
+# U, s, V=TruncateU.svd_parity1(theta1)
+
+# if MaxAbs(s) > 1.0e+7 or MaxAbs(s) < 1.0e-1:
+#  s=s*(1.00/MaxAbs(s))
+
+
+# U.setLabel([1,2,20,-1,-2,-3])
+# s.setLabel([-1,-2,-3,6,7,8])
+# Rb=U*s
+# Rb.permute([1,2,20,6,7,8],3)
+# Rb.permute([6,7,8,1,2,20],3)
+# 
+#################################################
+## Rb, q=TruncateU.lq_parity1(theta1)
+## Rb.setLabel([1,2,20,6,7,8])
+## Rb.permute([6,7,8,1,2,20],3)
+################################################
+# 
+# A=Rb*R
+# A.permute([6,7,8,3,4,5],3)
+
+# V, U, s=TruncateU.setTruncation(A, chi_dim) 
+
+## M_s=s.getBlock()
+## for i in xrange(int(M_s.row())):
+##  for j in xrange(int(M_s.col())):
+##   if i==j:
+##    print "1", M_s[i*int(M_s.col())+j]
+
+
+# U.setLabel([-1,3,4,5])
+# V.setLabel([6,7,8,-1])
+
+# if MaxAbs(s) > 1.0e+5 or MaxAbs(s) < 1.0e-2:
+#  #print "MaxAbs(s)1", MaxAbs(s)
+#  s=s*(1.00/MaxAbs(s))
+#   
+# s=TruncateU.inverse(s)
+# s=TruncateU.Sqrt(s)
+# 
+# s.setLabel([6,-1])
+# U=s*U
+# U.permute([6,3,4,5],1)
+
+# s.setLabel([-1,9])
+# V=V*s
+# V.permute([6,7,8,9],3) 
+
+
+# R.permute([1,2,20,3,4,5],3)
+# U.transpose()
+# U1x=R*U
+# U1x.permute([1,2,20,6],3)
+
+
+
+# Rb.permute([6,7,8,1,2,20],3)
+# V.transpose()
+# U1x_trans=V*Rb
+# U1x_trans.permute([9,1,2,20],1)
+################################################################
+# return U1x, U1x_trans 
 
 
 
@@ -352,6 +443,7 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  theta1.permute([  400, 200 ,-200, 100, 300, -300], 3)
 
  U2x, U2x_trans=produce_projectives(theta,theta1, chi_dim)
+ #print "norm2", U1x.norm() 
 
  
 # t0=time.time()
@@ -389,7 +481,6 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  CTM_3.putTensor('U2x_trans',U2x_trans)
  theta=CTM_3.launch() 
  theta.permute([100, 300, -300 , 400, 200 ,-200],3)
-
 # print time.time() - t0, "upup"
 
  
@@ -414,7 +505,6 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  CTM_4.putTensor('U2xb_trans',U2xb_trans)
  theta1=CTM_4.launch() 
  theta1.permute([100, 300, -300 , 400, 200 ,-200],3)
- #print "hi", Ta4.printDiagram(), Tb4p.printDiagram()
  
 
  U3x, U3x_trans=produce_projectives(theta,theta1, chi_dim)
@@ -470,15 +560,6 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  Ta4bar.permute([7,4,-4,6],1)
 #############################
 ###############################
- #print c1bar
- c1=norm_CTM(c1bar)
- c4=norm_CTM(c4bar)
- Ta4=norm_CTM(Ta4bar)
- Tb4=norm_CTM(Tb4bar)
-# c1=copy.copy(c1bar)
-# c4=copy.copy(c4bar)
- #Ta4=copy.copy(Ta4bar)
- #Tb4=copy.copy(Tb4bar)
 
  #################3################################
  c2.setLabel([0,1])
@@ -521,10 +602,11 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  Ta2=norm_CTM(Ta2bar)
  Tb2=norm_CTM(Tb2bar)
 
-# c3=copy.copy(c3bar)
-# c2=copy.copy(c2bar)
-# Ta2=copy.copy(Ta2bar)
-# Tb2=copy.copy(Tb2bar)
+ c1=norm_CTM(c1bar)
+ c4=norm_CTM(c4bar)
+ Ta4=norm_CTM(Ta4bar)
+ Tb4=norm_CTM(Tb4bar)
+
 
 
  return c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3
@@ -608,6 +690,22 @@ def  Env_energy_D1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,d_u,H
  E_ca=basicA.energy_ad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0,a_u,d_u)
 
  return E_ca
+
+def Env_energy_three(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,c_u,d_u,H0,D,d_phys):
+
+ E1, E2, E3, E4, E5, E6, E7, E8, a_u, b_u, c_u, d_u,a, b, c, d=basicC.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys,a_u, b_u,c_u,d_u)
+
+ E_cab=basicC.energy_cab(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,c_u,d_u, H0)
+ return E_cab
+
+
+def Env_energy_three1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_u,c_u,d_u,H0,D,d_phys):
+
+ E1, E2, E3, E4, E5, E6, E7, E8, a_u, b_u, c_u, d_u,a, b, c, d=basicC.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys,a_u, b_u,c_u,d_u)
+
+ E_abd=basicC.energy_abd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,c_u,d_u, H0)
+ return E_abd
+
 
 
 
