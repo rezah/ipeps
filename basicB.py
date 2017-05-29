@@ -59,6 +59,7 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_env,N_sv
 
  a_up, b_up =reproduce_ab(r_up, l_up, q_u, qq_u)
  a_up, b_up=equall_dis(a_up,b_up) 
+ a_up, b_up=equall_dis(a_up,b_up) 
 
  Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u,a_up,b_up)
  print "Dis_final", Dis_val
@@ -66,6 +67,11 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_env,N_sv
 
  a_up=basic.max_ten(a_up)
  b_up=basic.max_ten(b_up)
+
+ Maxa=basic.MaxAbs(a_up)
+ Maxb=basic.MaxAbs(b_up)
+ print Maxa, Maxb
+
 
  ap=basic.make_ab(a_up)
  bp=basic.make_ab(b_up)
@@ -123,6 +129,7 @@ def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_env,N_sv
 
  c_up,a_up = reproduce_ca(r_up, l_up, q_u, qq_u)
  c_up, a_up=equall_dis_1(c_up,a_up) 
+ c_up, a_up=equall_dis_1(c_up,a_up) 
  
  Dis_val=Dis_f_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u,c_up,a_up)
  print "Dis_final", Dis_val
@@ -130,6 +137,10 @@ def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_env,N_sv
 
  c_up=basic.max_ten(c_up)
  a_up=basic.max_ten(a_up)
+
+ Maxa=basic.MaxAbs(a_up)
+ Maxc=basic.MaxAbs(c_up)
+ print Maxa, Maxc
 
  
  cp=basic.make_ab(c_up)
@@ -208,8 +219,8 @@ def produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phy
   a.setLabel([16,-16,17,-17,18,-18,2,-2])
   d.setLabel([19,-19,10,-10,8,-8,20,-20])
   Norm=(((((E1*E8)*(a))*((E7*E6)*(c))))*(((E2*E3)*(b))))*((E4*E5)*d)
- 
- print "Final_Norm", Norm[0]
+  #print Norm[0]
+ #print "Final_Norm", Norm[0]
 
  return E1, E2, E3, E4, E5, E6, E7, E8
 
@@ -222,7 +233,7 @@ def checking_norm(E1, E2, E3, E4, E5, E6, E7, E8,a, b, c, d):
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
  Norm=(((((E1*E8)*(a))*((E7*E6)*(c))))*(((E2*E3)*(b))))*((E4*E5)*d)
  if Norm[0] < 0: E1=-1.0*E1;
- if Norm[0] < 1.0e-4:
+ if Norm[0] < 1.0e-2:
   #print "Norm[0] < 1.0e+1 ", Norm[0]
   E1*=1.5
   E8*=1.5
@@ -779,7 +790,7 @@ def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U,N_svd):
  for q in xrange(N_svd[0]):
   #print "\n", "\n"
   Distance_val=Dis_fQR(N_u, l_u, r_u, l_up, r_up, U)
-  print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
+  print 'Dis0', Distance_val, abs(Res1-Res) / abs(Res), q
   r_up=optimum_0(N_u, l_u, r_u, l_up, r_up, U)
   l_up=optimum_1(N_u, l_u, r_u, l_up, r_up, U)
 
@@ -827,7 +838,7 @@ def Do_optimization_Full_1(N_u, l_u, r_u, l_up, r_up, U,N_svd):
  for q in xrange(N_svd[0]):
   #print "\n", "\n"
   Distance_val=Dis_fQR_1(N_u, l_u, r_u, l_up, r_up, U)
-  print 'Dis', Distance_val, abs(Res1-Res) / abs(Res), q
+  print 'Dis1', Distance_val, abs(Res1-Res) / abs(Res), q
   r_up=optimum_00(N_u, l_u, r_u, l_up, r_up, U)
   l_up=optimum_11(N_u, l_u, r_u, l_up, r_up, U)
 
@@ -1809,12 +1820,13 @@ def inverse(Landa2):
  for qnum in blk_qnums:
   D=int(Landa2.getBlock(qnum).row())
   D1=int(Landa2.getBlock(qnum).col())
-  invL2 = uni10.Matrix(D, D1)
-  invLt = uni10.Matrix(D, D1)
-  invLt=Landa2.getBlock(qnum)
+  invL2 = uni10.Matrix(D, D1,True)
+  invLt = uni10.Matrix(D, D1,True)
+  invLt=Landa2.getBlock(qnum,True)
+  #print invLt[0], invLt[1], invLt[2], invLt[3]
   for i in xrange(D):
-    for j in xrange(D1):
-     invL2[i*D1+j] = 0 if ((invLt[i*D1+j].real) < 1.0e-12) else (1.00 / (invLt[i*D1+j].real))
+      invL2[i] = 0 if ((invLt[i].real) < 1.0e-9) else (1.00 / (invLt[i].real))
+
   invLanda2.putBlock(qnum,invL2)
  return invLanda2
 
@@ -1841,14 +1853,14 @@ def   Sqrt(Landa):
   blk_qnums=Landa.blockQnum()
   for qnum in blk_qnums:
    D=int(Landa_cp.getBlock(qnum).col())
-   Landa_cpm=Landa_cp.getBlock(qnum)
-   Landam=Landa_cp.getBlock(qnum)
+   Landa_cpm=Landa_cp.getBlock(qnum,True)
+   Landam=Landa_cp.getBlock(qnum,True)
+   #print Landa_cpm[0], Landa_cpm[1], Landa_cpm[2], Landa_cpm[3]
    for i in xrange(D):
-    for j in xrange(D):
-     if Landam[i*D+j] > 1.0e-12:
-      Landa_cpm[i*D+j]=Landam[i*D+j]**(1.00/2.00)
-     else:
-      Landa_cpm[i*D+j]=0
+      if Landam[i] > 1.0e-12:
+       Landa_cpm[i]=Landam[i]**(1.00/2.00)
+      else:
+       Landa_cpm[i]=0
    Landa_cp.putBlock(qnum,Landa_cpm)
   return Landa_cp 
 

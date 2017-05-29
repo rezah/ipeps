@@ -2,6 +2,7 @@ import pyUni10 as uni10
 #import matplotlib.pyplot as plt
 #import matplotlib
 #import pylab
+import math
 import copy
 import time
 import Move
@@ -10,86 +11,163 @@ import MoveFull
 import basicA
 import basicB
 import basicC
+import numpy as np
+from numpy import linalg as LA
 
 
-def full_make_bond():
+def Short_TrotterSteps(N_iterF):
+ List_delN=[]
+
+ Delta_N=(0.5, N_iterF)
+ List_delN.append(Delta_N)
+
+ Delta_N=(0.095, N_iterF)
+ List_delN.append(Delta_N)
+
+ Delta_N=(0.09, N_iterF)
+ List_delN.append(Delta_N)
+
+ Delta_N=(0.085, N_iterF)
+ List_delN.append(Delta_N)
+
+ Delta_N=(0.08, N_iterF)
+ List_delN.append(Delta_N)
+
+ Delta_N=(0.07, N_iterF)
+ List_delN.append(Delta_N)
+
+ Delta_N=(0.06, N_iterF)
+ List_delN.append(Delta_N)
+
+ Delta_N=(0.05, N_iterF)
+ List_delN.append(Delta_N)
+
+
+ Delta_N=(0.04, N_iterF)
+ List_delN.append(Delta_N)
+
+
+ Delta_N=(0.03, N_iterF)
+ List_delN.append(Delta_N)
+
+
+ Delta_N=(0.02, N_iterF)
+ List_delN.append(Delta_N)
+
+
+
+ Delta_N=(0.01, N_iterF)
+ List_delN.append(Delta_N)
+
+
+ Delta_N=(0.009, N_iterF)
+ List_delN.append(Delta_N)
+
+
+# for i in xrange(5, 1, -1):
+#  Delta_N=(i*(1.0/10),N_iterF)
+#  List_delN.append(Delta_N)
+
+# for i in xrange(10, 1, -1):
+#  Delta_N=(i*(1.0/100),N_iterF)
+#  List_delN.append(Delta_N)
+
+
+# for i in xrange(5, 5, -1):
+#  Delta_N=(i*(1.0/100),N_iterF)
+#  List_delN.append(Delta_N)
+
+# for i in xrange(10, 1, -1):
+#  Delta_N=(i*(1.0/1000),N_iterF)
+#  List_delN.append(Delta_N)
+
+# for i in xrange(10, 0, -1):
+#  Delta_N=(i*(1.0/10000),N_iterF)
+#  List_delN.append(Delta_N)
+
+ return List_delN
+
+
+def full_make_bond(Model, D, chi, d_phys):
  ######################### No-symmetry #############################################
-
- #q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
- #q_list=[q0_even]
- #qchi_list=[q0_even]
- #q_phys=[q0_even]*d_phys[0]
+ if Model is "Heisenberg":
+  q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+  q_list=[q0_even]
+  qchi_list=[q0_even]
+  q_phys=[q0_even]*d_phys[0]
 
  ###################### Z(2) ######################################
-
- #q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
- #q0_odd = uni10.Qnum(0,uni10.PRT_ODD);
- #q_list=[q0_even,q0_odd]
- #qchi_list=[q0_even,q0_odd]
- ##q_phys=[q0_even,q0_even,q0_even,q0_even,q0_odd,q0_odd,q0_odd,q0_odd]
- #q_phys=[q0_even,q0_odd]
+ if Model is "Heisenberg_Z2":
+  q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+  q0_odd = uni10.Qnum(0,uni10.PRT_ODD);
+  q_list=[q0_even,q0_odd]
+  qchi_list=[q0_even,q0_odd]
+  #q_phys=[q0_even,q0_even,q0_even,q0_even,q0_odd,q0_odd,q0_odd,q0_odd]
+  q_phys=[q0_even,q0_odd]
 
  ##########################  U(1)  ################################
+ if Model is "Heisenberg_U1":
+  q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+  q1_even = uni10.Qnum(1,uni10.PRT_EVEN);
+  q2_even = uni10.Qnum(2,uni10.PRT_EVEN);
+  q3_even = uni10.Qnum(3,uni10.PRT_EVEN);
+  q4_even = uni10.Qnum(4,uni10.PRT_EVEN);
+  q5_even = uni10.Qnum(5,uni10.PRT_EVEN);
 
- q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
- q1_even = uni10.Qnum(1,uni10.PRT_EVEN);
- q2_even = uni10.Qnum(2,uni10.PRT_EVEN);
- q3_even = uni10.Qnum(3,uni10.PRT_EVEN);
- q4_even = uni10.Qnum(4,uni10.PRT_EVEN);
- q5_even = uni10.Qnum(5,uni10.PRT_EVEN);
+  q_1_even = uni10.Qnum(-1,uni10.PRT_EVEN);
+  q_2_even = uni10.Qnum(-2,uni10.PRT_EVEN);
+  q_3_even = uni10.Qnum(-3,uni10.PRT_EVEN);
+  q_4_even = uni10.Qnum(-4,uni10.PRT_EVEN);
+  q_5_even = uni10.Qnum(-5,uni10.PRT_EVEN);
 
- q_1_even = uni10.Qnum(-1,uni10.PRT_EVEN);
- q_2_even = uni10.Qnum(-2,uni10.PRT_EVEN);
- q_3_even = uni10.Qnum(-3,uni10.PRT_EVEN);
- q_4_even = uni10.Qnum(-4,uni10.PRT_EVEN);
- q_5_even = uni10.Qnum(-5,uni10.PRT_EVEN);
+  #qchi_list=[q_2_even,q_1_even,q0_even,q1_even,q2_even]
+  #qchi_list=[q_2_even,q_1_even,q0_even,q1_even,q2_even]
+  #qchi_list=[q_3_even,q_2_even,q_1_even,q0_even,q1_even,q2_even,q3_even]
+  #qchi_list=[q_1_even,q0_even,q1_even]
+  #qchi_list=[q_4_even,q_3_even,q_2_even,q_1_even,q0_even,q1_even,q2_even,q3_even,q4_even]
+  qchi_list=[q_5_even,q_4_even,q_3_even,q_2_even,q_1_even,q0_even,q1_even,q2_even,q3_even,q4_even,q5_even]
+  #qchi_list=[q_1_even,q1_even]
 
- #qchi_list=[q_2_even,q_1_even,q0_even,q1_even,q2_even]
- qchi_list=[q_2_even,q_1_even,q0_even,q1_even,q2_even]
- #qchi_list=[q_3_even,q_2_even,q_1_even,q0_even,q1_even,q2_even,q3_even]
- #qchi_list=[q_1_even,q0_even,q1_even]
- #qchi_list=[q_4_even,q_3_even,q_2_even,q_1_even,q0_even,q1_even,q2_even,q3_even,q4_even]
- #qchi_list=[q_5_even,q_4_even,q_3_even,q_2_even,q_1_even,q0_even,q1_even,q2_even,q3_even,q4_even,q5_even]
- #qchi_list=[q_1_even,q1_even]
+  q_list=[q_1_even,q0_even,q1_even]
+  #q_list=[q_1_even,q0_even,q1_even,q2_even]
+  #q_list=[q_1_even,q0_even]
+  #q_list=[q_2_even,q_1_even,q0_even,q1_even, q2_even]
+  #q_list=[q_3_even,q_2_even,q_1_even,q0_even,q1_even, q2_even,q3_even]
+  #q_list=[q_1_even,q1_even]
 
- q_list=[q_1_even,q0_even,q1_even]
- #q_list=[q_1_even,q0_even]
- #q_list=[q_2_even,q_1_even,q0_even,q1_even, q2_even]
- #q_list=[q_3_even,q_2_even,q_1_even,q0_even,q1_even, q2_even,q3_even]
- #q_list=[q_1_even,q1_even]
-
- q_phys=[q_1_even,q1_even]
+  q_phys=[q_1_even,q1_even]
 
  ##########################  Z2*U(1)  ################################
- #q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
- #q1_even = uni10.Qnum(1,uni10.PRT_EVEN);
- #q2_even = uni10.Qnum(2,uni10.PRT_EVEN);
- #q3_even = uni10.Qnum(3,uni10.PRT_EVEN);
- #q4_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ if Model is "Heisenberg_U1Z2":
+  q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+  q1_even = uni10.Qnum(1,uni10.PRT_EVEN);
+  q2_even = uni10.Qnum(2,uni10.PRT_EVEN);
+  q3_even = uni10.Qnum(3,uni10.PRT_EVEN);
+  q4_even = uni10.Qnum(4,uni10.PRT_EVEN);
 
- #q_1_even = uni10.Qnum(-1,uni10.PRT_EVEN);
- #q_2_even = uni10.Qnum(-2,uni10.PRT_EVEN);
- #q_3_even = uni10.Qnum(-3,uni10.PRT_EVEN);
- #q_4_even = uni10.Qnum(-4,uni10.PRT_EVEN);
+  q_1_even = uni10.Qnum(-1,uni10.PRT_EVEN);
+  q_2_even = uni10.Qnum(-2,uni10.PRT_EVEN);
+  q_3_even = uni10.Qnum(-3,uni10.PRT_EVEN);
+  q_4_even = uni10.Qnum(-4,uni10.PRT_EVEN);
 
 
- #q0_odd = uni10.Qnum(0,uni10.PRT_ODD);
- #q1_odd = uni10.Qnum(1,uni10.PRT_ODD);
- #q2_odd = uni10.Qnum(2,uni10.PRT_ODD);
- #q3_odd = uni10.Qnum(3,uni10.PRT_ODD);
- #q4_odd = uni10.Qnum(4,uni10.PRT_ODD);
+  q0_odd = uni10.Qnum(0,uni10.PRT_ODD);
+  q1_odd = uni10.Qnum(1,uni10.PRT_ODD);
+  q2_odd = uni10.Qnum(2,uni10.PRT_ODD);
+  q3_odd = uni10.Qnum(3,uni10.PRT_ODD);
+  q4_odd = uni10.Qnum(4,uni10.PRT_ODD);
 
- #q_1_odd = uni10.Qnum(-1,uni10.PRT_ODD);
- #q_2_odd = uni10.Qnum(-2,uni10.PRT_ODD);
- #q_3_odd = uni10.Qnum(-3,uni10.PRT_ODD);
- #q_4_odd = uni10.Qnum(-4,uni10.PRT_ODD);
+  q_1_odd = uni10.Qnum(-1,uni10.PRT_ODD);
+  q_2_odd = uni10.Qnum(-2,uni10.PRT_ODD);
+  q_3_odd = uni10.Qnum(-3,uni10.PRT_ODD);
+  q_4_odd = uni10.Qnum(-4,uni10.PRT_ODD);
 
- #qchi_list=[q_1_even,q_1_odd,q0_even,q0_odd,q1_even,q1_odd]
- #q_list=[q_1_even,q_1_odd,q0_even,q0_odd,q1_even,q1_odd]
- #q_phys=[q_1_odd,q1_even]
+  qchi_list=[q_1_even,q_1_odd,q0_even,q0_odd,q1_even,q1_odd]
+  q_list=[q_1_even,q_1_odd,q0_even,q0_odd,q1_even,q1_odd]
+  q_phys=[q_1_odd,q1_even]
  #############################################################################
 
- q_D, q_chi=basic.make_bond(D, q_list, chi, qchi_list)
+ q_D, q_chi=make_bond(D, q_list, chi, qchi_list)
  return q_D, q_chi, q_phys
 
 
@@ -104,16 +182,6 @@ def make_bond(D, q_list, chi, qchi_list):
   for q in xrange(chi[i]):
    q_chi.append(qchi_list[i])
  return  q_D, q_chi
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -139,6 +207,73 @@ def produce_GammaLanda(q_D, q_phys):
  
  return Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8
 
+
+def produce_GammaLanda_manual(q_D, q_phys):
+ q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+ q1_even = uni10.Qnum(1,uni10.PRT_EVEN);
+ q2_even = uni10.Qnum(2,uni10.PRT_EVEN);
+ q3_even = uni10.Qnum(3,uni10.PRT_EVEN);
+ q4_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ q5_even = uni10.Qnum(5,uni10.PRT_EVEN);
+ q6_even = uni10.Qnum(6,uni10.PRT_EVEN);
+ q6_even = uni10.Qnum(7,uni10.PRT_EVEN);
+
+ q_1_even = uni10.Qnum(-1,uni10.PRT_EVEN);
+ q_2_even = uni10.Qnum(-2,uni10.PRT_EVEN);
+ q_3_even = uni10.Qnum(-3,uni10.PRT_EVEN);
+ q_4_even = uni10.Qnum(-4,uni10.PRT_EVEN);
+ q_5_even = uni10.Qnum(-5,uni10.PRT_EVEN);
+ q_6_even = uni10.Qnum(-6,uni10.PRT_EVEN);
+ q_7_even = uni10.Qnum(-7,uni10.PRT_EVEN);
+
+
+# q_D=[q_2_even, q_2_even, q0_even, q0_even, q2_even, q2_even, q4_even]
+# q_DD=[ q_2_even, q0_even, q0_even, q2_even, q2_even, q4_even,q4_even]
+
+# q_D1=[q_3_even, q_1_even, q_1_even, q1_even, q1_even, q3_even, q3_even]
+# q_DD1=[q_3_even,q_3_even, q_1_even, q_1_even, q1_even, q1_even, q3_even]
+
+
+ q_D=[q_2_even, q_2_even, q0_even, q0_even, q2_even, q2_even, q4_even,q4_even]
+ q_DD=[ q_2_even,q_2_even, q0_even, q0_even, q2_even, q2_even, q4_even,q4_even]
+
+ q_D1=[q_3_even,q_3_even, q_1_even, q_1_even, q1_even, q1_even, q3_even, q3_even]
+ q_DD1=[q_3_even,q_3_even, q_1_even, q_1_even, q1_even, q1_even, q3_even,q3_even]
+
+
+
+ q_phys=[q_1_even, q1_even]
+
+ bdi = uni10.Bond(uni10.BD_IN, q_D)
+ bdo = uni10.Bond(uni10.BD_OUT, q_D)
+ bdii = uni10.Bond(uni10.BD_IN, q_DD)
+ bdoo = uni10.Bond(uni10.BD_OUT, q_DD)
+
+ bdi1 = uni10.Bond(uni10.BD_IN, q_D1)
+ bdo1 = uni10.Bond(uni10.BD_OUT, q_D1)
+ bdii1 = uni10.Bond(uni10.BD_IN, q_DD1)
+ bdoo1 = uni10.Bond(uni10.BD_OUT, q_DD1)
+
+ bdi_pys = uni10.Bond(uni10.BD_IN, q_phys)
+
+ Gamma_a=uni10.UniTensor([bdi_pys,bdi,bdi,bdo1,bdoo], "Gamma_a")
+ Gamma_b=uni10.UniTensor([bdi_pys,bdi1,bdii,bdo,bdo], "Gamma_b")
+ Gamma_c=uni10.UniTensor([bdi_pys,bdii,bdii,bdoo1,bdo], "Gamma_c")
+ Gamma_d=uni10.UniTensor([bdi_pys,bdii1,bdi,bdoo,bdoo], "Gamma_d")
+
+ Landa_1=uni10.UniTensor([bdi1,bdo1],"Landa_1")
+ Landa_2=uni10.UniTensor([bdi,bdo],"Landa_2")
+ Landa_3=uni10.UniTensor([bdi,bdo],"Landa_3")
+ Landa_4=uni10.UniTensor([bdii,bdoo],"Landa_4")
+ Landa_5=uni10.UniTensor([bdii,bdoo],"Landa_5")
+ Landa_6=uni10.UniTensor([bdii1,bdoo1],"Landa_6")
+ Landa_7=uni10.UniTensor([bdii,bdoo],"Landa_7")
+ Landa_8=uni10.UniTensor([bdi,bdo],"Landa_8")
+ 
+ return Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8
+
+
+
 def produce_env_init(q_chi,q_D):
  c1, c2,c3,c4=makec1(q_chi,q_D)
  Ta1, Tb1=makeTab(q_chi,q_D)
@@ -161,19 +296,21 @@ def produce_abcd_gamma(Landa, Gamma_a,Gamma_b,Gamma_c,Gamma_d):
  d_u,d=makeab(Landa1,Gamma_d)
  return a_u,b_u,c_u,d_u,a,b,c,d
 
+def produce_gamma_abcd(a_u,b_u,c_u,d_u,Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa):
+ Gamma_a=copy.copy(a_u)
+ Gamma_b=copy.copy(b_u)
+ Gamma_c=copy.copy(c_u)
+ Gamma_d=copy.copy(d_u)
+ 
+ for i in xrange(len(Landa)):
+  Landa[i].identity()
+  blk_qnums = Landa[i].blockQnum()
+  for qnum in blk_qnums:
+    M=Landa[i].getBlock(qnum)
+    M.identity()
+    Landa[i].putBlock(qnum,M)
 
-
-
-
-
-
-
-
-
-
-
-
-
+ return Gamma_a,Gamma_b,Gamma_c,Gamma_d
 
 
 def Initialize_function(Gamma,Landa):
@@ -182,6 +319,7 @@ def Initialize_function(Gamma,Landa):
  #Gamma[0].randomize()
  for i in xrange(len(Gamma)):
   Gamma[i].randomize()
+  Gamma[i].orthoRand()
   Gamma[i]=Gamma[i]*(1.00/MaxAbs(Gamma[i]))
   
  for i in xrange(len(Landa)):
@@ -192,11 +330,14 @@ def Initialize_function(Gamma,Landa):
     if qnum == q0_even:
      #M[0]=1.100
      M.randomize()
+     #M.orthoRand()
+     #M=M*M
      #M.identity()
      #print "M0", M
     else: 
      #M[0]=0.01
      M.randomize()
+     #M.orthoRand()
      #M.identity()
 
     Landa[i].putBlock(qnum,M)
@@ -830,6 +971,7 @@ def corner_transfer_matrix_twosite_CTMRG(a_u,b_u,c_u,d_u,a,b,c,d,chi,c1, c2,c3,c
 
   MoveCorboz.permuteN1(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
+  c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4=MoveCorboz.equall_norm(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
 
   
   norm=MoveCorboz.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
@@ -870,7 +1012,7 @@ def corner_transfer_matrix_twosite_CTMRG(a_u,b_u,c_u,d_u,a,b,c,d,chi,c1, c2,c3,c
  #print 'CTM', norm
  return c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4
 
-
+#@profile 
 def corner_transfer_matrix_twosite_CTMFull(a_u,b_u,c_u,d_u,a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,H0,d_phys,direct_env,N_env):
  z1=copy.copy(a)
  z1.identity()
@@ -899,6 +1041,7 @@ def corner_transfer_matrix_twosite_CTMFull(a_u,b_u,c_u,d_u,a,b,c,d,chi,c1, c2,c3
 
   MoveFull.permuteN1(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
+  c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4=MoveFull.equall_norm(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
   
   norm=MoveFull.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
 #  norm1=MoveFull.magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,z1,b,c,d)
@@ -1269,98 +1412,1580 @@ def Energy_abd(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,N_
 
 def M_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model):
 
- iden = uni10.Matrix(2,2, [1, 0, 0, 1])
- sx = matSx()
- sy = matSy()
- sz = matSz()
 
- ident=uni10.otimes(iden,iden)
- identt=uni10.otimes(ident,iden)
-
- szttt=uni10.otimes(ident,sz)
- sxttt=uni10.otimes(ident,sx)
- syttt=uni10.otimes(ident,sy)
- 
- szt=uni10.otimes(sz,ident)
- sxt=uni10.otimes(sx,ident)
- syt=uni10.otimes(sy,ident)
-
- szt0=uni10.otimes(iden,sz)
- sxt0=uni10.otimes(iden,sx)
- syt0=uni10.otimes(iden,sy)
-
- sztt=uni10.otimes(szt0,iden)
- sxtt=uni10.otimes(sxt0,iden)
- sytt=uni10.otimes(syt0,iden)
-
-
- H0 =uni10.otimes(szt,identt)+uni10.otimes(sxt,identt)+uni10.otimes(syt,identt)
-
- H0 =H0 + -1.*(uni10.otimes(sztt,identt)+uni10.otimes(sxtt,identt)+uni10.otimes(sytt,identt))
-
- H0 =H0 + uni10.otimes(szttt,identt)+uni10.otimes(sxttt,identt)+uni10.otimes(syttt,identt)
-
- H0 =H0 + -1.*(uni10.otimes(identt,szt)+uni10.otimes(identt,sxt)+uni10.otimes(identt,syt))
-
- H0 =H0 + uni10.otimes(identt,sztt)+uni10.otimes(identt,sxtt)+uni10.otimes(identt,sytt)
-
- H0 =H0 + -1.*(uni10.otimes(identt,szttt)+uni10.otimes(identt,sxttt)+uni10.otimes(identt,syttt))
-
- H0*=(1./6.)
-
- dim = int(8)
- bdi = uni10.Bond(uni10.BD_IN, dim);
- bdo = uni10.Bond(uni10.BD_OUT, dim);
- H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg");
- H.putBlock(H0)
-
-
- H0=copy.copy(H)
- H00=copy.copy(H)
-
-##############################################################################
- E_ab=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H0)
- print E_ab 
- E_ba=M_h(b_u,a_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model,H0)
- print E_ba
- E_cd=M_h(c_u,d_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model,H0)
- print E_cd
- E_dc=M_h(d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model,H0)
- print E_dc
- E_bd=M_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model,H00)
- print E_bd
- E_ca=M_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H00)
- print E_ca
- E_db=M_v(d_u,b_u,b,a,d,c,Env2,D,h,d_phys,chi,Corner_method,Model,H00)
- print E_db
- E_ac=M_v(a_u,c_u,c,d,a,b,Env1,D,h,d_phys,chi,Corner_method,Model,H00)
- print E_ac 
- return ((abs(E_ca)+abs(E_ac)+abs(E_db)+abs(E_bd)) / 8.00) + ((abs(E_ab)+abs(E_ba)+abs(E_cd)+abs(E_dc)) / 8.00)#+((E_val1+E_val2
-###############################################################################
+ if Model is "Heisenberg":
+  bdi = uni10.Bond(uni10.BD_IN, d_phys)
+  bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  sz = matSz()
+  sx = matSx()
+  sy = matSy()
+  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  szt=uni10.otimes(sz,iden)
+  szt1=uni10.otimes(iden,sz)
+  H=szt
+  H1=szt1
+  E_1=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
+  E_2=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H1)
+  E_3=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
+  E_4=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H1)
+  E_z=((abs(E_1)+abs(E_2)+abs(E_3)+abs(E_4)) / 8.00)
+  szt=uni10.otimes(sx,iden)
+  szt1=uni10.otimes(iden,sx)
+  H=szt
+  H1=szt1
+  E_1=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
+  E_2=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H1)
+  E_3=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
+  E_4=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H1)
+  E_x=((abs(E_1)+abs(E_2)+abs(E_3)+abs(E_4)) / 8.00)
+  szt=uni10.otimes(sy,iden)
+  szt1=uni10.otimes(iden,sy)
+  H=szt
+  H1=szt1
+  E_1=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
+  E_2=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H1)
+  E_3=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
+  E_4=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H1)
+  E_y=((abs(E_1)+abs(E_2)+abs(E_3)+abs(E_4)) / 8.00)
+  return (E_x+E_y+E_z) 
+ if Model is "Heisenberg_Z2":
+  #print d_phys
+  bdi = uni10.Bond(uni10.BD_IN, d_phys)
+  bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  sz = matSz()
+  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  szt=uni10.otimes(sz,iden)
+  H.setRawElem(szt)
+  szt1=uni10.otimes(iden,sz)
+  H1.setRawElem(szt1)
+  print szt,H,szt1,H1
+  E_1=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
+  print E_1/2.0
+  E_2=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H1)
+  print E_2/2.0
+  E_3=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
+  print E_3/2.0
+  E_4=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H1)
+  print E_4/2.0
+  return ((abs(E_1)+abs(E_2)+abs(E_3)+abs(E_4)) / 8.00)
+ if Model is "Heisenberg_U1":
+  #print d_phys
+  bdi = uni10.Bond(uni10.BD_IN, d_phys)
+  bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  sz = matSz()
+  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  szt=uni10.otimes(sz,iden)
+  H.setRawElem(szt)
+  szt1=uni10.otimes(iden,sz)
+  H1.setRawElem(szt1)
+  #print szt,H,szt1,H1
+  E_1=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
+  print E_1/2.0
+  E_2=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H1)
+  print E_2/2.0
+  E_3=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
+  print E_3/2.0
+  E_4=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H1)
+  print E_4/2.0
+  return ((abs(E_1)+abs(E_2)+abs(E_3)+abs(E_4)) / 8.00)
+ if Model is "Heisenberg_U1Z2":
+  H0=Heisenberg0_U1Z2(h[0],h[1],d_phys)
+  H00=Heisenberg0_U1Z2(h[0],h[1],d_phys)
+  H1=Heisenberg1_U1(h[2],d_phys)
 
 
 
 def M_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H00):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
- 
  E1, E2, E3, E4, E5, E6, E7, E8=basicB.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
-
  E_ca=basicB.Energy_ca(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H00,c_u,a_u)
- 
  return E_ca
-
-
 
 
 def M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H0):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
-
  E1, E2, E3, E4, E5, E6, E7, E8=basicB.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
-
  E_ab=basicB.Energy_ab(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0,a_u,b_u)
  return E_ab
+
+#@profile
+def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,distance_final,fileCorr,fileCorrLength):
+
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+
+ if Model is "Heisenberg":
+  bdi = uni10.Bond(uni10.BD_IN, d_phys)
+  bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+  HH = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  sz = matSz()
+  sx = matSx()
+  sy = matSy()
+  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  HH=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)(-1.0)*uni10.otimes(sy,sy)
+  H=uni10.otimes(sz,iden)+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
+  H1=uni10.otimes(iden,sz)+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
+  HH.setLabel([-10,-20,10,20])
+  H.setLabel([-10,-20,10,20])
+  H1.setLabel([-10,-20,10,20])
+  Iden.setLabel([-10,-20,10,20])
+
+ if Model is "Heisenberg_Z2":
+  #print d_phys
+  bdi = uni10.Bond(uni10.BD_IN, d_phys)
+  bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  sz = matSz()
+  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  szt=uni10.otimes(sz,iden)
+  H.setRawElem(szt)
+  szt1=uni10.otimes(iden,sz)
+  H1.setRawElem(szt1)
+  HH.setLabel([-10,-20,10,20])
+  H.setLabel([-10,-20,10,20])
+  H1.setLabel([-10,-20,10,20])
+  Iden.setLabel([-10,-20,10,20])
+ if Model is "Heisenberg_U1":
+  bdi = uni10.Bond(uni10.BD_IN, d_phys)
+  bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+  HH = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  sz = matSz()
+  sx = matSx()
+  sy = matSy()
+  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  HH_tem=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy)
+  H_tem=uni10.otimes(sz,iden)#+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
+  H1_tem=uni10.otimes(iden,sz)#+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
+  HH.setRawElem(HH_tem)
+  H.setRawElem(H_tem)
+  H1.setRawElem(H1_tem)
+  Iden=copy.copy(H)
+  Iden.identity()
+  #print HH_tem, HH, H_tem, H, H1_tem, H1
+  HH.setLabel([-10,-20,10,20])
+  H.setLabel([-10,-20,10,20])
+  H1.setLabel([-10,-20,10,20])
+  Iden.setLabel([-10,-20,10,20])
+
+ vec_left=make_vleft(Tb4,Ta4,c1,c4)
+ vec_right=make_vright(Ta2,Tb2,c2,c3)
+ ap=make_ap_openindex(a_u)
+ bp=make_ap_openindex(b_u)
+ cp=make_ap_openindex(c_u)
+ dp=make_ap_openindex(d_u)
+ dis_val_list=[]
+ Corr_val_list=[]
+ dis_val_list1=[]
+ Corr_val_list1=[]
+ dis_val_list2=[]
+ Corr_val_list2=[]
+ dis_val_list3=[]
+ Corr_val_list3=[]
+ vec_right_copy=copy.copy(vec_right)
+ Corr_length=ED_right(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,vec_right_copy)
+ print "Corr_length",Corr_length
+ fileCorrLength.write(str(Corr_length)  + "\n")
+ fileCorrLength.flush()
+
+
+
+ print "\n"
+#######################a-a#####################################################
+
+ vec_left_1=Make_first_vecleft_a(vec_left, Ta1, Ta3,Tb1,Tb3,ap,b,c,d)
+ vec_right_1=Make_first_vecright_a(vec_right, Ta1, Ta3,Tb1,Tb3,ap,b,c,d)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,2)
+ dis_val_list.append(2)
+ Corr_val_list.append(Corr_val) 
+
+ dis_val=2
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list.append(dis_val)
+  Corr_val_list.append(Corr_val) 
+###################################################################################
+
+ print "\n"
+#######################b-b#####################################################
+
+ vec_left_1=Make_first_vecleft_b(vec_left, Ta1, Ta3,Tb1,Tb3,a,bp,c,d)
+ vec_right_1=Make_first_vecright_b(vec_right, Ta1, Ta3,Tb1,Tb3,a,bp,c,d)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,2)
+ dis_val_list1.append(2)
+ Corr_val_list1.append(Corr_val)
+
+ dis_val=2
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list1.append(dis_val)
+  Corr_val_list1.append(Corr_val) 
+###################################################################################
+
+
+ print "\n"
+#######################c-c#####################################################
+
+ vec_left_1=Make_first_vecleft_c(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,cp,d)
+ vec_right_1=Make_first_vecright_c(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,cp,d)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,2)
+ dis_val_list2.append(2)
+ Corr_val_list2.append(Corr_val)
+
+ dis_val=2
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list2.append(dis_val)
+  Corr_val_list2.append(Corr_val) 
+###################################################################################
+
+ print "\n"
+#######################d-d#####################################################
+
+ vec_left_1=Make_first_vecleft_d(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,c,dp)
+ vec_right_1=Make_first_vecright_d(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,c,dp)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,2)
+ dis_val_list3.append(2)
+ Corr_val_list3.append(Corr_val)
+
+ dis_val=2
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list3.append(dis_val)
+  Corr_val_list3.append(Corr_val) 
+###################################################################################
+
+############################################################################################################
+
+
+ dis_val_listo=[]
+ Corr_val_listo=[]
+ dis_val_list1o=[]
+ Corr_val_list1o=[]
+ dis_val_list2o=[]
+ Corr_val_list2o=[]
+ dis_val_list3o=[]
+ Corr_val_list3o=[]
+
+ print "\n"
+
+######################a-bo#####################################################
+
+ vec_left_1=Make_first_vecleft_a(vec_left, Ta1, Ta3,Tb1,Tb3,ap,b,c,d)
+ vec_right_1=Make_first_vecright_b(vec_right, Ta1, Ta3,Tb1,Tb3,a,bp,c,d)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,3)
+ dis_val_listo.append(3)
+ Corr_val_listo.append(Corr_val) 
+
+ dis_val=3
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_listo.append(dis_val)
+  Corr_val_listo.append(Corr_val) 
+##################################################################################
+
+
+ print "\n"
+
+######################b-ao#####################################################
+
+ vec_left_1=Make_first_vecleft_b(vec_left, Ta1, Ta3,Tb1,Tb3,a,bp,c,d)
+ vec_right_1=Make_first_vecright_a(vec_right, Ta1, Ta3,Tb1,Tb3,ap,b,c,d)
+
+ #Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,1)
+ #dis_val_list1.append(2)
+ #Corr_val_list1.append(Corr_val)
+
+ dis_val=1
+ for i in xrange(distance_final+1):
+  dis_val+=2
+  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list1o.append(dis_val)
+  Corr_val_list1o.append(Corr_val) 
+##################################################################################
+
+
+ print "\n"
+
+#######################c-do#####################################################
+
+ vec_left_1=Make_first_vecleft_c(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,cp,d)
+ vec_right_1=Make_first_vecright_d(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,c,dp)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,3)
+ dis_val_list2o.append(3)
+ Corr_val_list2o.append(Corr_val)
+
+ dis_val=3
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list2o.append(dis_val)
+  Corr_val_list2o.append(Corr_val) 
+###################################################################################
+
+ print "\n"
+
+#######################d-co#####################################################
+
+ vec_left_1=Make_first_vecleft_d(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,c,dp)
+ vec_right_1=Make_first_vecright_c(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,cp,d)
+
+# Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,2)
+# dis_val_list3.append(2)
+# Corr_val_list3.append(Corr_val)
+
+ dis_val=1
+ for i in xrange(distance_final+1):
+  dis_val+=2
+  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list3o.append(dis_val)
+  Corr_val_list3o.append(Corr_val) 
+###################################################################################
+
+
+ print dis_val_list,'\n,\n'
+ print Corr_val_list,'\n,\n'
+ print Corr_val_list1,'\n,\n'
+ print Corr_val_list2,'\n,\n'
+ print Corr_val_list3,'\n,\n'
+
+ print dis_val_listo,'\n,\n'
+ print Corr_val_listo,'\n,\n'
+ print Corr_val_list1o,'\n,\n'
+ print Corr_val_list2o,'\n,\n'
+ print Corr_val_list3o,'\n,\n'
+
+
+ Corr_val_list_ave=[ (sum(t)*(1.0/16.0)) for t in zip(Corr_val_list, Corr_val_list1, Corr_val_list2, Corr_val_list3)]
+ print Corr_val_list_ave,'\n,\n'
+
+
+ Corr_val_list_avo=[ (sum(t)*(1.0/16.0)) for t in zip(Corr_val_listo, Corr_val_list1o, Corr_val_list2o, Corr_val_list3o)]
+ print Corr_val_list_avo,'\n,\n'
+
+
+ Corr_val_list_final=Corr_val_list_ave+Corr_val_list_avo
+ dis_val_list_final=dis_val_list+dis_val_listo
+
+ print '\n,\n'
+ print dis_val_list_final
+ print Corr_val_list_final
+ print '\n,\n'
+
+
+ for i in xrange(len(dis_val_list_final)):
+  fileCorr.write(str(dis_val_list_final[i])  + " " + str(Corr_val_list_final[i]) + "\n")
+  fileCorr.flush()
+
+def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,distance_final,fileCorr,fileCorrLength):
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+
+
+ if Model is "Heisenberg":
+  bdi = uni10.Bond(uni10.BD_IN, d_phys)
+  bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+  HH = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  sz = matSz()
+  sx = matSx()
+  sy = matSy()
+  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  HH=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)(-1.0)*uni10.otimes(sy,sy)
+  H=uni10.otimes(sz,iden)+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
+  H1=uni10.otimes(iden,sz)+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
+  HH.setLabel([-10,-20,10,20])
+  H.setLabel([-10,-20,10,20])
+  H1.setLabel([-10,-20,10,20])
+  Iden.setLabel([-10,-20,10,20])
+
+ if Model is "Heisenberg_Z2":
+  #print d_phys
+  bdi = uni10.Bond(uni10.BD_IN, d_phys)
+  bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  sz = matSz()
+  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  szt=uni10.otimes(sz,iden)
+  H.setRawElem(szt)
+  szt1=uni10.otimes(iden,sz)
+  H1.setRawElem(szt1)
+  HH.setLabel([-10,-20,10,20])
+  H.setLabel([-10,-20,10,20])
+  H1.setLabel([-10,-20,10,20])
+  Iden.setLabel([-10,-20,10,20])
+ if Model is "Heisenberg_U1":
+  bdi = uni10.Bond(uni10.BD_IN, d_phys)
+  bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+  HH = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  sz = matSz()
+  sx = matSx()
+  sy = matSy()
+  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  HH_tem=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy)
+  H_tem=uni10.otimes(sz,iden)#+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
+  H1_tem=uni10.otimes(iden,sz)#+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
+  HH.setRawElem(HH_tem)
+  H.setRawElem(H_tem)
+  H1.setRawElem(H1_tem)
+  Iden=copy.copy(H)
+  Iden.identity()
+  #print HH_tem, HH, H_tem, H, H1_tem, H1
+  HH.setLabel([-10,-20,10,20])
+  H.setLabel([-10,-20,10,20])
+  H1.setLabel([-10,-20,10,20])
+  Iden.setLabel([-10,-20,10,20])
+
+ vec_down=make_down(c4,Ta3, Tb3,c3)
+ vec_up=make_up(c1,Tb1, Ta1,c2)
+ ap=make_ap_openindex(a_u)
+ bp=make_ap_openindex(b_u)
+ cp=make_ap_openindex(c_u)
+ dp=make_ap_openindex(d_u)
+ dis_val_list=[]
+ Corr_val_list=[]
+ dis_val_list1=[]
+ Corr_val_list1=[]
+ dis_val_list2=[]
+ Corr_val_list2=[]
+ dis_val_list3=[]
+ Corr_val_list3=[]
+
+# Corr_length=ED_right(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,vec_right)
+# print "Corr_length",Corr_length
+ vec_up_copy=copy.copy(vec_up)
+ Corr_length=ED_up(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,vec_up_copy)
+ print "Corr_length",Corr_length
+ fileCorrLength.write(str(Corr_length)  + "\n")
+ fileCorrLength.flush()
+
+
+ print "\n"
+#######################a-a#####################################################
+ vec_down_1=Make_first_vecdown_a(vec_down, ap, b, c, d, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_a(vec_up, ap, b, c, d, Tb2, Ta2, Ta4, Tb4)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
+ dis_val_list.append(2)
+ Corr_val_list.append(Corr_val) 
+
+ dis_val=2
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list.append(dis_val)
+  Corr_val_list.append(Corr_val) 
+###################################################################################
+
+ print "\n"
+########################b-b#####################################################
+
+ vec_down_1=Make_first_vecdown_b(vec_down, a, bp, c, d, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_b(vec_up, a, bp, c, d, Tb2, Ta2, Ta4, Tb4)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+ dis_val_list1.append(2)
+ Corr_val_list1.append(Corr_val) 
+
+ dis_val=2
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list1.append(dis_val)
+  Corr_val_list1.append(Corr_val) 
+####################################################################################
+
+
+ print "\n"
+########################c-c#####################################################
+
+ vec_down_1=Make_first_vecdown_c(vec_down, a, b, cp, d, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_c(vec_up, a, b, cp, d, Tb2, Ta2, Ta4, Tb4)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
+ dis_val_list2.append(2)
+ Corr_val_list2.append(Corr_val) 
+
+ dis_val=2
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list2.append(dis_val)
+  Corr_val_list2.append(Corr_val) 
+####################################################################################
+
+ print "\n"
+########################d-d#####################################################
+
+ vec_down_1=Make_first_vecdown_d(vec_down, a, b, c, dp, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_d(vec_up, a, b, c, dp, Tb2, Ta2, Ta4, Tb4)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
+ dis_val_list3.append(2)
+ Corr_val_list3.append(Corr_val) 
+
+ dis_val=2
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list3.append(dis_val)
+  Corr_val_list3.append(Corr_val) 
+####################################################################################
+
+#############################################################################################################
+
+
+ dis_val_listo=[]
+ Corr_val_listo=[]
+ dis_val_list1o=[]
+ Corr_val_list1o=[]
+ dis_val_list2o=[]
+ Corr_val_list2o=[]
+ dis_val_list3o=[]
+ Corr_val_list3o=[]
+
+ print "\n"
+
+#######################a-co#####################################################
+
+ vec_down_1=Make_first_vecdown_a(vec_down, ap, b, c, d, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_c(vec_up, a, b, cp, d, Tb2, Ta2, Ta4, Tb4)
+
+# Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
+# dis_val_listo.append(2)
+# Corr_val_listo.append(Corr_val) 
+
+ dis_val=1
+ for i in xrange(distance_final+1):
+  dis_val+=2
+  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_listo.append(dis_val)
+  Corr_val_listo.append(Corr_val) 
+
+###################################################################################
+
+
+ print "\n"
+
+#######################c-ao#####################################################
+ vec_down_1=Make_first_vecdown_c(vec_down, a, b, cp, d, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_a(vec_up, ap, b, c, d, Tb2, Ta2, Ta4, Tb4)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,3)
+ dis_val_list1o.append(3)
+ Corr_val_list1o.append(Corr_val) 
+
+ dis_val=3
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list1o.append(dis_val)
+  Corr_val_list1o.append(Corr_val) 
+###################################################################################
+
+
+ print "\n"
+
+########################b-do#####################################################
+
+ vec_down_1=Make_first_vecdown_b(vec_down, a, bp, c, d, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_d(vec_up, a, b, c, dp, Tb2, Ta2, Ta4, Tb4)
+
+# Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
+# dis_val_list2.append(2)
+# Corr_val_list2.append(Corr_val) 
+
+ dis_val=1
+ for i in xrange(distance_final+1):
+  dis_val+=2
+  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list2o.append(dis_val)
+  Corr_val_list2o.append(Corr_val) 
+####################################################################################
+
+ print "\n"
+
+########################d-bo#####################################################
+
+ vec_down_1=Make_first_vecdown_d(vec_down, a, b, c, dp, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_b(vec_up, a, bp, c, d, Tb2, Ta2, Ta4, Tb4)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,3)
+ dis_val_list3o.append(3)
+ Corr_val_list3o.append(Corr_val) 
+
+ dis_val=3
+ for i in xrange(distance_final):
+  dis_val+=2
+  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list3o.append(dis_val)
+  Corr_val_list3o.append(Corr_val) 
+####################################################################################
+
+
+ print dis_val_list,'\n,\n'
+ print Corr_val_list,'\n,\n'
+ print Corr_val_list1,'\n,\n'
+ print Corr_val_list2,'\n,\n'
+ print Corr_val_list3,'\n,\n'
+
+ print dis_val_listo,'\n,\n'
+ print Corr_val_listo,'\n,\n'
+ print Corr_val_list1o,'\n,\n'
+ print Corr_val_list2o,'\n,\n'
+ print Corr_val_list3o,'\n,\n'
+
+
+ Corr_val_list_ave=[ (sum(t)*(1.0/16.0)) for t in zip(Corr_val_list, Corr_val_list1, Corr_val_list2, Corr_val_list3)]
+ print Corr_val_list_ave,'\n,\n'
+
+
+ Corr_val_list_avo=[ (sum(t)*(1.0/16.0)) for t in zip(Corr_val_listo, Corr_val_list1o, Corr_val_list2o, Corr_val_list3o)]
+ print Corr_val_list_avo,'\n,\n'
+
+
+ Corr_val_list_final=Corr_val_list_ave+Corr_val_list_avo
+ dis_val_list_final=dis_val_list+dis_val_listo
+
+ print '\n,\n'
+ print dis_val_list_final
+ print Corr_val_list_final
+ print '\n,\n'
+
+
+ for i in xrange(len(dis_val_list_final)):
+  fileCorr.write(str(dis_val_list_final[i])  + " " + str(Corr_val_list_final[i]) + "\n")
+  fileCorr.flush()
+
+
+def Mat_np_to_Uni(Mat_np):
+ d0=np.size(Mat_np,0)
+ d1=np.size(Mat_np,1)
+ Mat_uni=uni10.Matrix(d0,d1)
+ for i in xrange(d0):
+  for j in xrange(d1):
+   Mat_uni[i*d1+j]=Mat_np[i,j]
+ return  Mat_uni
+
+
+def Mat_nptoUni(Mat_np):
+ d0=np.size(Mat_np,0)
+ Mat_uni=uni10.Matrix(d0,d0, True)
+ for i in xrange(d0):
+   Mat_uni[i]=Mat_np[i]
+ return  Mat_uni
+
+ 
+def Mat_uni_to_np(Mat_uni):
+ dim0=int(Mat_uni.row())
+ dim1=int(Mat_uni.col())
+ Mat_np=np.zeros((dim0,dim1))
+ for i in xrange(dim0):
+  for j in xrange(dim1):
+   Mat_np[i,j]=Mat_uni[i*dim1+j]
+ return  Mat_np
+
+def eig_np(A):
+ D_eig=[A]*2
+ A_np=Mat_uni_to_np(A)
+ w, v = LA.eig(A_np)
+ #print w,"\n,\n"#, v
+ D_eig[0]=Mat_nptoUni(w)
+ D_eig[1]=Mat_np_to_Uni(v)
+ return D_eig
+
+def  make_Q(q_vec): 
+ D=int(q_vec[0].row())
+ m=len(q_vec)
+ Q=uni10.Matrix(D, m)
+ for i in xrange(m):
+  for j in xrange(D):
+    Q[j*m+i]=q_vec[i][j]
+ return Q
+
+def return_vec(A, index ):
+ D=int(A.row())
+ vec_tem=uni10.Matrix(D,1)
+ for i in xrange(D): 
+  vec_tem[i]=A[i*D+index].real
+ return vec_tem
+
+
+def find_maxindex(A):
+ D=int(A.row())
+ max_val=0
+ index=0
+ #print A
+ for i in xrange(D):
+  if (i == 0) or ( max_val < abs(A[i]) ):
+   max_val = abs(A[i])
+   index=i
+ return max_val, index, A[index] 
+
+
+##############################################################################################
+def ED_right(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,Vec_uni):
+
+ Vec_F=Vec_uni.getBlock()
+ D=Vec_F.row()
+ #print "D=",  D
+
+ m=10
+ W=2
+ num=0
+ E1=0
+ p=0
+
+ while p  <  (W+1):
+  #print "norm", p, Vec_F.norm(),Vec_F[0], Vec_F[1], Vec_F[2], Vec_F[3] 
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(vec_tem)
+   r=Multi_r(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3)
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  D_eig=eig_np(h)
+  Lambda, index, Lambda_comp =find_maxindex(D_eig[0])
+  eigvec=return_vec(D_eig[1], index )
+  print 'r0', Lambda, Lambda_comp
+  Q=make_Q(q_vec)
+  Q.resize(D,m)
+  Vec_F=Q*eigvec
+  Vec_FL=Q*eigvec
+  if p==W and num==0:
+   p=-1
+   m+=5
+   E1=copy.copy(Lambda)
+   num+=1
+  elif p==W:
+   num+=1
+   if abs(Lambda) > 1.e-9: 
+    if  (((abs(Lambda-E1))/(abs(Lambda)))< 1.e-9): num+=1
+    elif m<=20:
+     p=-1
+     m+=5
+     E1=Lambda
+   else:
+    if  (abs(Lambda-E1))< 1.e-9:
+     num+=1
+    elif m<=20: 
+     p=-1
+     m+=5
+     E1=Lambda
+  p+=1
+
+
+ E1L=copy.copy(E1)
+ Vec_FL=Vec_FL*(1.00/Vec_FL.norm())
+ m=10
+ W=2
+ num=0
+ E1=0
+ p=0
+ Vec_F.randomize()
+ Vec_F=Vec_F*(1.00/Vec_F.norm())
+ while p  <  (W+1):
+  #print "norm", p, Vec_F.norm(),Vec_F[0], Vec_F[1], Vec_F[2], Vec_F[3] 
+  r=copy.copy(Vec_F)
+ 
+  Vec_FL_trans=copy.copy(Vec_FL)
+  Vec_FL_trans.transpose()
+  dot_vec=Vec_FL_trans*r
+  dot_val=dot_vec.trace()
+  r=r+(-1.00*dot_val*Vec_FL)
+  
+  
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(vec_tem)
+   r=Multi_r(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3)
+
+   Vec_FL_trans=copy.copy(Vec_FL)
+   Vec_FL_trans.transpose()
+   dot_vec=Vec_FL_trans*r
+   dot_val=dot_vec.trace()
+   r=r+(-1.00*dot_val*Vec_FL)
+
+
+
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  D_eig=eig_np(h)
+  Lambda, index, Lambda_comp=find_maxindex(D_eig[0])
+  eigvec=return_vec(D_eig[1], index )
+  print 'r1', Lambda, Lambda_comp
+  Q=make_Q(q_vec)
+  Q.resize(D,m)
+  Vec_F=Q*eigvec
+  if p==W and num==0:
+   p=-1
+   m+=5
+   E1=copy.copy(Lambda)
+   num+=1
+  elif p==W:
+   num+=1
+   if abs(Lambda) > 1.e-9: 
+    if  (((abs(Lambda-E1))/(abs(Lambda)))< 1.e-9): num+=1
+    elif m<=20:
+     p=-1
+     m+=5
+     E1=Lambda
+   else:
+    if  (abs(Lambda-E1))< 1.e-9:
+     num+=1
+    elif m<=20: 
+     p=-1
+     m+=5
+     E1=Lambda
+  p+=1
+
+ Length=abs(E1/E1L)
+ Length_val=-2.0*(1.00/math.log(Length))
+ print "Length", Length,Length_val 
+ return Length_val
+
+
+def ED_up(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,Vec_uni):
+
+
+ Vec_F=Vec_uni.getBlock()
+ D=Vec_F.row()
+ #print "D=",  D
+
+ m=10
+ W=2
+ num=0
+ E1=0
+ p=0
+
+ while p  <  (W+1):
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+
+  for j in xrange(m):
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(vec_tem)
+   r=Multi_u(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4)
+   #r.resize(D,1)
+   for i in xrange(j+1):
+
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+
+  D_eig=eig_np(h)
+  Lambda, index, Lambda_comp=find_maxindex(D_eig[0])
+  eigvec=return_vec(D_eig[1], index )
+  print 'u0', Lambda,Lambda_comp
+
+  Q=make_Q(q_vec)
+  Q.resize(D,m)
+  Vec_F=Q*eigvec
+  Vec_FL=Q*eigvec
+  if p==W and num==0:
+   p=-1
+   m+=5
+   E1=copy.copy(Lambda)
+   num+=1
+  elif p==W:
+   num+=1
+   if abs(Lambda) > 1.e-9: 
+    if  (((abs(Lambda-E1))/(abs(Lambda)))< 1.e-9): num+=1
+    elif m<=20:
+     p=-1
+     m=m+5
+     E1=Lambda
+   else:
+    if  (abs(Lambda-E1))< 1.e-9:
+     num+=1
+    elif m<=20: 
+     p=-1
+     m=m+5
+     E1=Lambda
+  p+=1
+
+ E1L=copy.copy(E1)
+ Vec_FL=Vec_FL*(1.00/Vec_FL.norm())
+ m=10
+ W=2
+ num=0
+ E1=0
+ p=0
+ Vec_F.randomize()
+ Vec_F=Vec_F*(1.00/Vec_F.norm())
+ while p  <  (W+1):
+  #print "norm", p, Vec_F.norm(),Vec_F[0], Vec_F[1], Vec_F[2], Vec_F[3] 
+  r=copy.copy(Vec_F)
+ 
+  Vec_FL_trans=copy.copy(Vec_FL)
+  Vec_FL_trans.transpose()
+  dot_vec=Vec_FL_trans*r
+  dot_val=dot_vec.trace()
+  r=r+(-1.00*dot_val*Vec_FL)
+  
+  
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(vec_tem)
+   r=Multi_u(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4)
+
+   Vec_FL_trans=copy.copy(Vec_FL)
+   Vec_FL_trans.transpose()
+   dot_vec=Vec_FL_trans*r
+   dot_val=dot_vec.trace()
+   r=r+(-1.00*dot_val*Vec_FL)
+
+
+
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  D_eig=eig_np(h)
+  Lambda, index,Lambda_comp=find_maxindex(D_eig[0])
+  eigvec=return_vec(D_eig[1], index )
+  print 'u1', Lambda,Lambda_comp
+  Q=make_Q(q_vec)
+  Q.resize(D,m)
+  Vec_F=Q*eigvec
+  if p==W and num==0:
+   p=-1
+   m+=5
+   E1=copy.copy(Lambda)
+   num+=1
+  elif p==W:
+   num+=1
+   if abs(Lambda) > 1.e-9: 
+    if  (((abs(Lambda-E1))/(abs(Lambda)))< 1.e-9): num+=1
+    elif m<=20:
+     p=-1
+     m+=5
+     E1=Lambda
+   else:
+    if  (abs(Lambda-E1))< 1.e-9:
+     num+=1
+    elif m<=20: 
+     p=-1
+     m+=5
+     E1=Lambda
+  p+=1
+
+
+
+ Length=abs(E1/E1L)
+ Length_val=-2.0*(1.00/math.log(Length))
+ print "Length", Length,Length_val 
+ return Length_val
+
+def Multi_r(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3):
+ CTM_1 = uni10.Network("Network/Right.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([21,14,-14 , 7,-7,0],6)
+ #print vec.printDiagram() 
+ Vec_M=vec.getBlock()
+ return Vec_M
+
+
+
+def Multi_u(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
+ CTM_1 = uni10.Network("Network/Up.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([17, 18, -18, 19, -19,  20],6)
+ Vec_M=vec.getBlock()
+ return Vec_M
+
+
+
+
+
+
+
+
+
+############################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def  Corr_val_function(Iden,HH,H,H1,vec_right, vec_left,dis_val):
+
+ vec_left.setLabel([10,23, 16, -16 , 9,-9, 2,-10])
+ vec_right.setLabel([20,23,16,-16 , 9,-9,2,-20])
+ Cor_norm=(vec_left*Iden)*vec_right
+ Corr_val=(vec_left*HH)*vec_right
+ Corr_val1=(vec_left*H)*vec_right
+ Corr_val2=(vec_left*H1)*vec_right
+
+ print  dis_val, Corr_val[0]/Cor_norm[0],Corr_val1[0]/Cor_norm[0],Corr_val2[0]/Cor_norm[0], Cor_norm[0] 
+
+ print dis_val, (Corr_val[0]/Cor_norm[0]),  ((Corr_val1[0]*Corr_val2[0])/(Cor_norm[0]*Cor_norm[0]))  
+
+ val=(Corr_val[0]/Cor_norm[0]) - ((Corr_val1[0]*Corr_val2[0])/(Cor_norm[0]*Cor_norm[0]))  
+
+ return val
+
+
+def  make_ap_openindex(a_u):
+ a_u.setLabel([10,1,2,3,4])
+ a_uc=copy.copy(a_u)
+ a_uc.transpose()
+ a_uc.setLabel([-3,-4,-10,-1,-2])
+ result=a_uc*a_u
+ result.permute([10,1,-1,2,-2,3,-3,4,-4,-10], 5)
+ return result
+
+
+def make_vleft(Tb4,Ta4,c1,c4):
+
+ Tb4.setLabel([-5,3,-3,4])
+ Ta4.setLabel([1,2,-2,-5])
+ c1.setLabel([4,6])
+ c4.setLabel([1,5])
+ vec_left=(Tb4*Ta4)*(c1*c4)
+ vec_left.permute([5,2,-2,3,-3,6],0)
+ return vec_left
+
+def  make_vright(Ta2,Tb2,c2,c3):
+
+ Ta2.setLabel([-5,3,-3,4])
+ Tb2.setLabel([1,2,-2,-5])
+ c2.setLabel([6,4])
+ c3.setLabel([5,1])
+ vec_right=(Ta2*Tb2)*(c2*c3)
+ vec_right.permute([5,2,-2,3,-3,6],6)
+ return vec_right
+
+
+def  Make_first_vecleft_a(vec_left, Ta1, Ta3,Tb1,Tb3,ap,b,c,d):
+
+ CTM_1 = uni10.Network("Network/LeftCorra.net")
+ CTM_1.putTensor('vec_left',vec_left)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',ap)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec.permute([10,23, 16, -16 , 9,-9, 2,-10],0)
+ vec=max_ten(vec)
+ return vec
+
+
+def Make_first_vecright_a(vec_right, Ta1, Ta3,Tb1,Tb3,ap,b,c,d):
+
+ CTM_1 = uni10.Network("Network/RightCorra.net")
+ CTM_1.putTensor('vec_right',vec_right)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',ap)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec.permute([10,21,14,-14 , 7,-7,0,-10],6)
+ vec=max_ten(vec)
+ return vec
+
+def  Make_first_vecleft_b(vec_left, Ta1, Ta3,Tb1,Tb3,a,bp,c,d):
+
+ CTM_1 = uni10.Network("Network/LeftCorrb.net")
+ CTM_1.putTensor('vec_left',vec_left)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',bp)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec.permute([10,23, 16, -16 , 9,-9, 2,-10],0)
+ vec=max_ten(vec)
+ return vec
+
+
+def Make_first_vecright_b(vec_right, Ta1, Ta3,Tb1,Tb3,a,bp,c,d):
+
+ CTM_1 = uni10.Network("Network/RightCorrb.net")
+ CTM_1.putTensor('vec_right',vec_right)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',bp)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec.permute([10,21,14,-14 , 7,-7,0,-10],6)
+ vec=max_ten(vec)
+ return vec
+
+
+def  Make_first_vecleft_c(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,cp,d):
+
+ CTM_1 = uni10.Network("Network/LeftCorrc.net")
+ CTM_1.putTensor('vec_left',vec_left)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',cp)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec.permute([10,23, 16, -16 , 9,-9, 2,-10],0)
+ vec=max_ten(vec)
+ return vec
+
+
+def Make_first_vecright_c(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,cp,d):
+
+ CTM_1 = uni10.Network("Network/RightCorrc.net")
+ CTM_1.putTensor('vec_right',vec_right)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',cp)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec.permute([10,21,14,-14 , 7,-7,0,-10],6)
+ vec=max_ten(vec)
+ return vec
+
+
+def  Make_first_vecleft_d(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,c,dp):
+
+ CTM_1 = uni10.Network("Network/LeftCorrd.net")
+ CTM_1.putTensor('vec_left',vec_left)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',dp)
+ vec=CTM_1.launch()
+ vec.permute([10,23, 16, -16 , 9,-9, 2,-10],0)
+ vec=max_ten(vec)
+ return vec
+
+
+def Make_first_vecright_d(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,c,dp):
+
+ CTM_1 = uni10.Network("Network/RightCorrd.net")
+ CTM_1.putTensor('vec_right',vec_right)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',dp)
+ vec=CTM_1.launch()
+ vec.permute([10,21,14,-14 , 7,-7,0,-10],6)
+ vec=max_ten(vec)
+ return vec
+
+def  Make_midle_vecleft(vec_left, Ta1, Ta3,Tb1,Tb3,ap,b,c,d):
+
+ CTM_1 = uni10.Network("Network/LeftCorr1.net")
+ CTM_1.putTensor('vec_left',vec_left)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',ap)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec.permute([10,23, 16, -16 , 9,-9, 2,-10],0)
+ vec=max_ten(vec)
+ return vec
+
+
+
+############################################################################################
+
+def  make_ap_openindex(a_u):
+ a_u.setLabel([10,1,2,3,4])
+ a_uc=copy.copy(a_u)
+ a_uc.transpose()
+ a_uc.setLabel([-3,-4,-10,-1,-2])
+ result=a_uc*a_u
+ result.permute([10,1,-1,2,-2,3,-3,4,-4,-10], 5)
+ return result
+
+
+def make_down(c4,Ta3, Tb3,c3):
+ Tb3.setLabel([-5,3,-3,4])
+ Ta3.setLabel([1,2,-2,-5])
+ c3.setLabel([4,6])
+ c4.setLabel([5,1])
+ vec_down=(Tb3*Ta3)*(c3*c4)
+ vec_down.permute([5, 2, -2 , 3, -3 , 6],0)
+ return vec_down
+
+def  make_up(c1,Tb1, Ta1,c2):
+ Ta1.setLabel([-5,3,-3,4])
+ Tb1.setLabel([1,2,-2,-5])
+ c2.setLabel([4,6])
+ c1.setLabel([5,1])
+ vec_up=(Ta1*Tb1)*(c1*c2)
+ vec_up.permute([5,2,-2,3,-3,6],6)
+ return vec_up
+
+
+
+
+def  Make_first_vecdown_a(vec_down, ap, b, c, d, Tb2, Ta2, Ta4, Tb4):
+
+ CTM_1 = uni10.Network("Network/DownCorra.net")
+ CTM_1.putTensor('vec_down',vec_down)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',ap)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ #vec.permute([10,3, 4, -4 , 5, -5 , 6,-10],8)
+ return vec
+
+
+
+
+def Make_first_vecup_a(vec_up, ap, b, c, d, Tb2, Ta2, Ta4, Tb4):
+
+ CTM_1 = uni10.Network("Network/UpCorra.net")
+ CTM_1.putTensor('vec_up',vec_up)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',ap)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ return vec
+
+
+def  Make_midle_vecdown(vec_down, a,b,c,d,Tb2, Ta2, Ta4, Tb4):
+
+ CTM_1 = uni10.Network("Network/DownCorr1.net")
+ CTM_1.putTensor('vec_down',vec_down)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec=max_ten(vec)
+ return vec
+
+
+
+def  Make_first_vecdown_b(vec_down, a, bp, c, d, Tb2, Ta2, Ta4, Tb4):
+
+ CTM_1 = uni10.Network("Network/DownCorrb.net")
+ CTM_1.putTensor('vec_down',vec_down)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',bp)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ #vec.permute([10,3, 4, -4 , 5, -5 , 6,-10],8)
+ return vec
+
+
+
+
+def Make_first_vecup_b(vec_up, a, bp, c, d, Tb2, Ta2, Ta4, Tb4):
+
+ CTM_1 = uni10.Network("Network/UpCorrb.net")
+ CTM_1.putTensor('vec_up',vec_up)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',bp)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ return vec
+
+
+
+def  Make_first_vecdown_c(vec_down, a, b, cp, d, Tb2, Ta2, Ta4, Tb4):
+
+ CTM_1 = uni10.Network("Network/DownCorrc.net")
+ CTM_1.putTensor('vec_down',vec_down)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',cp)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ #vec.permute([10,3, 4, -4 , 5, -5 , 6,-10],8)
+ return vec
+
+def Make_first_vecup_c(vec_up, a, b, cp, d, Tb2, Ta2, Ta4, Tb4):
+
+ CTM_1 = uni10.Network("Network/UpCorrc.net")
+ CTM_1.putTensor('vec_up',vec_up)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',cp)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ return vec
+
+
+
+
+def  Make_first_vecdown_d(vec_down, a, b, c, dp, Tb2, Ta2, Ta4, Tb4):
+
+ CTM_1 = uni10.Network("Network/DownCorrd.net")
+ CTM_1.putTensor('vec_down',vec_down)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',dp)
+ vec=CTM_1.launch()
+ #print CTM_1
+ #vec.permute([10,3, 4, -4 , 5, -5 , 6,-10],8)
+ return vec
+
+def Make_first_vecup_d(vec_up, a, b, c, dp, Tb2, Ta2, Ta4, Tb4):
+
+ CTM_1 = uni10.Network("Network/UpCorrd.net")
+ CTM_1.putTensor('vec_up',vec_up)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',dp)
+ vec=CTM_1.launch()
+ return vec
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#################################################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1653,6 +3278,32 @@ def total_random(a_u,b_u,c_u,d_u,a,b,c,d):
 # d=d*(1.00/MaxAbs(d)) 
  
  return a_u,b_u,c_u,d_u,a,b,c,d
+
+
+def total_random1(a_u,b_u,c_u,d_u,a,b,c,d):
+ a_u.orthoRand()
+ b_u.orthoRand()
+ c_u.orthoRand()
+ d_u.orthoRand()
+
+
+ a_u=a_u*(1.00/MaxAbs(a_u)) 
+ b_u=b_u*(1.00/MaxAbs(b_u)) 
+ c_u=c_u*(1.00/MaxAbs(c_u)) 
+ d_u=d_u*(1.00/MaxAbs(d_u)) 
+ 
+ a=make_ab(a_u)
+ b=make_ab(b_u)
+ c=make_ab(c_u)
+ d=make_ab(d_u)
+
+# a=a*(1.00/MaxAbs(a)) 
+# b=b*(1.00/MaxAbs(b)) 
+# c=c*(1.00/MaxAbs(c)) 
+# d=d*(1.00/MaxAbs(d)) 
+ 
+ return a_u,b_u,c_u,d_u,a,b,c,d
+
 
 
 def max_ten(a):
@@ -2267,55 +3918,6 @@ def rebond_corner(a,b,c,d,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
 
  return Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4
 
-def Short_TrotterSteps(N_iterF):
- List_delN=[]
-
-# for i in xrange(5, 1, -1):
-#  Delta_N=(i*(1.0/10),N_iterF)
-#  List_delN.append(Delta_N)
-
- for i in xrange(10, 1, -1):
-  Delta_N=(i*(1.0/100),N_iterF)
-  List_delN.append(Delta_N)
-
-
- for i in xrange(5, 5, -1):
-  Delta_N=(i*(1.0/100),N_iterF)
-  List_delN.append(Delta_N)
-
- for i in xrange(10, 1, -1):
-  Delta_N=(i*(1.0/1000),N_iterF)
-  List_delN.append(Delta_N)
-
- for i in xrange(10, 0, -1):
-  Delta_N=(i*(1.0/10000),N_iterF)
-  List_delN.append(Delta_N)
-
-
-########################################
-# Delta_N=((50.0/100),N_iterF)
-# List_delN.append(Delta_N)
-
-# Delta_N=((9.0/1000),N_iterF)
-# List_delN.append(Delta_N)
-
-# Delta_N=((1.0/100),N_iterF)
-# List_delN.append(Delta_N)
-
-# Delta_N=((0.90/100),N_iterF)
-# List_delN.append(Delta_N)
-
-# Delta_N=((0.80/100),N_iterF)
-# List_delN.append(Delta_N)
-
-# Delta_N=((0.70/100),N_iterF)
-# List_delN.append(Delta_N)
-
-# Delta_N=((0.40/100),N_iterF)
-# List_delN.append(Delta_N)
-
-
- return List_delN
  
 def Short_TrotterSteps1(N_iterF):
  List_delN=[]
@@ -2364,8 +3966,10 @@ def Long_TrotterSteps1(N_iterF):
  return List_delN 
  
 #@profile
-def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U):
-
+def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U, Gauge):
+ Gauge=copy.copy(Gauge)
+ Gauge='Fixed'
+ 
  U.setLabel([-54,-55,-56,0,1,2])
  H=copy.copy(U)
  H.setLabel([0,1,2,54,55,56])
@@ -2421,32 +4025,35 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  A=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E1*E8)*(a_dp))
  A.permute([55,16,17,18,2],3)
  D_a=A
- A=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E1*E8)*(a_up))
- A.permute([-18,-2,55,-16,-17],2)
- A.transpose()
- D_a=D_a+A
+
+ if Gauge is "Fixed":
+  A=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E1*E8)*(a_up))
+  A.permute([-18,-2,55,-16,-17],2)
+  A.transpose()
+  D_a=D_a+A
 
  a_dp.setLabel([-18,-2,-55,-16,-17])
  b_dp.setLabel([-6,-4,-56,-18,-20]) 
  c_dp.setLabel([-19,-17,-54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
-# t0=time.time()
 
  A=((((((E2*E3)*(b_up*b_d)))*((E4*E5)*(d_up*d_d))))*((E7*E6)*(c_up*c_d)*U))*((E1*E8)*(a_d))
  A.permute([55,16,17,18,2],3)
  D_a=D_a+(-1.0)*A
 
-# print "1", time.time() - t0
+
+ if Gauge is "Fixed":
+  A=((((((E2*E3)*(b_u*b_dp)))*((E4*E5)*(d_u*d_dp))))*((E7*E6)*(c_u*c_dp)*U))*((E1*E8)*(a_u))
+  A.permute([-18,-2,-55,-16,-17],2)
+  A.transpose()
+  D_a=D_a+(-1.0)*A
+#  D_a.transpose()
+#  D_a.permute([55,16,17,18,2],3)
 
 
- A=((((((E2*E3)*(b_u*b_dp)))*((E4*E5)*(d_u*d_dp))))*((E7*E6)*(c_u*c_dp)*U))*((E1*E8)*(a_u))
- A.permute([-18,-2,-55,-16,-17],2)
- A.transpose()
- D_a=D_a+(-1.0)*A
  D_a.transpose()
  D_a.permute([55,16,17,18,2],3)
- 
  
 #####################################----b----#############################################
 
@@ -2458,29 +4065,32 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))*(((E2*E3)*(b_dp)))
  A.permute([56,18,20,6,4],3)
  D_b=A
- A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))*(((E2*E3)*(b_up)))
- A.permute([-6,-4,56,-18,-20],2)
- A.transpose()
- D_b=D_b+A
+
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))*(((E2*E3)*(b_up)))
+  A.permute([-6,-4,56,-18,-20],2)
+  A.transpose()
+  D_b=D_b+A
 
  a_dp.setLabel([-18,-2,-55,-16,-17])
  b_dp.setLabel([-6,-4,-56,-18,-20]) 
  c_dp.setLabel([-19,-17,-54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
-# t0=time.time()
 
  A=(((((E1*E8)*(a_up*a_d)*U)*((E7*E6)*(c_up*c_d))))*((E4*E5)*(d_up*d_d)))*(((E2*E3)*(b_d)))
  A.permute([56,18,20,6,4],3)
  D_b=D_b+(-1.0)*A
 
-# print "2", time.time() - t0
 
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_u*a_dp)*U)*((E7*E6)*(c_u*c_dp))))*((E4*E5)*(d_u*d_dp)))*(((E2*E3)*(b_u)))
+  A.permute([-6,-4,-56,-18,-20],2)
+  A.transpose()
+  D_b=D_b+(-1.0)*A
+#  D_b.transpose()
+#  D_b.permute([56,18,20,6,4],3)
 
- A=(((((E1*E8)*(a_u*a_dp)*U)*((E7*E6)*(c_u*c_dp))))*((E4*E5)*(d_u*d_dp)))*(((E2*E3)*(b_u)))
- A.permute([-6,-4,-56,-18,-20],2)
- A.transpose()
- D_b=D_b+(-1.0)*A
  D_b.transpose()
  D_b.permute([56,18,20,6,4],3)
 
@@ -2495,32 +4105,34 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  A=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))* ((E7*E6)*(c_dp))
  A.permute([54,14,12,19,17],3)
  D_c=A
- A=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))* ((E7*E6)*(c_up))
- A.permute([-19,-17,54,-14,-12],2)
- A.transpose()
- D_c=D_c+A
+
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))* ((E7*E6)*(c_up))
+  A.permute([-19,-17,54,-14,-12],2)
+  A.transpose()
+  D_c=D_c+A
 
  a_dp.setLabel([-18,-2,-55,-16,-17])
  b_dp.setLabel([-6,-4,-56,-18,-20]) 
  c_dp.setLabel([-19,-17,-54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
-# t0=time.time()
 
  A=(((((E1*E8)*(a_up*a_d))*((E2*E3)*(b_up*b_d)))*U)*(((E4*E5)*(d_up*d_d))))*((E7*E6)*(c_d))
  A.permute([54,14,12,19,17],3)
  D_c=D_c+(-1.0)*A
 
-# print "3", time.time() - t0
 
-
- A=(((((E1*E8)*(a_u*a_dp))*((E2*E3)*(b_u*b_dp)))*U)*(((E4*E5)*(d_u*d_dp))))*((E7*E6)*(c_u))
- A.permute([-19,-17,-54,-14,-12],2)
- A.transpose()
- D_c=D_c+(-1.0)*A
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_u*a_dp))*((E2*E3)*(b_u*b_dp)))*U)*(((E4*E5)*(d_u*d_dp))))*((E7*E6)*(c_u))
+  A.permute([-19,-17,-54,-14,-12],2)
+  A.transpose()
+  D_c=D_c+(-1.0)*A
+#  D_c.transpose()
+#  D_c.permute([54,14,12,19,17],3)
+ 
  D_c.transpose()
  D_c.permute([54,14,12,19,17],3)
- 
  
 ###################################----d----######################################################
 
@@ -2532,38 +4144,45 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_dp))
  A.permute([57,19,10,8,20],3)
  D_d=A
- A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up))
- A.permute([-8,-20,57,-19,-10],2)
- A.transpose()
- D_d=D_d+A
+
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up))
+  A.permute([-8,-20,57,-19,-10],2)
+  A.transpose()
+  D_d=D_d+A
 
  a_dp.setLabel([-18,-2,-55,-16,-17])
  b_dp.setLabel([-6,-4,-56,-18,-20]) 
  c_dp.setLabel([-19,-17,-54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
-# t0=time.time()
 
  A=(((((E1*E8)*(a_up*a_d)*U)*((E7*E6)*(c_up*c_d))))*(((E2*E3)*(b_up*b_d))))*((E4*E5)*(d_d))
  A.permute([57,19,10,8,20],3)
  D_d=D_d+(-1.0)*A
 
-# print "4", time.time() - t0
 
-
- A=(((((E1*E8)*(a_u*a_dp)*U)*((E7*E6)*(c_u*c_dp))))*(((E2*E3)*(b_u*b_dp))))*((E4*E5)*(d_u))
- A.permute([-8,-20,57,-19,-10],2)
- A.transpose()
- D_d=D_d+(-1.0)*A
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_u*a_dp))*((E7*E6)*(c_u*c_dp)))*U)*(((E2*E3)*(b_u*b_dp))))*((E4*E5)*(d_u))
+  A.permute([-8,-20,57,-19,-10],2)
+  A.transpose()
+  D_d=D_d+(-1.0)*A
+#  D_d.transpose()
+#  D_d.permute([57,19,10,8,20],3)
+ # D_d=copy.copy(d_u)
+ # D_d.set_zero()
  D_d.transpose()
  D_d.permute([57,19,10,8,20],3)
-# D_d=copy.copy(d_u)
-# D_d.set_zero()
+ 
+ 
 ##################################################################################################
  return D_a, D_b, D_c, D_d 
  
- 
-def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U):
+#@profile 
+def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Gauge):
+
+ Gauge=copy.copy(Gauge)
+ Gauge='Fixed'
 
  U.setLabel([-55,-56,-57,0,1,2])
  H=copy.copy(U)
@@ -2620,10 +4239,13 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  A=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E1*E8)*(a_dp))
  A.permute([55,16,17,18,2],3)
  D_a=A
- A=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E1*E8)*(a_up))
- A.permute([-18,-2,55,-16,-17],2)
- A.transpose()
- D_a=D_a+A
+
+
+ if Gauge is "Fixed":
+  A=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E1*E8)*(a_up))
+  A.permute([-18,-2,55,-16,-17],2)
+  A.transpose()
+  D_a=D_a+A
 
  a_dp.setLabel([-18,-2,-55,-16,-17])
  b_dp.setLabel([-6,-4,-56,-18,-20]) 
@@ -2635,14 +4257,16 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  A.permute([55,16,17,18,2],3)
  D_a=D_a+(-1.0)*A
 
-
- A=((((((E2*E3)*(b_u*b_dp))*U)*((E4*E5)*(d_u*d_dp))))*((E7*E6)*(c_u*c_dp)))*((E1*E8)*(a_u))
- A.permute([-18,-2,-55,-16,-17],2)
- A.transpose()
- D_a=D_a+(-1.0)*A
+ if Gauge is "Fixed":
+  A=((((((E2*E3)*(b_u*b_dp))*U)*((E4*E5)*(d_u*d_dp))))*((E7*E6)*(c_u*c_dp)))*((E1*E8)*(a_u))
+  A.permute([-18,-2,-55,-16,-17],2)
+  A.transpose()
+  D_a=D_a+(-1.0)*A
+#  D_a.transpose()
+#  D_a.permute([55,16,17,18,2],3)
+ 
  D_a.transpose()
  D_a.permute([55,16,17,18,2],3)
- 
  
 #####################################----b----#############################################
 
@@ -2654,10 +4278,12 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))*(((E2*E3)*(b_dp)))
  A.permute([56,18,20,6,4],3)
  D_b=A
- A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))*(((E2*E3)*(b_up)))
- A.permute([-6,-4,56,-18,-20],2)
- A.transpose()
- D_b=D_b+A
+
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))*(((E2*E3)*(b_up)))
+  A.permute([-6,-4,56,-18,-20],2)
+  A.transpose()
+  D_b=D_b+A
 
  a_dp.setLabel([-18,-2,-55,-16,-17])
  b_dp.setLabel([-6,-4,-56,-18,-20]) 
@@ -2669,11 +4295,14 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  A.permute([56,18,20,6,4],3)
  D_b=D_b+(-1.0)*A
 
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_u*a_dp))*((E7*E6)*(c_u*c_dp))))*((E4*E5)*(d_u*d_dp))*U)*(((E2*E3)*(b_u)))
+  A.permute([-6,-4,-56,-18,-20],2)
+  A.transpose()
+  D_b=D_b+(-1.0)*A
+#  D_b.transpose()
+#  D_b.permute([56,18,20,6,4],3)
 
- A=(((((E1*E8)*(a_u*a_dp))*((E7*E6)*(c_u*c_dp))))*((E4*E5)*(d_u*d_dp))*U)*(((E2*E3)*(b_u)))
- A.permute([-6,-4,-56,-18,-20],2)
- A.transpose()
- D_b=D_b+(-1.0)*A
  D_b.transpose()
  D_b.permute([56,18,20,6,4],3)
 
@@ -2688,10 +4317,12 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  A=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))* ((E7*E6)*(c_dp))
  A.permute([54,14,12,19,17],3)
  D_c=A
- A=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))* ((E7*E6)*(c_up))
- A.permute([-19,-17,54,-14,-12],2)
- A.transpose()
- D_c=D_c+A
+
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))* ((E7*E6)*(c_up))
+  A.permute([-19,-17,54,-14,-12],2)
+  A.transpose()
+  D_c=D_c+A
 
  a_dp.setLabel([-18,-2,-55,-16,-17])
  b_dp.setLabel([-6,-4,-56,-18,-20]) 
@@ -2703,14 +4334,16 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  A.permute([54,14,12,19,17],3)
  D_c=D_c+(-1.0)*A
 
-
- A=(((((E1*E8)*(a_u*a_dp))*((E2*E3)*(b_u*b_dp)))*U)*(((E4*E5)*(d_u*d_dp))))*((E7*E6)*(c_u))
- A.permute([-19,-17,54,-14,-12],2)
- A.transpose()
- D_c=D_c+(-1.0)*A
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_u*a_dp))*((E2*E3)*(b_u*b_dp)))*U)*(((E4*E5)*(d_u*d_dp))))*((E7*E6)*(c_u))
+  A.permute([-19,-17,54,-14,-12],2)
+  A.transpose()
+  D_c=D_c+(-1.0)*A
+#  D_c.transpose()
+#  D_c.permute([54,14,12,19,17],3)
+ 
  D_c.transpose()
  D_c.permute([54,14,12,19,17],3)
- 
  
 ###################################----d----######################################################
 
@@ -2722,10 +4355,12 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_dp))
  A.permute([57,19,10,8,20],3)
  D_d=A
- A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up))
- A.permute([-8,-20,57,-19,-10],2)
- A.transpose()
- D_d=D_d+A
+
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up))
+  A.permute([-8,-20,57,-19,-10],2)
+  A.transpose()
+  D_d=D_d+A
 
  a_dp.setLabel([-18,-2,-55,-16,-17])
  b_dp.setLabel([-6,-4,-56,-18,-20]) 
@@ -2737,18 +4372,20 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  A.permute([57,19,10,8,20],3)
  D_d=D_d+(-1.0)*A
 
+ if Gauge is "Fixed":
+  A=(((((E1*E8)*(a_u*a_dp))*((E7*E6)*(c_u*c_dp))))*(((E2*E3)*(b_u*b_dp))*U))*((E4*E5)*(d_u))
+  A.permute([-8,-20,-57,-19,-10],2)
+  A.transpose()
+  D_d=D_d+(-1.0)*A
+#  D_d.transpose()
+#  D_d.permute([57,19,10,8,20],3)
 
- A=(((((E1*E8)*(a_u*a_dp))*((E7*E6)*(c_u*c_dp))))*(((E2*E3)*(b_u*b_dp))*U))*((E4*E5)*(d_u))
- A.permute([-8,-20,-57,-19,-10],2)
- A.transpose()
- D_d=D_d+(-1.0)*A
  D_d.transpose()
  D_d.permute([57,19,10,8,20],3)
+
  
 ##################################################################################################
  return D_a, D_b, D_c, D_d 
-
-
 
 
 

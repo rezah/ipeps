@@ -127,6 +127,8 @@ def Multi_u(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
  return Vec_M
 
 
+
+
 def Multi_d(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
 
  Vec_uni1=copy.copy(Vec_uni)
@@ -150,7 +152,6 @@ def Multi_d(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
  Vec_M=vec.getBlock()
 
  return Vec_M
-
 
 
 

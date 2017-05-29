@@ -491,10 +491,6 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  Ta4bar.permute([7,4,-4,6],1)
 #############################
 ###############################
- c1=norm_CTM(c1bar)
- c4=norm_CTM(c4bar)
- Ta4=norm_CTM(Ta4bar)
- Tb4=norm_CTM(Tb4bar)
 
  #################3################################
  c2.setLabel([0,1])
@@ -533,6 +529,20 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  Tb2bar.permute([6,4,-4,7],3)
  ###########################
  ###########################
+
+
+ Tb2bar, Ta2bar=equall_dis_qr(Tb2bar, Ta2bar )
+ Ta4bar, Tb4bar=equall_dis_qr(Ta4bar, Tb4bar )
+ Ta4bar.permute([62,58,57,17],1)
+ Tb4bar.permute([17,64,58,57],1)
+
+
+ c1=norm_CTM(c1bar)
+ c4=norm_CTM(c4bar)
+ Ta4=norm_CTM(Ta4bar)
+ Tb4=norm_CTM(Tb4bar)
+
+
  c3=norm_CTM(c3bar)
  c2=norm_CTM(c2bar)
  Ta2=norm_CTM(Ta2bar)
@@ -540,6 +550,121 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
 
  return c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3
  
+def equall_dis_qr(plist0, plist1 ):
+ 
+ plist0.setLabel([62,58,57,17])
+ plist1.setLabel([17,64,58,57])
+ 
+ plist0.permute([62,58,57,17],3)
+ plist1.permute([17,64,58,57],1)
+ 
+ q, r=qr_parity2(plist0)
+ q.setLabel([62,58,57,1])
+ r.setLabel([1,0])
+ 
+
+ l, qq=lq_parity2(plist1)
+ qq.setLabel([-1,64,58,57])
+ l.setLabel([0,-1])
+
+ teta=l*r
+ teta.permute([1,-1],1)
+
+ U, s, V =svd_parity2(teta)
+ s=TruncateU.Sqrt(s)
+
+ s.setLabel([0,17])
+ U.setLabel([1,0])
+ U=U*s
+
+ s.setLabel([17,0])
+ V.setLabel([0,-1])
+ V=s*V
+
+ plist0=q*U
+ plist1=V*qq
+ 
+ plist0.permute([62,58,57,17],3)
+ plist1.permute([17,64,58,57],3)
+ return plist0, plist1
+ 
+def equall_dis_qr1(plist0, plist1 ):
+ 
+ plist0.setLabel([62,58,57,17])
+ plist1.setLabel([64,17])
+ 
+ plist0.permute([62,58,57,17],3)
+ plist1.permute([17,64],1)
+ teta=plist0*plist1
+ teta.permute([62,58,57,64],3)
+
+ chi_dim=(teta.bond(3).dim())
+
+ U, s, V =TruncateU.svd_parity(teta,chi_dim)
+ s=TruncateU.Sqrt(s)
+
+ s.setLabel([0,17])
+ U.setLabel([62,58,57,0])
+ plist0=U*s
+
+ s.setLabel([17,0])
+ V.setLabel([0,64])
+ plist1=s*V
+ 
+ plist0.permute([62,58,57,17],3)
+ plist1.permute([17,64],1)
+ return plist0, plist1
+ 
+ 
+ 
+def equall_norm(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
+  
+ Norm=magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+ if Norm < 0: c1=-1.0*c1;
+
+ while Norm<1.0e-1: 
+  c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d=checking_norm(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+  Norm=magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+  #print Norm
+
+ while Norm>1.0e+5: 
+  c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d=checking_norm(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+  Norm=magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+  #print Norm
+
+ return c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4
+ 
+def checking_norm(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
+ Norm=magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+ if Norm < 0: c1=-1.0*c1;
+ if Norm < 1.0e-1:
+  c1*=1.4
+  c2*=1.4
+  c3*=1.4
+  c4*=1.4
+  Ta1*=1.4
+  Ta2*=1.4
+  Ta3*=1.4
+  Ta4*=1.4
+  Tb1*=1.4
+  Tb2*=1.4
+  Tb3*=1.4
+  Tb4*=1.4
+
+ elif Norm > 1.e+5:
+  c1*=0.92
+  c2*=0.92
+  c3*=0.92
+  c4*=0.92
+  Ta1*=0.92
+  Ta2*=0.92
+  Ta3*=0.92
+  Ta4*=0.92
+  Tb1*=0.92
+  Tb2*=0.92
+  Tb3*=0.92
+  Tb4*=0.92
+ return c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d
  
  
 #@profile 
@@ -772,3 +897,70 @@ def permuteN1(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  Tb4.setLabel([0,1,-1,2])
  Tb4.permute([2,1,-1,0],1)
  Tb4.setLabel([0,1,-1,2])
+ 
+ 
+ 
+ 
+ 
+def qr_parity2(theta):
+
+    bd1=uni10.Bond(uni10.BD_IN,theta.bond(3).Qlist())
+
+    GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3)])
+    LA=uni10.UniTensor([bd1, theta.bond(3)])
+
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).qr()
+        GA.putBlock(qnum, svds[qnum][0])
+        LA.putBlock(qnum, svds[qnum][1])
+
+    return GA, LA
+ 
+def lq_parity2(theta):
+    bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
+
+    
+    LA=uni10.UniTensor([theta.bond(0),bd1])
+    GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3)])
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).lq()
+        GA.putBlock(qnum, svds[qnum][1])
+        LA.putBlock(qnum, svds[qnum][0])
+
+    return  LA, GA
+ 
+def svd_parity2(theta):
+
+    LA=uni10.UniTensor([theta.bond(0), theta.bond(1)])
+    GA=uni10.UniTensor([theta.bond(0), theta.bond(1)])
+    GB=uni10.UniTensor([theta.bond(0), theta.bond(1)])
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).svd()
+    for qnum in blk_qnums:
+        svd = svds[qnum]
+        GA.putBlock(qnum, svd[0])
+        GB.putBlock(qnum, svd[2])
+        LA.putBlock(qnum, svd[1])
+#    print LA
+    return GA, LA,GB
+  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

@@ -87,7 +87,6 @@ def add_vec_to_mat(U,vec):
  return U_new
 
 
-
 def Add_onevector(Rb_mat, R_mat, p, V, U):
  U_mat=U.getBlock()
  V_mat=V.getBlock()
@@ -129,7 +128,6 @@ def produce_projectives(theta,theta1,chi_dim):
  R.permute([1,2,20,3,4,5],3)
 
 
-
  theta1.setLabel([1,2,20,3,4,40])
  theta1.permute([1,2,20,3,4,40],3) 
 
@@ -139,7 +137,6 @@ def produce_projectives(theta,theta1,chi_dim):
  if MaxAbs(s) > 1.0e+7 or MaxAbs(s) < 1.0e-1:
   s=s*(1.00/MaxAbs(s))
 
-
  U.setLabel([1,2,20,-1,-2,-3])
  s.setLabel([-1,-2,-3,6,7,8])
  Rb=U*s
@@ -147,7 +144,6 @@ def produce_projectives(theta,theta1,chi_dim):
  Rb.permute([6,7,8,1,2,20],3)
  
  
-  
  A=R*Rb
  A.permute([6,7,8,3,4,5],3)
 
@@ -181,17 +177,12 @@ def produce_projectives(theta,theta1,chi_dim):
  U1x=R*U
  U1x.permute([1,2,20,6],3)
 
-
-
  Rb.permute([6,7,8,1,2,20],3)
  V.transpose()
  U1x_trans=Rb*V
  U1x_trans.permute([9,1,2,20],1)
 
  return U1x, U1x_trans 
-
-
-
 
 
 
@@ -597,6 +588,12 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  ###########################
  ###########################
 
+ Tb2bar, Ta2bar=equall_dis_qr(Tb2bar, Ta2bar )
+ Ta4bar, Tb4bar=equall_dis_qr(Ta4bar, Tb4bar )
+ Ta4bar.permute([62,58,57,17],1)
+ Tb4bar.permute([17,64,58,57],1)
+ 
+
  c3=norm_CTM(c3bar)
  c2=norm_CTM(c2bar)
  Ta2=norm_CTM(Ta2bar)
@@ -608,14 +605,126 @@ def  add_left1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D):
  Tb4=norm_CTM(Tb4bar)
 
 
-
  return c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3
  
  
  
+def equall_dis_qr(plist0, plist1 ):
+ 
+ plist0.setLabel([62,58,57,17])
+ plist1.setLabel([17,64,58,57])
+ 
+ plist0.permute([62,58,57,17],3)
+ plist1.permute([17,64,58,57],1)
+ 
+ q, r=qr_parity2(plist0)
+ q.setLabel([62,58,57,1])
+ r.setLabel([1,0])
+ 
+
+ l, qq=lq_parity2(plist1)
+ qq.setLabel([-1,64,58,57])
+ l.setLabel([0,-1])
+
+ teta=l*r
+ teta.permute([1,-1],1)
+
+ U, s, V =svd_parity2(teta)
+ s=TruncateU.Sqrt(s)
+
+ s.setLabel([0,17])
+ U.setLabel([1,0])
+ U=U*s
+
+ s.setLabel([17,0])
+ V.setLabel([0,-1])
+ V=s*V
+
+ plist0=q*U
+ plist1=V*qq
+ 
+ plist0.permute([62,58,57,17],3)
+ plist1.permute([17,64,58,57],3)
+ return plist0, plist1
+ 
+def equall_dis_qr1(plist0, plist1 ):
+ 
+ plist0.setLabel([62,58,57,17])
+ plist1.setLabel([64,17])
+ 
+ plist0.permute([62,58,57,17],3)
+ plist1.permute([17,64],1)
+ teta=plist0*plist1
+ teta.permute([62,58,57,64],3)
+
+ chi_dim=(teta.bond(3).dim())
+
+ U, s, V =TruncateU.svd_parity(teta,chi_dim)
+ s=TruncateU.Sqrt(s)
+
+ s.setLabel([0,17])
+ U.setLabel([62,58,57,0])
+ plist0=U*s
+
+ s.setLabel([17,0])
+ V.setLabel([0,64])
+ plist1=s*V
+ 
+ plist0.permute([62,58,57,17],3)
+ plist1.permute([17,64],1)
+ return plist0, plist1
  
  
-#@profile 
+ 
+def equall_norm(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
+  
+ Norm=magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+ if Norm[0] < 0: c1=-1.0*c1;
+
+ while Norm[0]<1.0e-1: 
+  c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d=checking_norm(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+  Norm=magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+  #print Norm[0]
+
+ while Norm[0]>1.0e+5: 
+  c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d=checking_norm(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+  Norm=magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+  #print Norm[0]
+
+ return c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4
+ 
+def checking_norm(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
+ Norm=magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d)
+ if Norm[0] < 0: c1=-1.0*c1;
+ if Norm[0] < 1.0e-1:
+  c1*=1.4
+  c2*=1.4
+  c3*=1.4
+  c4*=1.4
+  Ta1*=1.4
+  Ta2*=1.4
+  Ta3*=1.4
+  Ta4*=1.4
+  Tb1*=1.4
+  Tb2*=1.4
+  Tb3*=1.4
+  Tb4*=1.4
+
+ elif Norm[0] > 1.e+5:
+  c1*=0.92
+  c2*=0.92
+  c3*=0.92
+  c4*=0.92
+  Ta1*=0.92
+  Ta2*=0.92
+  Ta3*=0.92
+  Ta4*=0.92
+  Tb1*=0.92
+  Tb2*=0.92
+  Tb3*=0.92
+  Tb4*=0.92
+ return c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d
+ 
  
 def  magnetization_value(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d):
 
@@ -709,7 +818,7 @@ def Env_energy_three1(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,a_u,b_
 
 
 
-#@profile 
+
  
 def permuteN(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
  
@@ -855,8 +964,56 @@ def permuteN1(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4):
 
  
  
+def qr_parity2(theta):
+
+    bd1=uni10.Bond(uni10.BD_IN,theta.bond(3).Qlist())
+
+    GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3)])
+    LA=uni10.UniTensor([bd1, theta.bond(3)])
+
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).qr()
+        GA.putBlock(qnum, svds[qnum][0])
+        LA.putBlock(qnum, svds[qnum][1])
+
+    return GA, LA
  
+def lq_parity2(theta):
+    bd1=uni10.Bond(uni10.BD_OUT,theta.bond(0).Qlist())
+
+    
+    LA=uni10.UniTensor([theta.bond(0),bd1])
+    GA=uni10.UniTensor([theta.bond(0),theta.bond(1),theta.bond(2),theta.bond(3)])
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).lq()
+        GA.putBlock(qnum, svds[qnum][1])
+        LA.putBlock(qnum, svds[qnum][0])
+
+    return  LA, GA
  
+def svd_parity2(theta):
+
+    LA=uni10.UniTensor([theta.bond(0), theta.bond(1)])
+    GA=uni10.UniTensor([theta.bond(0), theta.bond(1)])
+    GB=uni10.UniTensor([theta.bond(0), theta.bond(1)])
+    svds = {}
+    blk_qnums = theta.blockQnum()
+    dim_svd=[]
+    for qnum in blk_qnums:
+        svds[qnum] = theta.getBlock(qnum).svd()
+    for qnum in blk_qnums:
+        svd = svds[qnum]
+        GA.putBlock(qnum, svd[0])
+        GB.putBlock(qnum, svd[2])
+        LA.putBlock(qnum, svd[1])
+#    print LA
+    return GA, LA,GB
  
  
  

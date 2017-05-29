@@ -123,21 +123,42 @@ def setTruncation2(theta, chi):
 
 
 
-def svd_parity(theta):
-
-    LA=uni10.UniTensor([theta.bond(0), theta.bond(1)])
-    GA=uni10.UniTensor([theta.bond(0), theta.bond(1)])
-    GB=uni10.UniTensor([theta.bond(0), theta.bond(1)])
+def svd_parity(theta,chi):
+    LA=uni10.UniTensor(theta.bond())
+    GA=uni10.UniTensor(theta.bond())
+    GB=uni10.UniTensor(theta.bond())
     svds = {}
     blk_qnums = theta.blockQnum()
     dim_svd=[]
     for qnum in blk_qnums:
-        svds[qnum] = theta.getBlock(qnum).svd()
-    for qnum in blk_qnums:
+        M_tem=theta.getBlock(qnum)
+        svds[qnum] = M_tem.svd()
+        dim_svd.append(int(svds[qnum][1].col()))
+
+    svs = []
+    bidxs = []
+    for bidx in xrange(len(blk_qnums)):
+        svs, bidxs = sv_merge1(svs, bidxs, bidx, svds[blk_qnums[bidx]][1], chi,len(blk_qnums))
+    dims = [0] * len(blk_qnums)
+    for bidx in bidxs:
+        dims[bidx] += 1  
+    qnums = []
+    for bidx in xrange(len(blk_qnums)):
+        qnums += [blk_qnums[bidx]] * dims[bidx]
+    bdi_mid = uni10.Bond(uni10.BD_IN, qnums)
+    #print bdi_mid
+    bdo_mid = uni10.Bond(uni10.BD_OUT, qnums)
+    GA.assign([theta.bond(0),theta.bond(1),theta.bond(2), bdo_mid])
+    GB.assign([bdi_mid, theta.bond(3)])
+    LA.assign([bdi_mid, bdo_mid])
+    degs = bdi_mid.degeneracy()
+    for qnum, dim in degs.iteritems():
+        if qnum not in svds:
+            raise Exception("In setTruncaton(): Fatal error.")
         svd = svds[qnum]
-        GA.putBlock(qnum, svd[0])
-        GB.putBlock(qnum, svd[2])
-        LA.putBlock(qnum, svd[1])
+        GA.putBlock(qnum, svd[0].resize(svd[0].row(), dim))
+        GB.putBlock(qnum, svd[2].resize(dim, svd[2].col()))
+        LA.putBlock(qnum, svd[1].resize(dim, dim)  )
     return GA, LA,GB
 
 
@@ -243,26 +264,23 @@ def lq_parity1(theta):
 
 
 
-
-
-
-
-
 def   Sqrt(Landa):
   Landa_cp=copy.copy(Landa)
   blk_qnums=Landa.blockQnum()
   for qnum in blk_qnums:
    D=int(Landa_cp.getBlock(qnum).col())
-   Landa_cpm=Landa_cp.getBlock(qnum)
-   Landam=Landa_cp.getBlock(qnum)
+   Landa_cpm=Landa_cp.getBlock(qnum,True)
+   Landam=Landa_cp.getBlock(qnum,True)
+   #print Landa_cpm[0], Landa_cpm[1], Landa_cpm[2], Landa_cpm[3]
    for i in xrange(D):
-    for j in xrange(D):
-     if Landam[i*D+j] > 1.0e-12:
-      Landa_cpm[i*D+j]=Landam[i*D+j]**(1.00/2.00)
-     else:
-      Landa_cpm[i*D+j]=0
+      if Landam[i] > 1.0e-12:
+       Landa_cpm[i]=Landam[i]**(1.00/2.00)
+      else:
+       Landa_cpm[i]=0
    Landa_cp.putBlock(qnum,Landa_cpm)
   return Landa_cp 
+
+
 
 def inverse(Landa2):
  invLanda2=uni10.UniTensor(Landa2.bond())
@@ -270,14 +288,16 @@ def inverse(Landa2):
  for qnum in blk_qnums:
   D=int(Landa2.getBlock(qnum).row())
   D1=int(Landa2.getBlock(qnum).col())
-  invL2 = uni10.Matrix(D, D1)
-  invLt = uni10.Matrix(D, D1)
-  invLt=Landa2.getBlock(qnum)
+  invL2 = uni10.Matrix(D, D1,True)
+  invLt = uni10.Matrix(D, D1,True)
+  invLt=Landa2.getBlock(qnum,True)
+#  print invLt[0], invLt[1], invLt[2], invLt[3]
   for i in xrange(D):
-    for j in xrange(D1):
-     invL2[i*D1+j] = 1.0e-13 if ((invLt[i*D1+j].real) < 1.0e-12) else (1.00 / (invLt[i*D1+j].real))
+      invL2[i] = 0 if ((invLt[i].real) < 1.0e-10) else (1.00 / (invLt[i].real))
   invLanda2.putBlock(qnum,invL2)
  return invLanda2
+
+
 
 
 def lq_parity(theta):
