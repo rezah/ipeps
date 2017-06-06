@@ -90,7 +90,7 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,h,Env,Env1,Env2,Env3,Gauge,
 #   a_u, c_u, a, c=basicB.Var_ca(a_u,c_u,c,d,a,b,Env1,D,U0,d_phys,chi,Gauge,Corner_method,H00,N_env,N_svd)
 
 #   b_u, d_u, b, d=basicB.Var_ca(b_u,d_u,d,c,b,a,Env3,D,U0,d_phys,chi,Gauge,Corner_method,H00,N_env,N_svd)
-####################################################################################################
+#####################################################################################################
 
 ######################################################################################
 
@@ -135,7 +135,7 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,h,Env,Env1,Env2,Env3,Gauge,
     basic.Store_EnvEnv(Env,Env1,Env2,Env3)
     basicC.Store_plist(plist)
     basicC.Store_plist1(plist00)
-   elif q>3:
+   elif q>2:
     a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
     basic.Reload_EnvEnv(Env,Env1,Env2,Env3)
     basicC.Reload_plist(plist)

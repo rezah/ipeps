@@ -37,8 +37,8 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_env,N_sv
 # print time.time() - t0, "Qr_lQ_decom"
 
 # t0=time.time()
- if Gauge is 'Fixed':
-  N_u=N_Positiv(N_u)
+# if Gauge is 'Fixed':
+ N_u=N_Positiv(N_u)
 # print time.time() - t0, "Positive"
  
  l_up=copy.copy(l_u)
@@ -109,8 +109,8 @@ def Var_ca(c_u, a_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_env,N_sv
  
  N_u, l_u, r_u, q_u, qq_u = Qr_lQ_decom_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,c_u,a_u)
 
- if Gauge is 'Fixed':
-  N_u=N_Positiv_1(N_u)
+# if Gauge is 'Fixed':
+ N_u=N_Positiv_1(N_u)
  
  l_up=copy.copy(l_u)
  r_up=copy.copy(r_u)
@@ -801,7 +801,7 @@ def Do_optimization_Full(N_u, l_u, r_u, l_up, r_up, U,N_svd):
   if (q>1) and (Res1 > Res) and ((abs(Res1-Res) / abs(Res)) > 1.00e-4): checking_val=1;
 
   count+=1
-  if count > 30: print 'Num_Opt > 30'; break;
+  if count > 60: print 'Num_Opt > 60'; break;
   if abs(Res) > 1.00e-10:
    if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
     #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count

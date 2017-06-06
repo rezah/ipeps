@@ -9,7 +9,7 @@ import basic
 
 
 def itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,
-Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_D,fixbond_itebd):
+Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_D,fixbond_itebd,start_itebd, division_itebd,itebd_method):
   
  E_0=1.0
  E_1=2.0
@@ -28,6 +28,7 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
    H00=basic.Heisenberg0_U1(h[0],h[1],d_phys)
    H1=basic.Heisenberg1_U1(h[2],d_phys)
    H2=basic.threebody_U1(h,d_phys)   
+   H2=basic.threebody_U1_help(h,d_phys)   
  if Model is "Heisenberg_U1Z2":
    H0=basic.Heisenberg0_U1Z2(h[0],h[1],d_phys)
    H00=basic.Heisenberg0_U1Z2(h[0],h[1],d_phys)
@@ -37,8 +38,8 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
  U0 = uni10.UniTensor(H00.bond(), "U");
 
  for i in xrange(1,600):
-
-   delta=1.00/pow(5,i) 
+ 
+   delta=start_itebd/pow(division_itebd,i) 
 
    if delta>1.0e-1:
     N_iter=N_iterF
@@ -75,49 +76,49 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
 
 
 
+    if itebd_method is 'short':
+ ##############################################################################
+     Gamma=[Gamma_a,Gamma_b]
+     Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
+   #rlink
 
-#################################################################################
-#    Gamma=[Gamma_a,Gamma_b]
-#    Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
-#  #rlink
-
-#    basicitebd.update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
-#  #ulink
-#    Gamma=[Gamma_a, Gamma_c]
-#    Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
-#    basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D,fixbond_itebd)
-#    #print Landa_2.printDiagram(),Gamma_a.printDiagram(),Gamma_c.printDiagram()
-
-
-#  #rlink
-#    Gamma=[Gamma_b, Gamma_a]
-#    Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_5,Landa_6,Landa_2,Landa_4]
-#    basicitebd.update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
-#  #ulink
-#    Gamma=[ Gamma_b,Gamma_d]
-#    Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
-#    basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D,fixbond_itebd)
+     basicitebd.update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+   #ulink
+     Gamma=[Gamma_a, Gamma_c]
+     Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
+     basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D,fixbond_itebd)
+     #print Landa_2.printDiagram()
 
 
-#    Gamma=[Gamma_c,Gamma_d]
-#    Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]
-#  #rlink
-#    basicitebd.update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
-#  #ulink
-#    Gamma=[ Gamma_c,Gamma_a]
-#    Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_7,Landa_8]
-#    basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D,fixbond_itebd)
+   #rlink
+     Gamma=[Gamma_b, Gamma_a]
+     Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_5,Landa_6,Landa_2,Landa_4]
+     basicitebd.update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+   #ulink
+     Gamma=[ Gamma_b,Gamma_d]
+     Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
+     basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D,fixbond_itebd)
 
 
-#  #rlink
-#    Gamma=[Gamma_d, Gamma_c]
-#    Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_3,Landa_1,Landa_4,Landa_2]
-#    basicitebd.update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
-# #ulink
-#    Gamma=[ Gamma_d,Gamma_b]
-#    Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_2,Landa_4]
-#    basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D,fixbond_itebd)
-################################################################################################
+     Gamma=[Gamma_c,Gamma_d]
+     Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]
+   #rlink
+     basicitebd.update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+   #ulink
+     Gamma=[ Gamma_c,Gamma_a]
+     Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_7,Landa_8]
+     basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D,fixbond_itebd)
+
+
+   #rlink
+     Gamma=[Gamma_d, Gamma_c]
+     Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_3,Landa_1,Landa_4,Landa_2]
+     basicitebd.update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+  #ulink
+     Gamma=[ Gamma_d,Gamma_b]
+     Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_2,Landa_4]
+     basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D,fixbond_itebd)
+ #############################################################################################
     
     
     A1=Landa_1.trace().real
@@ -145,102 +146,103 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
         U.putBlock(qnum, uni10.takeExp((-1.00/2.00)*delta, H2.getBlock(qnum)))
     #print H2
 
+    #print Landa_1, '\n', Landa_2, '\n',Landa_3 ,'\n',Landa_4 ,'\n',Landa_5, '\n',Landa_6, '\n',Landa_7, 
+    if itebd_method is 'long':
 
-
-#################################  abcd  ##############################################################
-    #print q
-    Gamma=[Gamma_a,Gamma_b,Gamma_c]
-    Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
-  #rlink
-    basicitebd.update_rlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
-
-#    Gamma=[Gamma_c,Gamma_d,Gamma_b]
-#    Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
-#  #rlink
-#    basicitebd.update_rdlink_eff_long(Gamma,Landa,U,D,d_phys,q_D)
-
-    Gamma=[Gamma_a,Gamma_b,Gamma_d]
-    Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
-  #rlink
-    basicitebd.update_ulink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
-
-#    Gamma=[Gamma_a,Gamma_c,Gamma_d]
-#    Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
-#  #rlink
-#    basicitebd.update_udlink_eff_long(Gamma,Landa,U,D,d_phys,q_D)
-
-######################################################################################################
-#    
-#################################  badc   #####################################################    
-    Gamma=[Gamma_b,Gamma_a,Gamma_d]
-    Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
-  #rlink
-    basicitebd.update_rlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
-#    
-#    
-#    Gamma=[Gamma_a,Gamma_b,Gamma_d]
-#    Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]
-#  #rlink
-#    basicitebd.update_rdlink_eff_long(Gamma,Landa,U,D,d_phys,q_D)
-
-    Gamma=[Gamma_b,Gamma_a,Gamma_c]
-    Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
+ #################################  abcd  ##############################################################
+     #print q
+     Gamma=[Gamma_a,Gamma_b,Gamma_c]
+     Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
    #rlink
-    basicitebd.update_ulink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+     basicitebd.update_rlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+
+     Gamma=[Gamma_c,Gamma_d,Gamma_b]
+     Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
+ #  #rlink
+     basicitebd.update_rdlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+
+     Gamma=[Gamma_a,Gamma_b,Gamma_d]
+     Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
+   #rlink
+     basicitebd.update_ulink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+
+     Gamma=[Gamma_a,Gamma_c,Gamma_d]
+     Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
+   #rlink
+     basicitebd.update_udlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+
+ ######################################################################################################
+ #    
+ #################################  badc   #####################################################    
+     Gamma=[Gamma_b,Gamma_a,Gamma_d]
+     Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
+   #rlink
+     basicitebd.update_rlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+     
+     
+     Gamma=[Gamma_a,Gamma_b,Gamma_d]
+     Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]
+   #rlink
+     basicitebd.update_rdlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+
+     Gamma=[Gamma_b,Gamma_a,Gamma_c]
+     Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
+    #rlink
+     basicitebd.update_ulink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
 
 
-#    Gamma=[Gamma_c,Gamma_a,Gamma_b]
-#    Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]
-#  #rlink
-#    basicitebd.update_udlink_eff_long(Gamma,Landa,U,D,d_phys,q_D)
+     Gamma=[Gamma_c,Gamma_a,Gamma_b]
+     Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]
+   #rlink
+     basicitebd.update_udlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
 
-################################################################################################    
-#    
-#    
-#    
-##################################cdab########################################################    
-    Gamma=[Gamma_c,Gamma_d,Gamma_a]
-    Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]
-  #rlink
-    basicitebd.update_rlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+ ################################################################################################    
+ #    
+ #    
+ #    
+ ##################################cdab########################################################    
+     Gamma=[Gamma_c,Gamma_d,Gamma_a]
+     Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]
+   #rlink
+     basicitebd.update_rlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
 
-#    Gamma=[Gamma_b,Gamma_a,Gamma_c]
-#    Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_4,Landa_2]
-#  #rlink
-#    basicitebd.update_rdlink_eff_long(Gamma,Landa,U,D,d_phys,q_D)
+     Gamma=[Gamma_b,Gamma_a,Gamma_c]
+     Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_4,Landa_2]
+   #rlink
+     basicitebd.update_rdlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
 
-    Gamma=[Gamma_c,Gamma_d,Gamma_b]
-    Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]
-#  #rlink
-    basicitebd.update_ulink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+     Gamma=[Gamma_c,Gamma_d,Gamma_b]
+     Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]
+ #  #rlink
+     basicitebd.update_ulink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
 
-#    Gamma=[Gamma_d,Gamma_b,Gamma_a]
-#    Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_4,Landa_2]
-#  #rlink
-#    basicitebd.update_udlink_eff_long(Gamma,Landa,U,D,d_phys,q_D)
-##########################################################################################
-#    
-####################################     dcba    #################################################    
-    Gamma=[Gamma_d,Gamma_c,Gamma_b]
-    Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_4,Landa_2]
-  #rlink
-    basicitebd.update_rlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
-#    
-#    Gamma=[Gamma_d,Gamma_c,Gamma_a]
-#    Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
-#  #rlink
-#    basicitebd.update_rdlink_eff_long(Gamma,Landa,U,D,d_phys,q_D)
-#    
-    Gamma=[Gamma_d,Gamma_c,Gamma_a]
-    Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_4,Landa_2]
-#  #rlink
-    basicitebd.update_ulink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
-#    
-#    
-#    Gamma=[Gamma_b,Gamma_d,Gamma_c]
-#    Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
-#  #rlink
-#    basicitebd.update_udlink_eff_long(Gamma,Landa,U,D,d_phys,q_D)
+     Gamma=[Gamma_d,Gamma_b,Gamma_a]
+     Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_4,Landa_2]
+   #rlink
+     basicitebd.update_udlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+ ##########################################################################################
+
+ ####################################     dcba    #################################################    
+     Gamma=[Gamma_d,Gamma_c,Gamma_b]
+     Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_4,Landa_2]
+   #rlink
+     basicitebd.update_rlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+     
+     Gamma=[Gamma_d,Gamma_c,Gamma_a]
+     Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
+   #rlink
+     basicitebd.update_rdlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+     
+     Gamma=[Gamma_d,Gamma_c,Gamma_a]
+     Landa=[Landa_5,Landa_8,Landa_6,Landa_7,Landa_1,Landa_3,Landa_4,Landa_2]
+   #rlink
+     basicitebd.update_ulink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
+     
+     
+     Gamma=[Gamma_b,Gamma_d,Gamma_c]
+     Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
+   #rlink
+     basicitebd.update_udlink_eff_long(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
 
 
  return Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8  

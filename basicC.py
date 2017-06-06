@@ -3,10 +3,11 @@ import copy
 import time
 import basic
 import numpy as np
+#import sys
 #import scipy as sp
 #import line_profiler
 
-#@profile
+##@profile
 def Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist,MPO_list,Inv_method,N_svd,N_env,method,check_step):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic.Init_env(Env)
@@ -35,10 +36,12 @@ def Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N
 
 
  if method is "SVD_mpo":
-  Do_optimization_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, MPO_list, c_u, a_u, b_u, plist, Inv_method, N_grad,N_svd,Gauge,check_step)
-  equall_dis_plist(plist)
-  c_up,a_up,b_up=recover(c_u, a_u, b_u, plist, MPO_list)
-  normal_plist(plist)
+   #Do_optimization_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, MPO_list, c_u, a_u, b_u, plist, Inv_method, N_grad,N_svd,Gauge,check_step)
+   Do_optimization_MPO_positive(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, MPO_list, c_u, a_u, b_u, plist, Inv_method, N_grad,N_svd,Gauge,check_step)
+
+   equall_dis_plist(plist)
+   c_up,a_up,b_up=recover(c_u, a_u, b_u, plist, MPO_list)
+   normal_plist(plist)
 
  if method is "SVD":
   a_up, b_up, c_up, d_up=Do_optimization_svd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Inv_method,N_svd,Gauge,check_step)
@@ -82,7 +85,7 @@ def Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N
 
  return a_up, b_up, c_up, d_up, ap, bp, cp, dp
 
-##@profile
+###@profile
 def Var_abd(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist,MPO_list,Inv_method,N_svd,N_env,method,check_step):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic.Init_env(Env)
@@ -112,11 +115,11 @@ def Var_abd(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N
  
  #randomize_plist(plist)
  if method is "SVD_mpo":
-  Do_optimization_MPO1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step)
+  #Do_optimization_MPO1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step)
+  Do_optimization_MPO_positive1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step)
   equall_dis_plist1(plist)
   a_up,b_up,d_up=recover1( a_u, b_u, d_u, plist, MPO_list)
   normal_plist1(plist)
- 
 
  if method is "SVD":
   a_up, b_up, c_up, d_up=Do_optimization_svd1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Inv_method,N_svd,Gauge,check_step)
@@ -364,7 +367,7 @@ def energy_abd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,c_u,d_u, U):
 
 
  
-###@profile
+####@profile
 def  Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U):
 
  U.setLabel([-54,-55,-56,0,1,2])
@@ -444,7 +447,7 @@ def  Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
 
  return  val_f
 
-##@profile
+###@profile
 def Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U, N_grad, Opt_method, Gauge):
 
 
@@ -470,7 +473,7 @@ def Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c
 
    E1_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
    Ef=E1_val
-   print 'E1=', E1_val, abs((E_previous-E1_val)/E1_val), count, time_val
+   print 'E1=', E1_val, abs((E_previous-E1_val)/E1_val), i, count, time_val
 
 
    D_a,D_b,D_c,D_d=basic.Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Gauge)
@@ -820,7 +823,7 @@ def Do_optimization_Grad_MPO1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_lis
 
 
 
-###@profile
+####@profile
 def  Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U):
 
  U.setLabel([-55,-56,-57,0,1,2])
@@ -897,7 +900,7 @@ def  Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up
  
  #print Val2[0], Val3[0]
  return  val_f
-##@profile
+###@profile
 def Do_optimization_Grad1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Gauge):
 
   time_val=0
@@ -1169,7 +1172,7 @@ def svd_parity1(theta):
 
 
 
-###@profile
+####@profile
 def inverse(Landa2):
  invLanda2=uni10.UniTensor(Landa2.bond())
  blk_qnums=Landa2.blockQnum()
@@ -1534,7 +1537,7 @@ def   Sqrt(Landa):
 def Sqrt_mat(e):
  d=int(e.row())
  for q in xrange(d):
-   #print e[q] 
+   #print q, e[q] 
    if e[q] > 0:  
     e[q]=((e[q])**(1.00/2.00))
    else:  
@@ -1773,9 +1776,889 @@ def initialize_plist1(a_u, b_u, d_u, MPO_list):
 
  return plist
 
+##@profile
+def Do_optimization_MPO_positive(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step):
+ 
+# Distance_val=Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist)
+# print Distance_val
+ 
+ N_mpo=obtain_N_mpo(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,c_u,a_u,b_u)
+# N_mpo=N_Positiv(N_mpo)
+
+
+
+
+
+ t0=time.time()
+ N_mpo.setLabel([-1,-2,-3,-4,-5,-6,-7,1,2,3,4,5,6,7])
+ N_mpo1=copy.copy(N_mpo)
+ N_mpo1.transpose()
+ N_mpo=(N_mpo+N_mpo1)*(1.00/2.00)
+ N_mpo1=copy.copy(N_mpo)
+ N_mpo1.setLabel([11,22,33,44,55,66,77, -1,-2,-3,-4,-5,-6,-7])
+ N_mpo=N_mpo*N_mpo1
+ N_mpo.permute([11,22,33,44,55,66,77,1,2,3,4,5,6,7],7)
+ N_mpo=sqrt_general(N_mpo)
+ N_mpo.setLabel([-54,-62,-55,-64,-56,-66,-68,54,62,55,64,56,66,68])
+ print time.time() - t0, "N_Positiv"
+
+# Distance_val=Dis_ff_mpo(N_mpo,plist,MPO_list)
+# print 'Dis0', Distance_val
+
+
+ plist_f=[copy.copy(plist[i])  for i in xrange(len(plist)) ]
+ 
+ Distance_val=Dis_ff_mpo(N_mpo,plist,MPO_list)
+ print 'Dis0', Distance_val
+ 
+ Res=1
+ Res1=Distance_val
+ count=0
+ check_val=0
+ for q in xrange(N_svd[0]):
+  t0=time.time()
+  if check_step is 'on':
+
+
+   Dis1=Dis_ff_mpo(N_mpo,plist,MPO_list)
+   optimum_1_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge)
+   Dis2=Dis_ff_mpo(N_mpo,plist,MPO_list)
+   #print "1", Dis1, Dis2, Dis2 <= Dis1
+   if Dis2 <= Dis1:
+    plist_f[1]=plist[1]
+   else: 
+    plist[1]=plist_f[1]
+
+
+   Dis1=Dis_ff_mpo(N_mpo,plist,MPO_list)
+   optimum_2_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge)
+   Dis2=Dis_ff_mpo(N_mpo,plist,MPO_list)
+   #print "2", Dis1, Dis2, Dis2 <= Dis1
+   if Dis2 <= Dis1:
+    plist_f[2]=plist[2]
+   else: 
+    plist[2]=plist_f[2]
+
+
+
+   Dis1=Dis_ff_mpo(N_mpo,plist,MPO_list)
+   optimum_3_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge)
+   Dis2=Dis_ff_mpo(N_mpo,plist,MPO_list)
+   #print "3", Dis1, Dis2, Dis2 <= Dis1
+   if Dis2 <= Dis1:
+    plist_f[3]=plist[3]
+   else: 
+    plist[3]=plist_f[3]
+
+
+   Dis1=Dis_ff_mpo(N_mpo,plist,MPO_list)
+   optimum_0_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge)
+   Dis2=Dis_ff_mpo(N_mpo,plist,MPO_list)
+   #print "0", Dis1, Dis2, Dis2 <= Dis1 
+   if Dis2 <= Dis1:
+    plist_f[0]=plist[0]
+   else: 
+    plist[0]=plist_f[0]
+
+
+  elif check_step is 'off':
+   optimum_0_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge)
+   optimum_1_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge)
+   optimum_2_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge)
+   optimum_3_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge)
+
+
+
+  Distance_val=Dis_ff_mpo(N_mpo,plist,MPO_list)
+  Res=Res1
+  Res1=Distance_val
+  print 'Dis-mpo1=', Distance_val, abs(Res1-Res) / abs(Res), q, time.time() - t0
+#  print  Res1 , Res,Res1 < Res 
+
+  if Res1 < Res:
+    plist_f[0]=plist[0]
+    plist_f[1]=plist[1]
+    plist_f[2]=plist[2]
+    plist_f[3]=plist[3]
+  else: 
+    plist[0]=plist_f[0]
+    plist[1]=plist_f[1]
+    plist[2]=plist_f[2]
+    plist[3]=plist_f[3]
+    check_val=1
+    break
+  count+=1
+  if count > 550: print 'Num_Opt > 550'; break;
+  if abs(Res) > 1.00e-10:
+   if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
+    print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
+    check_val=0
+    break
+  else:
+    if (abs(Distance_val) < 1.00e-7) or (  abs(Res1-Res) < 1.00e-11  ): 
+     print 'break, Dis', Distance_val, abs(Res1-Res)
+     break
+# Distance_val=Dis_ff_mpo(N_mpo,plist,MPO_list)
+# print 'DisFMPO_final', Distance_val
+ #if check_val!=0: 
+  #Do_optimization_Grad_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,N_grad)
+
+
+
+
 
 
 ##@profile
+def obtain_N_mpo(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,c_u,a_u,b_u):
+
+ d.setLabel([19,-19,10,-10,8,-8,20,-20])
+
+ a_u1=copy.copy(a_u)
+ b_u1=copy.copy(b_u)
+ c_u1=copy.copy(c_u)
+
+
+###########################################################
+ c_u1.setLabel([54,14,12,19,62])
+ a_u1.setLabel([55,16,64,66,2])
+ b_u1.setLabel([56,68,20,6,4])
+
+
+ c_d1=copy.copy(c_u1)
+ b_d1=copy.copy(b_u1)
+ a_d1=copy.copy(a_u1)
+
+ c_d1.transpose()
+ b_d1.transpose()
+ a_d1.transpose()
+
+ c_d1.setLabel([-19,-62,-54,-14,-12])
+ a_d1.setLabel([-66,-2,-55,-16,-64])
+ b_d1.setLabel([-6,-4,-56,-68,-20])
+
+
+
+
+ N_mpo=((((E1*E8)*(a_u1*a_d1))))*((((E7*E6)*(c_u1*c_d1))*(((E4*E5)*d)))*((E2*E3)*(b_u1*b_d1)))
+ #print  N_mpo.printDiagram()
+ N_mpo.permute([-54,-62,-55,-64,-56,-66,-68,54,62,55,64,56,66,68],7)
+ return N_mpo
+
+##@profile
+def Dis_ff_mpo(N_mpo,plist,MPO_list):
+
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ #print MPO_list[0].printDiagram(),MPO_list[1].printDiagram(),MPO_list[2].printDiagram()
+
+
+ plist0=MPO_list[0]*plist[0]
+ plist0.permute([-54,62,54,17],2)
+ plist0.setLabel([100,62,54,17])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-54,-17,100,-62])
+ 
+ 
+ plist1=(MPO_list[1]*plist[1])*plist[2]
+ plist1.permute([-55,17,66,55,64,18],3)
+ plist1.setLabel([200,17,66,55,64,18])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-64,-18,200,-17,-66])
+
+
+
+ plist2=(MPO_list[2]*plist[3])
+ plist2.permute([-56,18,56,68],2)
+ plist2.setLabel([300,18,56,68])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,-68,300,-18])
+#########################################################################
+ bd=uni10.Bond(uni10.BD_OUT,plist[0].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[0].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[0].bond(2).Qlist())
+ 
+ plist0_iden=uni10.UniTensor([plist[0].bond(0),plist[0].bond(1),plist[0].bond(2),bd,bd1,bd2])
+ plist0_iden.setLabel([62,58,57,170,171,172])
+ plist0_iden.identity()
+
+ plist0_iden=MPO_list[0]*plist0_iden
+ plist0_iden.permute([-54,62,54,170,171,172],2)
+ plist0_iden.setLabel([100,62,54,170,171,172])
+
+ plist0_iden_d=copy.copy(plist0_iden)
+ plist0_iden_d.transpose()
+ plist0_iden_d.setLabel([-54,-170,-171,-172,100,-62])
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[1].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[1].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[1].bond(3).Qlist())
+
+ plist1_iden=uni10.UniTensor([bd,bd1,bd2,plist[1].bond(1),plist[1].bond(2),plist[1].bond(3)])
+ plist1_iden.setLabel([170,171,172,64,58,57])
+ plist1_iden.identity()
+
+
+ bd=uni10.Bond(uni10.BD_OUT,plist[2].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[2].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[2].bond(2).Qlist())
+
+ plist2_iden=uni10.UniTensor([plist[2].bond(0),plist[2].bond(1),plist[2].bond(2),bd,bd1,bd2])
+ plist2_iden.setLabel([66,59,60,180,181,182])
+ plist2_iden.identity()
+
+
+ plist1_iden=(MPO_list[1]*plist1_iden)*plist2_iden
+ plist1_iden.permute([-55,170,171,172,66,55,64,180,181,182],5)
+ plist1_iden.setLabel([200,170,171,172,66,55,64,180,181,182])
+
+ plist1_iden_d=copy.copy(plist1_iden)
+ plist1_iden_d.transpose()
+ plist1_iden_d.setLabel([-55,-64,-180,-181,-182,200,-170,-171,-172,-66])
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[3].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[3].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[3].bond(3).Qlist())
+
+ plist2_iden=uni10.UniTensor([bd,bd1,bd2,plist[3].bond(1),plist[3].bond(2),plist[3].bond(3)])
+ plist2_iden.setLabel([180,181,182,68,59,60])
+ plist2_iden.identity()
+
+ plist2_iden=(MPO_list[2]*plist2_iden)
+ plist2_iden.permute([-56,180,181,182,56,68],4)
+ plist2_iden.setLabel([300,180,181,182,56,68])
+
+ plist2_iden_d=copy.copy(plist2_iden)
+ plist2_iden_d.transpose()
+ plist2_iden_d.setLabel([-56,-68,300,-180,-181,-182])
+
+
+ val_1=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ #print val_1[0]
+
+ val_2=((plist0_iden_d*plist1_iden_d)*(plist2_iden_d))*N_mpo*((plist0*plist1)*(plist2))
+ #print val_2[0]
+
+ return val_1[0]-2.0*val_2[0]
+
+
+
+
+
+##@profile
+def  optimum_0_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
+
+
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ #print MPO_list[0].printDiagram(),MPO_list[1].printDiagram(),MPO_list[2].printDiagram()
+
+
+ plist0=MPO_list[0]*plist[0]
+ plist0.permute([-54,62,54,17],2)
+ plist0.setLabel([100,62,54,17])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-54,-17,100,-62])
+ 
+ 
+ plist1=(MPO_list[1]*plist[1])*plist[2]
+ plist1.permute([-55,17,66,55,64,18],3)
+ plist1.setLabel([200,17,66,55,64,18])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-64,-18,200,-17,-66])
+
+
+
+ plist2=(MPO_list[2]*plist[3])
+ plist2.permute([-56,18,56,68],2)
+ plist2.setLabel([300,18,56,68])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,-68,300,-18])
+#########################################################################
+ bd=uni10.Bond(uni10.BD_OUT,plist[0].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[0].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[0].bond(2).Qlist())
+ 
+ plist0_iden=uni10.UniTensor([plist[0].bond(0),plist[0].bond(1),plist[0].bond(2),bd,bd1,bd2])
+ plist0_iden.setLabel([62,58,57,170,171,172])
+ plist0_iden.identity()
+
+ plist0_iden=MPO_list[0]*plist0_iden
+ plist0_iden.permute([-54,62,54,170,171,172],2)
+ plist0_iden.setLabel([100,62,54,170,171,172])
+
+ plist0_iden_d=copy.copy(plist0_iden)
+ plist0_iden_d.transpose()
+ plist0_iden_d.setLabel([-54,-170,-171,-172,100,-62])
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[1].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[1].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[1].bond(3).Qlist())
+
+ plist1_iden=uni10.UniTensor([bd,bd1,bd2,plist[1].bond(1),plist[1].bond(2),plist[1].bond(3)])
+ plist1_iden.setLabel([170,171,172,64,58,57])
+ plist1_iden.identity()
+
+
+ bd=uni10.Bond(uni10.BD_OUT,plist[2].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[2].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[2].bond(2).Qlist())
+
+ plist2_iden=uni10.UniTensor([plist[2].bond(0),plist[2].bond(1),plist[2].bond(2),bd,bd1,bd2])
+ plist2_iden.setLabel([66,59,60,180,181,182])
+ plist2_iden.identity()
+
+
+ plist1_iden=(MPO_list[1]*plist1_iden)*plist2_iden
+ plist1_iden.permute([-55,170,171,172,66,55,64,180,181,182],5)
+ plist1_iden.setLabel([200,170,171,172,66,55,64,180,181,182])
+
+ plist1_iden_d=copy.copy(plist1_iden)
+ plist1_iden_d.transpose()
+ plist1_iden_d.setLabel([-55,-64,-180,-181,-182,200,-170,-171,-172,-66])
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[3].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[3].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[3].bond(3).Qlist())
+
+ plist2_iden=uni10.UniTensor([bd,bd1,bd2,plist[3].bond(1),plist[3].bond(2),plist[3].bond(3)])
+ plist2_iden.setLabel([180,181,182,68,59,60])
+ plist2_iden.identity()
+
+ plist2_iden=(MPO_list[2]*plist2_iden)
+ plist2_iden.permute([-56,180,181,182,56,68],4)
+ plist2_iden.setLabel([300,180,181,182,56,68])
+
+ plist2_iden_d=copy.copy(plist2_iden)
+ plist2_iden_d.transpose()
+ plist2_iden_d.setLabel([-56,-68,300,-180,-181,-182])
+################################################################################################
+
+
+ plist0=copy.copy(MPO_list[0])
+ plist0.permute([-54,58,57,54],1)
+ plist0.setLabel([100,58,57,54])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-58,-57,-54,100])
+
+
+ A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A.permute([-62,-58,-57,-17,62,58,57,17],4)
+
+# if Gauge is "Fixed":
+#  A1=copy.copy(A)
+#  A1.transpose()
+#  A=A+A1
+ 
+# A=N_Positiv(A)
+# A.setLabel([-62,-58,-57,-17,62,58,57,17])
+
+
+
+ Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap.permute([-62,-58,-57,-17],4)
+
+# if Gauge is "Fixed":
+#  Ap1=(((((E1*E8)*(a_ut*a_d1)))*((E2*E3)*(b_ut*b_d1)))*(((E4*E5)*d)))*(((E7*E6)*(c_ut*c_d1)))
+#  Ap1.permute([62,58,57,17],0)
+#  Ap1.transpose()
+#  Ap=Ap+Ap1
+
+ if Inv_method is 'SVD':
+   U, S, V=svd_parity(A)
+   U.transpose()
+   V.transpose()
+   S=Normal_Singulars(S)
+   S=inverse(S)
+   U.setLabel([8,9,10,11,12,13,14,15])
+   S.setLabel([4,5,6,7,8,9,10,11])
+   V.setLabel([0,1,2,3,4,5,6,7])
+   A_inv=V*S*U
+   A_inv.permute([0,1,2,3,12,13,14,15],4)
+   A_inv.setLabel([62,58,57,17,-62,-58,-57,-17])
+   A=A_inv*Ap
+   A.permute([62,58,57,17],3)
+   plist[0]=A
+ elif Inv_method is 'CG':
+   A=solve_linear_eq(A,Ap)
+   A.setLabel([62,58,57,17])
+   A.permute([62,58,57,17],3)   
+   plist[0]=A 
+
+##@profile
+def  optimum_1_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
+
+
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ #print MPO_list[0].printDiagram(),MPO_list[1].printDiagram(),MPO_list[2].printDiagram()
+
+
+ plist0=MPO_list[0]*plist[0]
+ plist0.permute([-54,62,54,17],2)
+ plist0.setLabel([100,62,54,17])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-54,-17,100,-62])
+ 
+ 
+ plist1=(MPO_list[1]*plist[1])*plist[2]
+ plist1.permute([-55,17,66,55,64,18],3)
+ plist1.setLabel([200,17,66,55,64,18])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-64,-18,200,-17,-66])
+
+
+
+ plist2=(MPO_list[2]*plist[3])
+ plist2.permute([-56,18,56,68],2)
+ plist2.setLabel([300,18,56,68])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,-68,300,-18])
+#########################################################################
+ bd=uni10.Bond(uni10.BD_OUT,plist[0].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[0].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[0].bond(2).Qlist())
+ 
+ plist0_iden=uni10.UniTensor([plist[0].bond(0),plist[0].bond(1),plist[0].bond(2),bd,bd1,bd2])
+ plist0_iden.setLabel([62,58,57,170,171,172])
+ plist0_iden.identity()
+
+ plist0_iden=MPO_list[0]*plist0_iden
+ plist0_iden.permute([-54,62,54,170,171,172],2)
+ plist0_iden.setLabel([100,62,54,170,171,172])
+
+ plist0_iden_d=copy.copy(plist0_iden)
+ plist0_iden_d.transpose()
+ plist0_iden_d.setLabel([-54,-170,-171,-172,100,-62])
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[1].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[1].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[1].bond(3).Qlist())
+
+ plist1_iden=uni10.UniTensor([bd,bd1,bd2,plist[1].bond(1),plist[1].bond(2),plist[1].bond(3)])
+ plist1_iden.setLabel([170,171,172,64,58,57])
+ plist1_iden.identity()
+
+
+ bd=uni10.Bond(uni10.BD_OUT,plist[2].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[2].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[2].bond(2).Qlist())
+
+ plist2_iden=uni10.UniTensor([plist[2].bond(0),plist[2].bond(1),plist[2].bond(2),bd,bd1,bd2])
+ plist2_iden.setLabel([66,59,60,180,181,182])
+ plist2_iden.identity()
+
+
+ plist1_iden=(MPO_list[1]*plist1_iden)*plist2_iden
+ plist1_iden.permute([-55,170,171,172,66,55,64,180,181,182],5)
+ plist1_iden.setLabel([200,170,171,172,66,55,64,180,181,182])
+
+ plist1_iden_d=copy.copy(plist1_iden)
+ plist1_iden_d.transpose()
+ plist1_iden_d.setLabel([-55,-64,-180,-181,-182,200,-170,-171,-172,-66])
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[3].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[3].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[3].bond(3).Qlist())
+
+ plist2_iden=uni10.UniTensor([bd,bd1,bd2,plist[3].bond(1),plist[3].bond(2),plist[3].bond(3)])
+ plist2_iden.setLabel([180,181,182,68,59,60])
+ plist2_iden.identity()
+
+ plist2_iden=(MPO_list[2]*plist2_iden)
+ plist2_iden.permute([-56,180,181,182,56,68],4)
+ plist2_iden.setLabel([300,180,181,182,56,68])
+
+ plist2_iden_d=copy.copy(plist2_iden)
+ plist2_iden_d.transpose()
+ plist2_iden_d.setLabel([-56,-68,300,-180,-181,-182])
+################################################################################################
+
+
+ plist1=(MPO_list[1])*plist[2]
+ plist1.permute([58,57,-55,66,55,18],4)
+ plist1.setLabel([58,57,200,66,55,18])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-18,-58,-57,200,-66])
+
+
+ A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A.permute([-17,-64,-58,-57,17,64,58,57],4)
+
+# if Gauge is "Fixed":
+#  A1=copy.copy(A)
+#  A1.transpose()
+#  A=A+A1
+ 
+# A=N_Positiv(A)
+# A.setLabel([-62,-58,-57,-17,62,58,57,17])
+
+
+
+ Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap.permute([-17,-64,-58,-57],4)
+
+
+# if Gauge is "Fixed":
+#  A1=(((((E7*E6)*(c_ut*c_d1))))*(((E4*E5)*d)*((E2*E3)*(b_ut*b_d1))))*((E1*E8)*(a_ut*a_d1))
+#  A1.permute([17,64,58,57],0)
+#  A1.transpose()
+#  Ap=Ap+A1
+# #Ap.setLabel([-17,-58,-57,-64])
+
+ if Inv_method is 'SVD':
+   U, S, V=svd_parity(A)
+   U.transpose()
+   V.transpose()
+   S=Normal_Singulars(S)
+   S=inverse(S)
+   
+   U.setLabel([8,9,10,11,12,13,14,15])
+   S.setLabel([4,5,6,7,8,9,10,11])
+   V.setLabel([0,1,2,3,4,5,6,7])
+   A_inv=V*S*U
+   A_inv.permute([0,1,2,3,12,13,14,15],4)
+   A_inv.setLabel([17,64,58,57,-17,-64,-58,-57])
+   A=A_inv*Ap
+   A.permute([17,64,58,57],1)
+   plist[1]=A
+ elif Inv_method is 'CG':
+   A=solve_linear_eq(A,Ap)
+   A.setLabel([17,64,58,57])
+   A.permute([17,64,58,57],1)   
+   plist[1]=A 
+
+##@profile
+def  optimum_2_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
+
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ #print MPO_list[0].printDiagram(),MPO_list[1].printDiagram(),MPO_list[2].printDiagram()
+
+
+ plist0=MPO_list[0]*plist[0]
+ plist0.permute([-54,62,54,17],2)
+ plist0.setLabel([100,62,54,17])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-54,-17,100,-62])
+ 
+ 
+ plist1=(MPO_list[1]*plist[1])*plist[2]
+ plist1.permute([-55,17,66,55,64,18],3)
+ plist1.setLabel([200,17,66,55,64,18])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-64,-18,200,-17,-66])
+
+
+
+ plist2=(MPO_list[2]*plist[3])
+ plist2.permute([-56,18,56,68],2)
+ plist2.setLabel([300,18,56,68])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,-68,300,-18])
+#########################################################################
+ bd=uni10.Bond(uni10.BD_OUT,plist[0].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[0].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[0].bond(2).Qlist())
+ 
+ plist0_iden=uni10.UniTensor([plist[0].bond(0),plist[0].bond(1),plist[0].bond(2),bd,bd1,bd2])
+ plist0_iden.setLabel([62,58,57,170,171,172])
+ plist0_iden.identity()
+
+ plist0_iden=MPO_list[0]*plist0_iden
+ plist0_iden.permute([-54,62,54,170,171,172],2)
+ plist0_iden.setLabel([100,62,54,170,171,172])
+
+ plist0_iden_d=copy.copy(plist0_iden)
+ plist0_iden_d.transpose()
+ plist0_iden_d.setLabel([-54,-170,-171,-172,100,-62])
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[1].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[1].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[1].bond(3).Qlist())
+
+ plist1_iden=uni10.UniTensor([bd,bd1,bd2,plist[1].bond(1),plist[1].bond(2),plist[1].bond(3)])
+ plist1_iden.setLabel([170,171,172,64,58,57])
+ plist1_iden.identity()
+
+
+ bd=uni10.Bond(uni10.BD_OUT,plist[2].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[2].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[2].bond(2).Qlist())
+
+ plist2_iden=uni10.UniTensor([plist[2].bond(0),plist[2].bond(1),plist[2].bond(2),bd,bd1,bd2])
+ plist2_iden.setLabel([66,59,60,180,181,182])
+ plist2_iden.identity()
+
+
+ plist1_iden=(MPO_list[1]*plist1_iden)*plist2_iden
+ plist1_iden.permute([-55,170,171,172,66,55,64,180,181,182],5)
+ plist1_iden.setLabel([200,170,171,172,66,55,64,180,181,182])
+
+ plist1_iden_d=copy.copy(plist1_iden)
+ plist1_iden_d.transpose()
+ plist1_iden_d.setLabel([-55,-64,-180,-181,-182,200,-170,-171,-172,-66])
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[3].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[3].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[3].bond(3).Qlist())
+
+ plist2_iden=uni10.UniTensor([bd,bd1,bd2,plist[3].bond(1),plist[3].bond(2),plist[3].bond(3)])
+ plist2_iden.setLabel([180,181,182,68,59,60])
+ plist2_iden.identity()
+
+ plist2_iden=(MPO_list[2]*plist2_iden)
+ plist2_iden.permute([-56,180,181,182,56,68],4)
+ plist2_iden.setLabel([300,180,181,182,56,68])
+
+ plist2_iden_d=copy.copy(plist2_iden)
+ plist2_iden_d.transpose()
+ plist2_iden_d.setLabel([-56,-68,300,-180,-181,-182])
+################################################################################################
+
+
+ plist1=(MPO_list[1])*plist[1]
+ plist1.permute([17,-55,64,55,59,60],2)
+ plist1.setLabel([17,200,64,55,59,60])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-64,-55,-59,-60,-17,200])
+
+
+ A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A.permute([-66,-59,-60,-18,66,59,60,18],4)
+
+
+ Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap.permute([-66,-59,-60,-18],4)
+
+
+
+ if Inv_method is 'SVD':
+   U, S, V=svd_parity(A)
+   U.transpose()
+   V.transpose()
+   S=Normal_Singulars(S)
+   S=inverse(S)
+   
+   U.setLabel([8,9,10,11,12,13,14,15])
+   S.setLabel([4,5,6,7,8,9,10,11])
+   V.setLabel([0,1,2,3,4,5,6,7])
+
+   A_inv=V*S*U
+   A_inv.permute([0,1,2,3,12,13,14,15],4)
+   A_inv.setLabel([66,59,60,18,-66,-59,-60,-18])
+   A=A_inv*Ap
+   A.permute([66,59,60,18],3)
+   plist[2]=A
+ elif Inv_method is 'CG':
+   A=solve_linear_eq(A,Ap)
+   A.setLabel([66,59,60,18])
+   A.permute([66,59,60,18],3)   
+   plist[2]=A 
+
+
+
+##@profile
+def  optimum_3_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
+
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ #print MPO_list[0].printDiagram(),MPO_list[1].printDiagram(),MPO_list[2].printDiagram()
+
+
+ plist0=MPO_list[0]*plist[0]
+ plist0.permute([-54,62,54,17],2)
+ plist0.setLabel([100,62,54,17])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-54,-17,100,-62])
+ 
+ 
+ plist1=(MPO_list[1]*plist[1])*plist[2]
+ plist1.permute([-55,17,66,55,64,18],3)
+ plist1.setLabel([200,17,66,55,64,18])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-64,-18,200,-17,-66])
+
+
+
+ plist2=(MPO_list[2]*plist[3])
+ plist2.permute([-56,18,56,68],2)
+ plist2.setLabel([300,18,56,68])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,-68,300,-18])
+#########################################################################
+ bd=uni10.Bond(uni10.BD_OUT,plist[0].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[0].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[0].bond(2).Qlist())
+ 
+ plist0_iden=uni10.UniTensor([plist[0].bond(0),plist[0].bond(1),plist[0].bond(2),bd,bd1,bd2])
+ plist0_iden.setLabel([62,58,57,170,171,172])
+ plist0_iden.identity()
+
+ plist0_iden=MPO_list[0]*plist0_iden
+ plist0_iden.permute([-54,62,54,170,171,172],2)
+ plist0_iden.setLabel([100,62,54,170,171,172])
+
+ plist0_iden_d=copy.copy(plist0_iden)
+ plist0_iden_d.transpose()
+ plist0_iden_d.setLabel([-54,-170,-171,-172,100,-62])
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[1].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[1].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[1].bond(3).Qlist())
+
+ plist1_iden=uni10.UniTensor([bd,bd1,bd2,plist[1].bond(1),plist[1].bond(2),plist[1].bond(3)])
+ plist1_iden.setLabel([170,171,172,64,58,57])
+ plist1_iden.identity()
+
+
+ bd=uni10.Bond(uni10.BD_OUT,plist[2].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[2].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[2].bond(2).Qlist())
+
+ plist2_iden=uni10.UniTensor([plist[2].bond(0),plist[2].bond(1),plist[2].bond(2),bd,bd1,bd2])
+ plist2_iden.setLabel([66,59,60,180,181,182])
+ plist2_iden.identity()
+
+
+ plist1_iden=(MPO_list[1]*plist1_iden)*plist2_iden
+ plist1_iden.permute([-55,170,171,172,66,55,64,180,181,182],5)
+ plist1_iden.setLabel([200,170,171,172,66,55,64,180,181,182])
+
+ plist1_iden_d=copy.copy(plist1_iden)
+ plist1_iden_d.transpose()
+ plist1_iden_d.setLabel([-55,-64,-180,-181,-182,200,-170,-171,-172,-66])
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[3].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[3].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[3].bond(3).Qlist())
+
+ plist2_iden=uni10.UniTensor([bd,bd1,bd2,plist[3].bond(1),plist[3].bond(2),plist[3].bond(3)])
+ plist2_iden.setLabel([180,181,182,68,59,60])
+ plist2_iden.identity()
+
+ plist2_iden=(MPO_list[2]*plist2_iden)
+ plist2_iden.permute([-56,180,181,182,56,68],4)
+ plist2_iden.setLabel([300,180,181,182,56,68])
+
+ plist2_iden_d=copy.copy(plist2_iden)
+ plist2_iden_d.transpose()
+ plist2_iden_d.setLabel([-56,-68,300,-180,-181,-182])
+################################################################################################
+
+
+ plist2=copy.copy(MPO_list[2])
+ plist2.permute([-56,59,60,56],3)
+ plist2.setLabel([300,59,60,56])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,300,-59,-60])
+
+
+ A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A.permute([-18,-68,-59,-60,18,68,59,60],4)
+
+# if Gauge is "Fixed":
+#  A1=copy.copy(A)
+#  A1.transpose()
+#  A=A+A1
+ 
+# A=N_Positiv(A)
+# A.setLabel([-62,-58,-57,-17,62,58,57,17])
+
+
+
+ Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap.permute([-18,-68,-59,-60],4)
+
+
+ if Inv_method is 'SVD':
+   U, S, V=svd_parity(A)
+   U.transpose()
+   V.transpose()
+   S=Normal_Singulars(S)
+   S=inverse(S)
+   
+   U.setLabel([8,9,10,11,12,13,14,15])
+   S.setLabel([4,5,6,7,8,9,10,11])
+   V.setLabel([0,1,2,3,4,5,6,7])
+
+
+   A_inv=V*S*U
+   A_inv.permute([0,1,2,3,12,13,14,15],4)
+   A_inv.setLabel([18,68,59,60,-18,-68,-59,-60])
+
+   A=A_inv*Ap
+   #A.transpose()
+   A.permute([18,68,59,60],1)
+   plist[3]=A
+ elif Inv_method is 'CG':
+   A=solve_linear_eq(A,Ap)
+   A.setLabel([18,68,59,60])
+   A.permute([18,68,59,60],1)   
+   plist[3]=A 
+
+
+
+
+
+###@profile
 def Do_optimization_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step):
  
  plist_f=[copy.copy(plist[i])  for i in xrange(len(plist)) ]
@@ -1878,7 +2761,7 @@ def optimum_1230(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u
    Dis1=Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist)
    optimum_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,  MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge)
    Dis2=Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist)
-   #print "1", Dis1, Dis2, Dis2 <= Dis1
+   print "1", Dis1, Dis2, Dis2 <= Dis1
    if Dis2 <= Dis1:
     plist_f[1]=plist[1]
    else: 
@@ -1888,7 +2771,7 @@ def optimum_1230(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u
    Dis1=Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist)
    optimum_2(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,  MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge)
    Dis2=Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist)
-   #print "2", Dis1, Dis2, Dis2 <= Dis1
+   print "2", Dis1, Dis2, Dis2 <= Dis1
    if Dis2 <= Dis1:
     plist_f[2]=plist[2]
    else: 
@@ -1899,7 +2782,7 @@ def optimum_1230(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u
    Dis1=Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist)
    optimum_3(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,  MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge)
    Dis2=Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist)
-   #print "3", Dis1, Dis2, Dis2 <= Dis1
+   print "3", Dis1, Dis2, Dis2 <= Dis1
    if Dis2 <= Dis1:
     plist_f[3]=plist[3]
    else: 
@@ -1909,7 +2792,7 @@ def optimum_1230(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u
    Dis1=Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist)
    optimum_0(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,  MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge)
    Dis2=Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist)
-   #print "0", Dis1, Dis2, Dis2 <= Dis1 
+   print "0", Dis1, Dis2, Dis2 <= Dis1 
    if Dis2 <= Dis1:
     plist_f[0]=plist[0]
    else: 
@@ -2003,7 +2886,7 @@ def optimum_2013(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u
   else: 
    plist[3]=plist_f[3]
 
-##@profile
+###@profile
 def optimum_0(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge):
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
 
@@ -2122,7 +3005,7 @@ def optimum_0(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,pl
 
 
 
-##@profile
+###@profile
 def optimum_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge):
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
 
@@ -2245,7 +3128,7 @@ def optimum_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,pl
 
 
 
-##@profile
+###@profile
 def optimum_2(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge):
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
 
@@ -2369,7 +3252,7 @@ def optimum_2(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,pl
 
 
 
-##@profile
+###@profile
 def optimum_3(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge):
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
 
@@ -2494,7 +3377,7 @@ def optimum_3(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,MPO_list,c_u,a_u,b_u,pli
 
 
 
-##@profile
+###@profile
 def  Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist):
 
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
@@ -2565,11 +3448,11 @@ def  Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plis
 
 
  Val=(((((E1*E8)*(a_ut*a_dt))*((E7*E6)*(c_ut*c_dt))))*(((E2*E3)*(b_ut*b_dt))))*((E4*E5)*d)
- #print 'Val=',Val
+ #print 'Val=',Val[0]
  #Val1=(((((E1*E8)*(a_u1*a_d1))*((E7*E6)*(c_u1*c_d1))))*((E2*E3)*(b_u1*b_d1)))*(((E4*E5)*d))
  #print 'Val1=',Val1
  Val2=(((((E1*E8)*(a_ut*a_d1))*((E7*E6)*(c_ut*c_d1))))*(((E2*E3)*(b_ut*b_d1))))*((E4*E5)*d)
- #print 'Val2=',Val2
+ #print 'Val2=',Val2[0]
  #Val3=(((((E1*E8)*(a_u1*a_dt))*((E7*E6)*(c_u1*c_dt))))*(((E2*E3)*(b_u1*b_dt))))*((E4*E5)*d)
  #print 'Val3=',Val3
 
@@ -2626,9 +3509,923 @@ def Reload_plist1(plist):
  plist[3]=uni10.UniTensor("Store/plist1[3]")
  return plist
 
+#@profile
+def Do_optimization_MPO_positive1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step):
+ 
+# Distance_val=Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist)
+# print Distance_val
+ 
+ N_mpo=obtain_N_mpo1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,d_u)
+
+ t0=time.time()
+ N_mpo.setLabel([-1,-2,-3,-4,-5,-6,-7,1,2,3,4,5,6,7])
+ N_mpo1=copy.copy(N_mpo)
+ N_mpo1.transpose()
+ N_mpo=(N_mpo+N_mpo1)*(1.00/2.00)
+ N_mpo1=copy.copy(N_mpo)
+ N_mpo1.setLabel([11,22,33,44,55,66,77, -1,-2,-3,-4,-5,-6,-7])
+ N_mpo=N_mpo*N_mpo1
+ N_mpo.permute([11,22,33,44,55,66,77,1,2,3,4,5,6,7],7)
+ N_mpo=sqrt_general(N_mpo)
+ N_mpo.setLabel([-54,-62,-55,-64,-56,-66,-68,54,62,55,64,56,66,68])
+ print time.time() - t0, "N_Positiv"
 
 
-##@profile
+
+# t0=time.time()
+# N_mpo=N_Positiv(N_mpo)
+# print time.time() - t0, "N_Positiv"
+
+
+
+ plist_f=[copy.copy(plist[i])  for i in xrange(len(plist)) ]
+ 
+ Distance_val=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+ print 'Dis0', Distance_val
+ 
+ Res=1
+ Res1=Distance_val
+ count=0
+ check_val=0
+ for q in xrange(N_svd[0]):
+  t0=time.time()
+  if check_step is 'on':
+
+ 
+ 
+   Dis1=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+   optimum_11_positive(N_mpo, MPO_list,plist,Inv_method,Gauge)
+   Dis2=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+   #print "1", Dis1, Dis2, Dis2 <= Dis1
+   if Dis2 <= Dis1:
+    plist_f[1]=plist[1]
+   else: 
+    plist[1]=plist_f[1]
+
+   Dis1=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+   optimum_33_positive(N_mpo, MPO_list,plist,Inv_method,Gauge)
+   Dis2=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+   #print "3", Dis1, Dis2, Dis2 <= Dis1
+   if Dis2 <= Dis1:
+    plist_f[2]=plist[2]
+   else: 
+    plist[2]=plist_f[2]
+
+
+
+   Dis1=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+   optimum_22_positive(N_mpo, MPO_list,plist,Inv_method,Gauge)
+   Dis2=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+   #print "2", Dis1, Dis2, Dis2 <= Dis1
+   if Dis2 <= Dis1:
+    plist_f[3]=plist[3]
+   else: 
+    plist[3]=plist_f[3]
+
+
+
+
+   Dis1=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+   optimum_00_positive(N_mpo, MPO_list,plist,Inv_method,Gauge)
+   Dis2=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+   #print "0", Dis1, Dis2, Dis2 <= Dis1 
+   if Dis2 <= Dis1:
+    plist_f[0]=plist[0]
+   else: 
+    plist[0]=plist_f[0]
+
+
+
+
+  elif check_step is 'off':
+   optimum_00_positive(N_mpo,MPO_list,plist,Inv_method,Gauge)
+   optimum_11_positive(N_mpo,MPO_list,plist,Inv_method,Gauge)
+   optimum_22_positive(N_mpo,MPO_list,plist,Inv_method,Gauge)
+   optimum_33_positive(N_mpo,MPO_list,plist,Inv_method,Gauge)
+
+
+
+  Distance_val=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+  Res=Res1
+  Res1=Distance_val
+  print 'Dis-mpo2=', Distance_val, abs(Res1-Res) / abs(Res), q, time.time() - t0
+#  print  Res1 , Res,Res1 < Res 
+
+  if Res1 < Res:
+    plist_f[0]=plist[0]
+    plist_f[1]=plist[1]
+    plist_f[2]=plist[2]
+    plist_f[3]=plist[3]
+  else: 
+    plist[0]=plist_f[0]
+    plist[1]=plist_f[1]
+    plist[2]=plist_f[2]
+    plist[3]=plist_f[3]
+    check_val=1
+    break
+  count+=1
+  if count > 550: print 'Num_Opt > 550'; break;
+  if abs(Res) > 1.00e-10:
+   if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
+    print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
+    check_val=0
+    break
+  else:
+    if (abs(Distance_val) < 1.00e-7) or (  abs(Res1-Res) < 1.00e-11  ): 
+     print 'break, Dis', Distance_val, abs(Res1-Res)
+     break
+# Distance_val=Dis_ff_mpo1(N_mpo,plist,MPO_list)
+# print 'DisFMPO_final', Distance_val
+ #if check_val!=0: 
+  #Do_optimization_Grad_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,N_grad)
+
+
+
+
+
+
+#@profile
+def obtain_N_mpo1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,d_u):
+
+ c.setLabel([14,-14,12,-12,19,-19,17,-17])
+
+
+ a_u1=copy.copy(a_u)
+ b_u1=copy.copy(b_u)
+ d_u1=copy.copy(d_u)
+
+ a_u1.setLabel([54,16,17,62,2])
+ b_u1.setLabel([55,64,68,6,4])
+ d_u1.setLabel([56,19,10,8,66])
+
+
+ d_d1=copy.copy(d_u1)
+ b_d1=copy.copy(b_u1)
+ a_d1=copy.copy(a_u1)
+
+ d_d1.transpose()
+ b_d1.transpose()
+ a_d1.transpose()
+
+ a_d1.setLabel([-62,-2,-54,-16,-17])
+ b_d1.setLabel([-6,-4,-55,-64,-68])
+ d_d1.setLabel([-8,-66,-56,-19,-10])
+
+
+
+
+ N_mpo=((((E1*E8)*(a_u1*a_d1))*((E7*E6)*(c)))*((((E4*E5)*(d_u1*d_d1)))))*((E2*E3)*(b_u1*b_d1))
+ #print  N_mpo.printDiagram()
+ N_mpo.permute([-54,-62,-55,-64,-56,-66,-68,54,62,55,64,56,66,68],7)
+ return N_mpo
+
+#@profile
+def Dis_ff_mpo1(N_mpo,plist,MPO_list):
+
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ #print MPO_list[0].printDiagram(),MPO_list[1].printDiagram(),MPO_list[2].printDiagram()
+
+
+ plist0=MPO_list[0]*plist[0]
+ plist0.permute([-54,62,54,18],2)
+ plist0.setLabel([100,62,54,18])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-54,-18,100,-62])
+ 
+ 
+ plist1=(MPO_list[1]*plist[1])*plist[3]
+ plist1.permute([-55,18,20,55,64,68],3)
+ plist1.setLabel([200,18,20,55,64,68])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-64,-68,200,-18,-20])
+
+
+
+ plist2=(MPO_list[2]*plist[2])
+ plist2.permute([-56,66,56,20],2)
+ plist2.setLabel([300,66,56,20])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,-20,300,-66])
+#########################################################################
+ bd=uni10.Bond(uni10.BD_OUT,plist[0].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[0].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[0].bond(2).Qlist())
+ 
+ plist0_iden=uni10.UniTensor([plist[0].bond(0),plist[0].bond(1),plist[0].bond(2),bd,bd1,bd2])
+ plist0_iden.setLabel([62,58,57,180,181,182])
+ plist0_iden.identity()
+
+ plist0_iden=MPO_list[0]*plist0_iden
+ plist0_iden.permute([-54,62,54,180,181,182],2)
+ plist0_iden.setLabel([100,62,54,180,181,182])
+
+ plist0_iden_d=copy.copy(plist0_iden)
+ plist0_iden_d.transpose()
+ plist0_iden_d.setLabel([-54,-180,-181,-182,100,-62])
+#####################
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[1].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[1].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[1].bond(3).Qlist())
+
+ plist1_iden=uni10.UniTensor([bd,bd1,bd2,plist[1].bond(1),plist[1].bond(2),plist[1].bond(3)])
+ plist1_iden.setLabel([180,181,182,64,58,57])
+ plist1_iden.identity()
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[3].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[3].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[3].bond(3).Qlist())
+
+ plist3_iden=uni10.UniTensor([plist[3].bond(0),plist[3].bond(1),bd,bd1,bd2,plist[3].bond(3)])
+ plist3_iden.setLabel([60,59,201,202,203,68])
+ plist3_iden.permute([60,59,68,201,202,203],3)
+ plist3_iden.identity()
+
+
+ plist1_iden=(MPO_list[1]*plist1_iden)*plist3_iden
+ plist1_iden.permute([-55,180,181,182,201,202,203,55,64,68],7)
+ plist1_iden.setLabel([200,180,181,182,201,202,203,55,64,68])
+
+ plist1_iden_d=copy.copy(plist1_iden)
+ plist1_iden_d.transpose()
+ plist1_iden_d.setLabel([-55,-64,-68,200,-180,-181,-182,-201,-202,-203 ])
+
+#####################################
+
+ bd=uni10.Bond(uni10.BD_OUT,plist[2].bond(2).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[2].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[2].bond(0).Qlist())
+
+ plist2_iden=uni10.UniTensor([plist[2].bond(0),plist[2].bond(1),plist[2].bond(2),bd,bd1,bd2])
+ plist2_iden.setLabel([66,60,59,201,202,203])
+ plist2_iden.permute([60,59,66,201,202,203],3)
+ plist2_iden.identity()
+
+
+ #print MPO_list[2].printDiagram(), plist2_iden.printDiagram()
+ plist2_iden=(MPO_list[2]*plist2_iden)
+ plist2_iden.permute([-56,66,56,201,202,203],2)
+ plist2_iden.setLabel([300,66,56,201,202,203])
+
+ plist2_iden_d=copy.copy(plist2_iden)
+ plist2_iden_d.transpose()
+ plist2_iden_d.setLabel([-56,-201,-202,-203,300,-66])
+
+
+ val_1=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ #print val_1
+
+# #print plist1_iden_d.printDiagram(), plist2_iden_d.printDiagram()  
+# A=plist0_iden_d*plist1_iden_d
+# A=plist1_iden_d*plist2_iden_d
+ 
+ val_2=((plist0_iden_d*plist1_iden_d)*(plist2_iden_d))*N_mpo*((plist0*plist1)*(plist2))
+ #print val_2
+
+ return val_1[0]-2.0*val_2[0]
+
+
+#@profile
+def  optimum_00_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
+
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ #print MPO_list[0].printDiagram(),MPO_list[1].printDiagram(),MPO_list[2].printDiagram()
+
+
+ plist0=MPO_list[0]*plist[0]
+ plist0.permute([-54,62,54,18],2)
+ plist0.setLabel([100,62,54,18])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-54,-18,100,-62])
+ 
+ 
+ plist1=(MPO_list[1]*plist[1])*plist[3]
+ plist1.permute([-55,18,20,55,64,68],3)
+ plist1.setLabel([200,18,20,55,64,68])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-64,-68,200,-18,-20])
+
+
+
+ plist2=(MPO_list[2]*plist[2])
+ plist2.permute([-56,66,56,20],2)
+ plist2.setLabel([300,66,56,20])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,-20,300,-66])
+#########################################################################
+ bd=uni10.Bond(uni10.BD_OUT,plist[0].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[0].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[0].bond(2).Qlist())
+ 
+ plist0_iden=uni10.UniTensor([plist[0].bond(0),plist[0].bond(1),plist[0].bond(2),bd,bd1,bd2])
+ plist0_iden.setLabel([62,58,57,180,181,182])
+ plist0_iden.identity()
+
+ plist0_iden=MPO_list[0]*plist0_iden
+ plist0_iden.permute([-54,62,54,180,181,182],2)
+ plist0_iden.setLabel([100,62,54,180,181,182])
+
+ plist0_iden_d=copy.copy(plist0_iden)
+ plist0_iden_d.transpose()
+ plist0_iden_d.setLabel([-54,-180,-181,-182,100,-62])
+#####################
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[1].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[1].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[1].bond(3).Qlist())
+
+ plist1_iden=uni10.UniTensor([bd,bd1,bd2,plist[1].bond(1),plist[1].bond(2),plist[1].bond(3)])
+ plist1_iden.setLabel([180,181,182,64,58,57])
+ plist1_iden.identity()
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[3].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[3].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[3].bond(3).Qlist())
+
+ plist3_iden=uni10.UniTensor([plist[3].bond(0),plist[3].bond(1),bd,bd1,bd2,plist[3].bond(3)])
+ plist3_iden.setLabel([60,59,201,202,203,68])
+ plist3_iden.permute([60,59,68,201,202,203],3)
+ plist3_iden.identity()
+
+
+ plist1_iden=(MPO_list[1]*plist1_iden)*plist3_iden
+ plist1_iden.permute([-55,180,181,182,201,202,203,55,64,68],7)
+ plist1_iden.setLabel([200,180,181,182,201,202,203,55,64,68])
+
+ plist1_iden_d=copy.copy(plist1_iden)
+ plist1_iden_d.transpose()
+ plist1_iden_d.setLabel([-55,-64,-68,200,-180,-181,-182,-201,-202,-203 ])
+
+#####################################
+
+ bd=uni10.Bond(uni10.BD_OUT,plist[2].bond(2).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[2].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[2].bond(0).Qlist())
+
+ plist2_iden=uni10.UniTensor([plist[2].bond(0),plist[2].bond(1),plist[2].bond(2),bd,bd1,bd2])
+ plist2_iden.setLabel([66,60,59,201,202,203])
+ plist2_iden.permute([60,59,66,201,202,203],3)
+ plist2_iden.identity()
+
+
+ #print MPO_list[2].printDiagram(), plist2_iden.printDiagram()
+ plist2_iden=(MPO_list[2]*plist2_iden)
+ plist2_iden.permute([-56,66,56,201,202,203],2)
+ plist2_iden.setLabel([300,66,56,201,202,203])
+
+ plist2_iden_d=copy.copy(plist2_iden)
+ plist2_iden_d.transpose()
+ plist2_iden_d.setLabel([-56,-201,-202,-203,300,-66])
+###############################################################################
+
+ plist0=copy.copy(MPO_list[0])
+ plist0.permute([-54,58,57,54],1)
+ plist0.setLabel([100,58,57,54])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-58,-57,-54,100])
+
+
+ A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A.permute([-62,-58,-57,-18,62,58,57,18],4)
+
+
+ Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap.permute([-62,-58,-57,-18],4)
+
+
+
+ if Inv_method is 'SVD':
+   U, S, V=svd_parity(A)
+   #print S
+   U.transpose()
+   V.transpose()
+   S=Normal_Singulars(S)
+
+   S=inverse(S)
+   
+   U.setLabel([8,9,10,11,12,13,14,15])
+   S.setLabel([4,5,6,7,8,9,10,11])
+   V.setLabel([0,1,2,3,4,5,6,7])
+
+
+   A_inv=V*S*U
+   A_inv.permute([0,1,2,3,12,13,14,15],4)
+   A_inv.setLabel([62,58,57,18,-62,-58,-57,-18])
+
+  #######################################################
+   A=A_inv*Ap
+   A.permute([62,58,57,18],3)
+   plist[0]=A
+ elif Inv_method is 'CG':
+   A=solve_linear_eq(A,Ap)
+   A.setLabel([62,58,57,18])
+   A.permute([62,58,57,18],3)   
+   plist[0]=A 
+
+#@profile
+
+def  optimum_11_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
+
+
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ #print MPO_list[0].printDiagram(),MPO_list[1].printDiagram(),MPO_list[2].printDiagram()
+
+
+ plist0=MPO_list[0]*plist[0]
+ plist0.permute([-54,62,54,18],2)
+ plist0.setLabel([100,62,54,18])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-54,-18,100,-62])
+ 
+ 
+ plist1=(MPO_list[1]*plist[1])*plist[3]
+ plist1.permute([-55,18,20,55,64,68],3)
+ plist1.setLabel([200,18,20,55,64,68])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-64,-68,200,-18,-20])
+
+
+
+ plist2=(MPO_list[2]*plist[2])
+ plist2.permute([-56,66,56,20],2)
+ plist2.setLabel([300,66,56,20])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,-20,300,-66])
+#########################################################################
+ bd=uni10.Bond(uni10.BD_OUT,plist[0].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[0].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[0].bond(2).Qlist())
+ 
+ plist0_iden=uni10.UniTensor([plist[0].bond(0),plist[0].bond(1),plist[0].bond(2),bd,bd1,bd2])
+ plist0_iden.setLabel([62,58,57,180,181,182])
+ plist0_iden.identity()
+
+ plist0_iden=MPO_list[0]*plist0_iden
+ plist0_iden.permute([-54,62,54,180,181,182],2)
+ plist0_iden.setLabel([100,62,54,180,181,182])
+
+ plist0_iden_d=copy.copy(plist0_iden)
+ plist0_iden_d.transpose()
+ plist0_iden_d.setLabel([-54,-180,-181,-182,100,-62])
+#####################
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[1].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[1].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[1].bond(3).Qlist())
+
+ plist1_iden=uni10.UniTensor([bd,bd1,bd2,plist[1].bond(1),plist[1].bond(2),plist[1].bond(3)])
+ plist1_iden.setLabel([180,181,182,64,58,57])
+ plist1_iden.identity()
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[3].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[3].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[3].bond(3).Qlist())
+
+ plist3_iden=uni10.UniTensor([plist[3].bond(0),plist[3].bond(1),bd,bd1,bd2,plist[3].bond(3)])
+ plist3_iden.setLabel([60,59,201,202,203,68])
+ plist3_iden.permute([60,59,68,201,202,203],3)
+ plist3_iden.identity()
+
+
+ plist1_iden=(MPO_list[1]*plist1_iden)*plist3_iden
+ plist1_iden.permute([-55,180,181,182,201,202,203,55,64,68],7)
+ plist1_iden.setLabel([200,180,181,182,201,202,203,55,64,68])
+
+ plist1_iden_d=copy.copy(plist1_iden)
+ plist1_iden_d.transpose()
+ plist1_iden_d.setLabel([-55,-64,-68,200,-180,-181,-182,-201,-202,-203 ])
+
+#####################################
+
+ bd=uni10.Bond(uni10.BD_OUT,plist[2].bond(2).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[2].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[2].bond(0).Qlist())
+
+ plist2_iden=uni10.UniTensor([plist[2].bond(0),plist[2].bond(1),plist[2].bond(2),bd,bd1,bd2])
+ plist2_iden.setLabel([66,60,59,201,202,203])
+ plist2_iden.permute([60,59,66,201,202,203],3)
+ plist2_iden.identity()
+
+
+ #print MPO_list[2].printDiagram(), plist2_iden.printDiagram()
+ plist2_iden=(MPO_list[2]*plist2_iden)
+ plist2_iden.permute([-56,66,56,201,202,203],2)
+ plist2_iden.setLabel([300,66,56,201,202,203])
+
+ plist2_iden_d=copy.copy(plist2_iden)
+ plist2_iden_d.transpose()
+ plist2_iden_d.setLabel([-56,-201,-202,-203,300,-66])
+###############################################################################
+
+
+ plist1=(MPO_list[1])*plist[3]
+ plist1.permute([58,57,-55,20,68,55],4)
+ plist1.setLabel([58,57,200,20,68,55])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-68,-55,-58,-57,200,-20])
+
+
+ A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A.permute([-18,-64,-58,-57,18,64,58,57],4)
+
+
+
+ Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap.permute([-18,-64,-58,-57],4)
+
+
+
+ if Inv_method is 'SVD':
+   U, S, V=svd_parity(A)
+   U.transpose()
+   V.transpose()
+   S=Normal_Singulars(S)
+
+   S=inverse(S)
+   
+   U.setLabel([8,9,10,11,12,13,14,15])
+   S.setLabel([4,5,6,7,8,9,10,11])
+   V.setLabel([0,1,2,3,4,5,6,7])
+
+
+   A_inv=V*S*U
+   A_inv.permute([0,1,2,3,12,13,14,15],4)
+   A_inv.setLabel([18,64,58,57,-18,-64,-58,-57])
+
+   A=A_inv*Ap
+   #A.transpose()
+   A.permute([18,64,58,57],1)
+   plist[1]=A
+ elif Inv_method is 'CG':
+   A=solve_linear_eq(A,Ap)
+   A.setLabel([18,64,58,57])
+   A.permute([18,64,58,57],1)   
+   plist[1]=A 
+
+
+
+#@profile
+def  optimum_22_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
+
+
+ 
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ #print MPO_list[0].printDiagram(),MPO_list[1].printDiagram(),MPO_list[2].printDiagram()
+
+
+ plist0=MPO_list[0]*plist[0]
+ plist0.permute([-54,62,54,18],2)
+ plist0.setLabel([100,62,54,18])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-54,-18,100,-62])
+ 
+ 
+ plist1=(MPO_list[1]*plist[1])*plist[3]
+ plist1.permute([-55,18,20,55,64,68],3)
+ plist1.setLabel([200,18,20,55,64,68])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-64,-68,200,-18,-20])
+
+
+
+ plist2=(MPO_list[2]*plist[2])
+ plist2.permute([-56,66,56,20],2)
+ plist2.setLabel([300,66,56,20])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,-20,300,-66])
+#########################################################################
+ bd=uni10.Bond(uni10.BD_OUT,plist[0].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[0].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[0].bond(2).Qlist())
+ 
+ plist0_iden=uni10.UniTensor([plist[0].bond(0),plist[0].bond(1),plist[0].bond(2),bd,bd1,bd2])
+ plist0_iden.setLabel([62,58,57,180,181,182])
+ plist0_iden.identity()
+
+ plist0_iden=MPO_list[0]*plist0_iden
+ plist0_iden.permute([-54,62,54,180,181,182],2)
+ plist0_iden.setLabel([100,62,54,180,181,182])
+
+ plist0_iden_d=copy.copy(plist0_iden)
+ plist0_iden_d.transpose()
+ plist0_iden_d.setLabel([-54,-180,-181,-182,100,-62])
+#####################
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[1].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[1].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[1].bond(3).Qlist())
+
+ plist1_iden=uni10.UniTensor([bd,bd1,bd2,plist[1].bond(1),plist[1].bond(2),plist[1].bond(3)])
+ plist1_iden.setLabel([180,181,182,64,58,57])
+ plist1_iden.identity()
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[3].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[3].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[3].bond(3).Qlist())
+
+ plist3_iden=uni10.UniTensor([plist[3].bond(0),plist[3].bond(1),bd,bd1,bd2,plist[3].bond(3)])
+ plist3_iden.setLabel([60,59,201,202,203,68])
+ plist3_iden.permute([60,59,68,201,202,203],3)
+ plist3_iden.identity()
+
+
+ plist1_iden=(MPO_list[1]*plist1_iden)*plist3_iden
+ plist1_iden.permute([-55,180,181,182,201,202,203,55,64,68],7)
+ plist1_iden.setLabel([200,180,181,182,201,202,203,55,64,68])
+
+ plist1_iden_d=copy.copy(plist1_iden)
+ plist1_iden_d.transpose()
+ plist1_iden_d.setLabel([-55,-64,-68,200,-180,-181,-182,-201,-202,-203 ])
+
+#####################################
+
+ bd=uni10.Bond(uni10.BD_OUT,plist[2].bond(2).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[2].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[2].bond(0).Qlist())
+
+ plist2_iden=uni10.UniTensor([plist[2].bond(0),plist[2].bond(1),plist[2].bond(2),bd,bd1,bd2])
+ plist2_iden.setLabel([66,60,59,201,202,203])
+ plist2_iden.permute([60,59,66,201,202,203],3)
+ plist2_iden.identity()
+
+
+ #print MPO_list[2].printDiagram(), plist2_iden.printDiagram()
+ plist2_iden=(MPO_list[2]*plist2_iden)
+ plist2_iden.permute([-56,66,56,201,202,203],2)
+ plist2_iden.setLabel([300,66,56,201,202,203])
+
+ plist2_iden_d=copy.copy(plist2_iden)
+ plist2_iden_d.transpose()
+ plist2_iden_d.setLabel([-56,-201,-202,-203,300,-66])
+###############################################################################
+
+
+ plist1=(MPO_list[1])*plist[1]
+ plist1.permute([18,-55,64,55,59,60],2)
+ plist1.setLabel([18,200,64,55,59,60])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-64,-55,-59,-60,-18,200])
+
+
+ A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A.permute([-60,-59,-20,-68,60,59,20,68],4)
+
+
+ Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap.permute([-60,-59,-20,-68],4)
+
+
+ if Inv_method is 'SVD':
+   U, S, V=svd_parity(A)
+   U.transpose()
+   V.transpose()
+   S=Normal_Singulars(S)
+
+   S=inverse(S)
+   
+   U.setLabel([8,9,10,11,12,13,14,15])
+   S.setLabel([4,5,6,7,8,9,10,11])
+   V.setLabel([0,1,2,3,4,5,6,7])
+
+
+   A_inv=V*S*U
+   A_inv.permute([0,1,2,3,12,13,14,15],4)
+   A_inv.setLabel([60,59,20,68,-60,-59,-20,-68])
+
+   A=A_inv*Ap
+   A.permute([60,59,20,68],3)
+   plist[3]=A
+ elif Inv_method is 'CG':
+   A=solve_linear_eq(A,Ap)
+   A.setLabel([60,59,20,68])
+   A.permute([60,59,20,68],3)   
+   plist[3]=A 
+
+
+
+
+#@profile
+def  optimum_33_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
+
+ 
+ MPO_list[0].setLabel([-54,58,57,54])
+ MPO_list[1].setLabel([58,57,-55,59,60,55])
+ MPO_list[2].setLabel([60,59,-56,56])
+
+ #print MPO_list[0].printDiagram(),MPO_list[1].printDiagram(),MPO_list[2].printDiagram()
+
+
+ plist0=MPO_list[0]*plist[0]
+ plist0.permute([-54,62,54,18],2)
+ plist0.setLabel([100,62,54,18])
+
+ plist0_d=copy.copy(plist0)
+ plist0_d.transpose()
+ plist0_d.setLabel([-54,-18,100,-62])
+ 
+ 
+ plist1=(MPO_list[1]*plist[1])*plist[3]
+ plist1.permute([-55,18,20,55,64,68],3)
+ plist1.setLabel([200,18,20,55,64,68])
+
+ plist1_d=copy.copy(plist1)
+ plist1_d.transpose()
+ plist1_d.setLabel([-55,-64,-68,200,-18,-20])
+
+
+
+ plist2=(MPO_list[2]*plist[2])
+ plist2.permute([-56,66,56,20],2)
+ plist2.setLabel([300,66,56,20])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,-20,300,-66])
+#########################################################################
+ bd=uni10.Bond(uni10.BD_OUT,plist[0].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[0].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[0].bond(2).Qlist())
+ 
+ plist0_iden=uni10.UniTensor([plist[0].bond(0),plist[0].bond(1),plist[0].bond(2),bd,bd1,bd2])
+ plist0_iden.setLabel([62,58,57,180,181,182])
+ plist0_iden.identity()
+
+ plist0_iden=MPO_list[0]*plist0_iden
+ plist0_iden.permute([-54,62,54,180,181,182],2)
+ plist0_iden.setLabel([100,62,54,180,181,182])
+
+ plist0_iden_d=copy.copy(plist0_iden)
+ plist0_iden_d.transpose()
+ plist0_iden_d.setLabel([-54,-180,-181,-182,100,-62])
+#####################
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[1].bond(1).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[1].bond(2).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[1].bond(3).Qlist())
+
+ plist1_iden=uni10.UniTensor([bd,bd1,bd2,plist[1].bond(1),plist[1].bond(2),plist[1].bond(3)])
+ plist1_iden.setLabel([180,181,182,64,58,57])
+ plist1_iden.identity()
+
+
+ bd=uni10.Bond(uni10.BD_IN,plist[3].bond(0).Qlist())
+ bd1=uni10.Bond(uni10.BD_IN,plist[3].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_IN,plist[3].bond(3).Qlist())
+
+ plist3_iden=uni10.UniTensor([plist[3].bond(0),plist[3].bond(1),bd,bd1,bd2,plist[3].bond(3)])
+ plist3_iden.setLabel([60,59,201,202,203,68])
+ plist3_iden.permute([60,59,68,201,202,203],3)
+ plist3_iden.identity()
+
+
+ plist1_iden=(MPO_list[1]*plist1_iden)*plist3_iden
+ plist1_iden.permute([-55,180,181,182,201,202,203,55,64,68],7)
+ plist1_iden.setLabel([200,180,181,182,201,202,203,55,64,68])
+
+ plist1_iden_d=copy.copy(plist1_iden)
+ plist1_iden_d.transpose()
+ plist1_iden_d.setLabel([-55,-64,-68,200,-180,-181,-182,-201,-202,-203 ])
+
+#####################################
+
+ bd=uni10.Bond(uni10.BD_OUT,plist[2].bond(2).Qlist())
+ bd1=uni10.Bond(uni10.BD_OUT,plist[2].bond(1).Qlist())
+ bd2=uni10.Bond(uni10.BD_OUT,plist[2].bond(0).Qlist())
+
+ plist2_iden=uni10.UniTensor([plist[2].bond(0),plist[2].bond(1),plist[2].bond(2),bd,bd1,bd2])
+ plist2_iden.setLabel([66,60,59,201,202,203])
+ plist2_iden.permute([60,59,66,201,202,203],3)
+ plist2_iden.identity()
+
+
+ #print MPO_list[2].printDiagram(), plist2_iden.printDiagram()
+ plist2_iden=(MPO_list[2]*plist2_iden)
+ plist2_iden.permute([-56,66,56,201,202,203],2)
+ plist2_iden.setLabel([300,66,56,201,202,203])
+
+ plist2_iden_d=copy.copy(plist2_iden)
+ plist2_iden_d.transpose()
+ plist2_iden_d.setLabel([-56,-201,-202,-203,300,-66])
+###############################################################################
+
+
+ plist2=copy.copy(MPO_list[2])
+ plist2.permute([-56,59,60,56],3)
+ plist2.setLabel([300,59,60,56])
+
+ plist2_d=copy.copy(plist2)
+ plist2_d.transpose()
+ plist2_d.setLabel([-56,300,-59,-60])
+
+
+ A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A.permute([-66,-60,-59,-20,66,60,59,20],4)
+
+
+ Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap.permute([-66,-60,-59,-20],4)
+
+
+ if Inv_method is 'SVD':
+    U, S, V=svd_parity(A)
+    U.transpose()
+    V.transpose()
+    S=Normal_Singulars(S)
+    S=inverse(S)
+    
+    U.setLabel([8,9,10,11,12,13,14,15])
+    S.setLabel([4,5,6,7,8,9,10,11])
+    V.setLabel([0,1,2,3,4,5,6,7])
+
+
+    A_inv=V*S*U
+    A_inv.permute([0,1,2,3,12,13,14,15],4)
+    A_inv.setLabel([66,60,59,20,-66,-60,-59,-20])
+
+    A=A_inv*Ap
+    A.permute([66,60,59,20],1)
+    plist[2]=A
+
+ elif Inv_method is 'CG':
+    A=solve_linear_eq(A,Ap)
+    A.setLabel([66,60,59,20])
+    A.permute([66,60,59,20],1)   
+    plist[2]=A 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###@profile
 def Do_optimization_MPO1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step):
  plist_f=[copy.copy(plist[i])  for i in xrange(len(plist)) ]
  
@@ -2737,7 +4534,7 @@ MPO_list,a_u,b_u,d_u,plist,Inv_method,plist_f,Gauge,check_step):
    Dis1=Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist)
    optimum_11(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,  MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge)
    Dis2=Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist)
-   #print "1", Dis1, Dis2, Dis2 <= Dis1
+   print "1", Dis1, Dis2, Dis2 <= Dis1
    if Dis2 <= Dis1:
     plist_f[1]=plist[1]
    else:
@@ -2746,7 +4543,7 @@ MPO_list,a_u,b_u,d_u,plist,Inv_method,plist_f,Gauge,check_step):
    Dis1=Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist)
    optimum_33(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,  MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge)
    Dis2=Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist)
-   #print "3", Dis1, Dis2, Dis2 <= Dis1
+   print "3", Dis1, Dis2, Dis2 <= Dis1
    if Dis2 <= Dis1:
     plist_f[2]=plist[2]
    else: 
@@ -2755,7 +4552,7 @@ MPO_list,a_u,b_u,d_u,plist,Inv_method,plist_f,Gauge,check_step):
    Dis1=Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist)
    optimum_22(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,  MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge)
    Dis2=Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist)
-   #print "2", Dis1, Dis2, Dis2 <= Dis1
+   print "2", Dis1, Dis2, Dis2 <= Dis1
    if Dis2 <= Dis1:
     plist_f[3]=plist[3]
    else: 
@@ -2765,7 +4562,7 @@ MPO_list,a_u,b_u,d_u,plist,Inv_method,plist_f,Gauge,check_step):
    Dis1=Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist)
    optimum_00(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,  MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge)
    Dis2=Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist)
-   #print "0", Dis1, Dis2, Dis2 <= Dis1
+   print "0", Dis1, Dis2, Dis2 <= Dis1
    if Dis2 <= Dis1:
     plist_f[0]=plist[0]
    else: 
@@ -2872,7 +4669,7 @@ def optimum_2013s(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_
 
 
 
-##@profile
+###@profile
 def  Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist):
 
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
@@ -2961,7 +4758,7 @@ def  Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,pli
 
 
 
-##@profile
+###@profile
 def optimum_00(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge):
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
 
@@ -3084,7 +4881,7 @@ def optimum_00(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,p
 
 
 
-##@profile
+###@profile
 def optimum_11(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge):
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
 
@@ -3211,7 +5008,7 @@ def optimum_11(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,p
 
 
 
-##@profile
+###@profile
 def optimum_22(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge):
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
 
@@ -3335,7 +5132,7 @@ def optimum_22(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,p
 
 
 
-##@profile
+###@profile
 def optimum_33(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge):
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
 
@@ -3475,7 +5272,7 @@ def  recover1( a_u,b_u, d_u, plist, MPO_list):
  return a_ut, b_ut,d_ut 
  
 
-#@profile
+##@profile
 def Do_optimization_svd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Inv_method,N_svd,Gauge,check_step):
 
  a_up_first=copy.copy(a_up) 
@@ -3586,7 +5383,7 @@ def Do_optimization_svd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_
  return a_up, b_up, c_up, d_up
 
 
-#@profile
+##@profile
 def opt_a(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-54,-55,-56,0,1,2])
@@ -3702,7 +5499,7 @@ def opt_a(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, 
  return A
 
 
-#@profile
+##@profile
 def opt_b(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-54,-55,-56,0,1,2])
@@ -3825,7 +5622,7 @@ def opt_b(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, 
  return A
 
 
-#@profile
+##@profile
 def opt_c(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-54,-55,-56,0,1,2])
@@ -3942,7 +5739,7 @@ def opt_c(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, 
 
  return A
 
-#@profile
+##@profile
 def opt_d(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-54,-55,-56,0,1,2])
@@ -4068,7 +5865,7 @@ def opt_d(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, 
 
 
 
-#@profile
+##@profile
 def Do_optimization_svd1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Inv_method,N_svd,Gauge, check_step):
 
  a_up_first=copy.copy(a_up) 
@@ -4183,7 +5980,7 @@ def Do_optimization_svd1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c
  return a_up, b_up, c_up, d_up
 
 
-#@profile
+##@profile
 def opt_a1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-55,-56,-57,0,1,2])
@@ -4303,7 +6100,7 @@ def opt_a1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
  return A
 
 
-#@profile
+##@profile
 def opt_b1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-55,-56,-57,0,1,2])
@@ -4422,7 +6219,7 @@ def opt_b1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
  return A
 
 
-#@profile
+##@profile
 def opt_d1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-55,-56,-57,0,1,2])
@@ -4541,7 +6338,7 @@ def opt_d1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
 
  return A
 
-#@profile
+##@profile
 def opt_c1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-55,-56,-57,0,1,2])
@@ -4685,7 +6482,7 @@ def Mat_uni_to_np(Mat_uni):
 
 
 
-###@profile
+####@profile
 def solve_linear_eq(A,Ap):
  Ap_h=copy.copy(Ap)
  Ap_h.transpose()
@@ -4747,5 +6544,35 @@ def Normal_Singulars(S):
 
  return S
 
+#@profile
+def sqrt_general(N2):
+  #N_init=copy.copy(N2)
+  blk_qnums = N2.blockQnum()
+  for qnum in blk_qnums:
+   M=N2.getBlock(qnum)
+   eig=M.eigh()
+   #print qnum
+   e=Sqrt_mat(eig[0])
+   U_trans=copy.copy(eig[1])
+   U_trans.transpose()
+   M=U_trans*e*eig[1]
+   N2.putBlock(qnum,M)
+  return N2
 
+##@profile 
+def N_Positiv(N):
+ #print N.printDiagram()#, sys.getsizeof(N)
+ 
+ N.setLabel([-1,-2,-3,-4,-5,-6,-7,1,2,3,4,5,6,7])
+ N1=copy.copy(N)
+ N1.transpose()
+ N=(N+N1)*(1.00/2.00)
+ N1=copy.copy(N)
+ N1.setLabel([11,22,33,44,55,66,77, -1,-2,-3,-4,-5,-6,-7])
+ N=N*N1
+ N.permute([11,22,33,44,55,66,77,1,2,3,4,5,6,7],7)
+ N_final=sqrt_general(N)
+ N_final.setLabel([-54,-62,-55,-64,-56,-66,-68,54,62,55,64,56,66,68])
+ #N_final.permute([-54,-62,-55,-64,-56,-66,-68,54,62,55,64,56,66,68],7) 
+ return N_final              
 

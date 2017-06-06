@@ -18,17 +18,21 @@ from numpy import linalg as LA
 def Short_TrotterSteps(N_iterF):
  List_delN=[]
 
- Delta_N=(0.5, N_iterF)
- List_delN.append(Delta_N)
+# Delta_N=(0.5, N_iterF)
+# List_delN.append(Delta_N)
 
- Delta_N=(0.095, N_iterF)
- List_delN.append(Delta_N)
+# Delta_N=(0.1, N_iterF)
+# List_delN.append(Delta_N)
 
- Delta_N=(0.09, N_iterF)
- List_delN.append(Delta_N)
 
- Delta_N=(0.085, N_iterF)
- List_delN.append(Delta_N)
+# Delta_N=(0.095, N_iterF)
+# List_delN.append(Delta_N)
+
+# Delta_N=(0.09, N_iterF)
+# List_delN.append(Delta_N)
+
+# Delta_N=(0.085, N_iterF)
+# List_delN.append(Delta_N)
 
  Delta_N=(0.08, N_iterF)
  List_delN.append(Delta_N)
@@ -135,6 +139,7 @@ def full_make_bond(Model, D, chi, d_phys):
   #q_list=[q_3_even,q_2_even,q_1_even,q0_even,q1_even, q2_even,q3_even]
   #q_list=[q_1_even,q1_even]
 
+  #q_phys=[q_1_even,q0_even,q1_even]
   q_phys=[q_1_even,q1_even]
 
  ##########################  Z2*U(1)  ################################
@@ -296,21 +301,33 @@ def produce_abcd_gamma(Landa, Gamma_a,Gamma_b,Gamma_c,Gamma_d):
  d_u,d=makeab(Landa1,Gamma_d)
  return a_u,b_u,c_u,d_u,a,b,c,d
 
-def produce_gamma_abcd(a_u,b_u,c_u,d_u,Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa):
+def produce_gamma_abcd(a_u,b_u,c_u,d_u,Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8):
  Gamma_a=copy.copy(a_u)
  Gamma_b=copy.copy(b_u)
  Gamma_c=copy.copy(c_u)
  Gamma_d=copy.copy(d_u)
- 
- for i in xrange(len(Landa)):
-  Landa[i].identity()
-  blk_qnums = Landa[i].blockQnum()
-  for qnum in blk_qnums:
-    M=Landa[i].getBlock(qnum)
-    M.identity()
-    Landa[i].putBlock(qnum,M)
 
- return Gamma_a,Gamma_b,Gamma_c,Gamma_d
+
+ Landa_1=uni10.UniTensor([b_u.bond(1),a_u.bond(3)])
+ Landa_3=uni10.UniTensor([a_u.bond(1),b_u.bond(3)])
+
+ Landa_2=uni10.UniTensor([a_u.bond(2),c_u.bond(4)])
+ Landa_4=uni10.UniTensor([c_u.bond(2),a_u.bond(4)])
+
+
+ Landa_5=uni10.UniTensor([c_u.bond(1),d_u.bond(3)])
+ Landa_6=uni10.UniTensor([d_u.bond(1),c_u.bond(3)])
+
+
+ Landa_7=uni10.UniTensor([b_u.bond(2),d_u.bond(4)])
+ Landa_8=uni10.UniTensor([d_u.bond(2),b_u.bond(4)])
+ 
+ Landa_1.identity();  Landa_2.identity();  Landa_3.identity();
+ Landa_4.identity();  Landa_5.identity();  Landa_6.identity();
+ Landa_7.identity();  Landa_8.identity();  
+
+
+ return Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8
 
 
 def Initialize_function(Gamma,Landa):
@@ -360,14 +377,56 @@ def matSy():
   return uni10.Matrix(dim, dim, [0.0, -1.00, 1.00, 0.00]);
 
 
+def matIden():
+    spin_t=0.5
+    dimT = int(2*spin_t + 1)
+    Mat=uni10.Matrix(dimT, dimT,[1,0,0,1])
+    return Mat
+
+
+#cx_mat X1(3,3);  X1.zeros();         X1(0,1)=1; X1(1,0)=1; X1(1,2)=1,X1(2,1)=1;
+#cx_mat Z1(3,3);  Z1.zeros();         Z1(0,0)=1; Z1(1,1)=0; Z1(2,2)=-1;
+#cx_mat Y1(3,3);  Y1.zeros();         Y1(0,1)=-1; Y1(1,0)=1; Y1(1,2)=-1,Y1(2,1)=1;
+
+
+#def matSx():
+#    spin_t=1
+#    dimT = int(2*spin_t + 1)
+#    Mat=(1.0/(2.0**(0.5)))*uni10.Matrix(dimT, dimT,[0, 1.0, 0 ,1.0,0, 1.0,0,1.0,0])
+#    return Mat 
+#    
+#def matSy():
+#    spin_t=1
+#    dimT = int(2*spin_t + 1)
+#    Mat=(1.0/(2.0**(0.5)))*uni10.Matrix(dimT, dimT,[0,-1.0,0,1.0,0,-1.0,0,1.0,0])
+#    return Mat 
+#   
+
+#def matSz():
+#    spin_t=1
+#    dimT = int(2*spin_t + 1)
+#    Mat=uni10.Matrix(dimT, dimT,[1,0,0,0,0,0,0,0,-1])
+#    return Mat
+
+#def matIden():
+#    spin_t=1
+#    dimT = int(2*spin_t + 1)
+#    Mat=uni10.Matrix(dimT, dimT,[1,0,0,0,1,0,0,0,1])
+#    return Mat
+
+
+
+
 def Heisenberg0(h, J1):
     spin = 0.5
+    #spin = 1.0
     sx = matSx()
     sy = matSy()
     sz = matSz()
-    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+    iden=matIden()
     ham =J1*0.25*(h*uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy))
     dim = int(spin * 2 + 1)
+#    dim = int(spin * 2 + 1)
     bdi = uni10.Bond(uni10.BD_IN, dim);
     bdo = uni10.Bond(uni10.BD_OUT, dim);
     H =  uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg");
@@ -428,10 +487,11 @@ def Heisenberg0(h, J1):
 
 def Heisenberg00(h, J1):
     spin = 0.5
+    #spin = 1.0
     sx = matSx()
     sy = matSy()
     sz = matSz()
-    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+    iden=matIden()
     ham =J1*0.25*(h*uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy))
     dim = int(spin * 2 + 1)
     bdi = uni10.Bond(uni10.BD_IN, dim);
@@ -500,10 +560,11 @@ def Heisenberg00(h, J1):
 
 def Heisenberg1(J2):
     spin = 0.5
+    #spin = 1.0
     sx = matSx()
     sy = matSy()
     sz = matSz()
-    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+    iden = matIden()
     ham =J2*0.25*(uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy))
     dim = int(spin * 2 + 1)
     bdi = uni10.Bond(uni10.BD_IN, dim);
@@ -543,7 +604,9 @@ def threebody(h,d_phys):
     sx = matSx()
     sy = matSy()
     sz = matSz()
-    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+#    print sx, sy, sz    
+    iden=matIden()
+
     szt=uni10.otimes(sz,sz)
     sxt=uni10.otimes(sx,sx)
     syt=(-1.0)*uni10.otimes(sy,sy)
@@ -584,11 +647,11 @@ def threebody_U1(h,d_phys):
     sx = matSx()
     sy = matSy()
     sz = matSz()
-    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
     szt=uni10.otimes(sz,sz)
     sxt=uni10.otimes(sx,sx)
     syt=(-1.0)*uni10.otimes(sy,sy)
-    ident=uni10.otimes(iden,iden)
+    #ident=uni10.otimes(iden,iden)
+    iden = matIden()
 
     sztt=uni10.otimes(iden,sz)
     sxtt=uni10.otimes(iden,sx)
@@ -597,14 +660,48 @@ def threebody_U1(h,d_phys):
 
     ham =(0.25*h[1])*(h[0]*uni10.otimes(szt,iden)+uni10.otimes(sxt,iden)+uni10.otimes(syt,iden))
     ham =ham + 0.25*h[1]*(h[0]*uni10.otimes(iden,szt)+uni10.otimes(iden,sxt)+uni10.otimes(iden,syt))
-    ham =ham + 0.25*2.00*h[2]*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+uni10.otimes(sy,sytt))
+    ham =ham + 0.5*h[2]*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+uni10.otimes(sy,sytt))
 
     #ham = 0.25*2.00*h[2]*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+uni10.otimes(sy,sytt))
 
     H.setRawElem(ham)
     #print ham, H
-
+    #print sx, sy, sz
     return H
+
+
+
+#def threebody_U1_help(h,d_phys):
+#    bdi = uni10.Bond(uni10.BD_IN, d_phys)
+#    bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+
+#    H = uni10.UniTensor([bdi, bdi,bdi, bdo, bdo,bdo], "Heisenberg")
+#    sx = matSx()
+#    sy = matSy()
+#    sz = matSz()
+#    szt=uni10.otimes(sz,sz)
+#    sxt=uni10.otimes(sx,sx)
+#    syt=(-1.0)*uni10.otimes(sy,sy)
+#    #ident=uni10.otimes(iden,iden)
+#    iden = matIden()
+
+#    sztt=uni10.otimes(iden,sz)
+#    sxtt=uni10.otimes(iden,sx)
+#    sytt=(-1.0)*uni10.otimes(iden,sy)
+
+
+#    ham =(0.25*h[1])*(h[0]*uni10.otimes(szt,iden)+uni10.otimes(sxt,iden)+uni10.otimes(syt,iden))
+#    ham =ham + 0.25*h[1]*(h[0]*uni10.otimes(iden,szt)+uni10.otimes(iden,sxt)+uni10.otimes(iden,syt))
+#    ham =ham + 0.25*2*h[2]*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+uni10.otimes(sy,sytt))
+
+#    #ham = 0.25*2.00*h[2]*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+uni10.otimes(sy,sytt))
+
+#    H.setRawElem(ham)
+#    #print ham, H
+#    #print sx, sy, sz
+#    return H
+
+
 
 def threebody_Z2(h,d_phys):
     bdi = uni10.Bond(uni10.BD_IN, d_phys)
@@ -614,7 +711,7 @@ def threebody_Z2(h,d_phys):
     sx = matSx()
     sy = matSy()
     sz = matSz()
-    iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+    iden=matIden()
     szt=uni10.otimes(sz,sz)
     sxt=uni10.otimes(sx,sx)
     syt=(-1.0)*uni10.otimes(sy,sy)
@@ -695,26 +792,44 @@ def Heisenberg0_U1(h,J1, d_phys):
     #print transverseIsing(h).getBlock()
     #H.setRawElem(transverseIsing(h).getBlock().getElem());
     #H.setRawElem(Heisenberg().getBlock());
-    blk_qnums=H.blockQnum()
-    blk_qnums[0]
-    
-    M=H.getBlock(blk_qnums[0])
-    M[0]=J1*h
-    H.putBlock(blk_qnums[0],M)
 
-    M=H.getBlock(blk_qnums[1])
-    M[0]=J1*(-h)
-    M[1]=J1*2.0
-    M[2]=J1*2.0
-    M[3]=J1*(-h)
-    H.putBlock(blk_qnums[1],M)
+    sx = matSx()
+    sy = matSy()
+    sz = matSz()
+    iden=matIden()
+    szt=uni10.otimes(sz,sz)
+    sxt=uni10.otimes(sx,sx)
+    syt=(-1.0)*uni10.otimes(sy,sy)
+    #ident=uni10.otimes(iden,iden)
+    iden = matIden()
 
 
-    M=H.getBlock(blk_qnums[2])
-    M[0]=J1*h
-    H.putBlock(blk_qnums[2],M)
-    H=0.25*H
-    #print H
+
+    ham =(0.25*J1)*(h*uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy))
+    H.setRawElem(ham)
+    #print H, ham
+
+    return H
+
+def Heisenberg1_U1(J2, d_phys):
+    bdi = uni10.Bond(uni10.BD_IN, d_phys)
+    bdo = uni10.Bond(uni10.BD_OUT, d_phys)
+    H = uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg")
+
+    sx = matSx()
+    sy = matSy()
+    sz = matSz()
+    iden=matIden()
+    szt=uni10.otimes(sz,sz)
+    sxt=uni10.otimes(sx,sx)
+    syt=(-1.0)*uni10.otimes(sy,sy)
+    #ident=uni10.otimes(iden,iden)
+    #iden = uni10.Matrix(3,3, [1,0,0,0,1,0,0,0,1])
+
+
+    ham =(0.25*J2)*(uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy))
+    H.setRawElem(ham)
+    #print H, ham
     return H
 
 
@@ -751,26 +866,6 @@ def Heisenberg0_U1Z2(h,J1, d_phys):
 
 
 
-def Heisenberg1_U1(J2, d_phys):
-    bdi = uni10.Bond(uni10.BD_IN, d_phys)
-    bdo = uni10.Bond(uni10.BD_OUT, d_phys)
-    H = uni10.UniTensor([bdi, bdi, bdo, bdo], "Heisenberg")
-    blk_qnums=H.blockQnum()
-    blk_qnums[0]
-    M=H.getBlock(blk_qnums[0])
-    M[0]=J2
-    H.putBlock(blk_qnums[0],M)
-    M=H.getBlock(blk_qnums[1])
-    M[0]=J2*1.00
-    M[1]=J2*2.0
-    M[2]=J2*2.0
-    M[3]=J2*1.00
-    H.putBlock(blk_qnums[1],M)
-    M=H.getBlock(blk_qnums[2])
-    M[0]=J2
-    H.putBlock(blk_qnums[2],M)
-    #print Heisenberg(h)
-    return H
 
 
 
@@ -1318,6 +1413,8 @@ def Energy_cab(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,N_
    H00=Heisenberg0_U1(h[0],h[1],d_phys)
    H1=Heisenberg1_U1(h[2],d_phys)
    H2=threebody_U1(h,d_phys)
+   #H2=threebody_U1_help(h,d_phys)
+   
  if Model is "Heisenberg_U1Z2":
    H0=Heisenberg0_U1Z2(h[0],h[1],d_phys)
    H00=Heisenberg0_U1Z2(h[0],h[1],d_phys)
@@ -1371,6 +1468,8 @@ def Energy_abd(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,N_
    H00=Heisenberg0_U1(h[0],h[1],d_phys)
    H1=Heisenberg1_U1(h[2],d_phys)
    H2=threebody_U1(h,d_phys)
+   #H2=threebody_U1_help(h,d_phys)
+   
  if Model is "Heisenberg_U1Z2":
    H0=Heisenberg0_U1Z2(h[0],h[1],d_phys)
    H00=Heisenberg0_U1Z2(h[0],h[1],d_phys)
@@ -1421,33 +1520,45 @@ def M_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_met
   sz = matSz()
   sx = matSx()
   sy = matSy()
-  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  iden =matIden() 
   szt=uni10.otimes(sz,iden)
   szt1=uni10.otimes(iden,sz)
-  H=szt
-  H1=szt1
+  H.putBlock(szt)
+  H1.putBlock(szt1)
   E_1=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
+  print E_1/2.0
   E_2=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H1)
+  print E_2/2.0
   E_3=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
+  print E_3/2.0
   E_4=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H1)
+  print E_4/2.0
   E_z=((abs(E_1)+abs(E_2)+abs(E_3)+abs(E_4)) / 8.00)
   szt=uni10.otimes(sx,iden)
   szt1=uni10.otimes(iden,sx)
-  H=szt
-  H1=szt1
+  H.putBlock(szt)
+  H1.putBlock(szt1)
   E_1=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
+  print E_1/2.0
   E_2=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H1)
+  print E_2/2.0
   E_3=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
+  print E_3/2.0
   E_4=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H1)
+  print E_4/2.0
   E_x=((abs(E_1)+abs(E_2)+abs(E_3)+abs(E_4)) / 8.00)
   szt=uni10.otimes(sy,iden)
   szt1=uni10.otimes(iden,sy)
-  H=szt
-  H1=szt1
+  H.putBlock(szt)
+  H1.putBlock(szt1)
   E_1=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
+  print E_1/2.0
   E_2=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H1)
+  print E_2/2.0
   E_3=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
+  print E_3/2.0
   E_4=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H1)
+  print E_4/2.0
   E_y=((abs(E_1)+abs(E_2)+abs(E_3)+abs(E_4)) / 8.00)
   return (E_x+E_y+E_z) 
  if Model is "Heisenberg_Z2":
@@ -1457,12 +1568,12 @@ def M_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_met
   H = uni10.UniTensor([bdi, bdi, bdo, bdo])
   H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
   sz = matSz()
-  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  iden = matIden()
   szt=uni10.otimes(sz,iden)
   H.setRawElem(szt)
   szt1=uni10.otimes(iden,sz)
   H1.setRawElem(szt1)
-  print szt,H,szt1,H1
+  #print szt,H,szt1,H1
   E_1=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
   print E_1/2.0
   E_2=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H1)
@@ -1479,7 +1590,7 @@ def M_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_met
   H = uni10.UniTensor([bdi, bdi, bdo, bdo])
   H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
   sz = matSz()
-  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  iden=matIden()
   szt=uni10.otimes(sz,iden)
   H.setRawElem(szt)
   szt1=uni10.otimes(iden,sz)
@@ -1530,7 +1641,7 @@ def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
   sz = matSz()
   sx = matSx()
   sy = matSy()
-  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  iden = matIden()
   HH=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)(-1.0)*uni10.otimes(sy,sy)
   H=uni10.otimes(sz,iden)+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
   H1=uni10.otimes(iden,sz)+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
@@ -1546,7 +1657,7 @@ def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
   H = uni10.UniTensor([bdi, bdi, bdo, bdo])
   H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
   sz = matSz()
-  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  iden = matIden()
   szt=uni10.otimes(sz,iden)
   H.setRawElem(szt)
   szt1=uni10.otimes(iden,sz)
@@ -1564,7 +1675,7 @@ def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
   sz = matSz()
   sx = matSx()
   sy = matSy()
-  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  iden = matIden()
   HH_tem=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy)
   H_tem=uni10.otimes(sz,iden)#+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
   H1_tem=uni10.otimes(iden,sz)#+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
@@ -1828,7 +1939,7 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
   sz = matSz()
   sx = matSx()
   sy = matSy()
-  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  iden = matIden()
   HH=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)(-1.0)*uni10.otimes(sy,sy)
   H=uni10.otimes(sz,iden)+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
   H1=uni10.otimes(iden,sz)+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
@@ -1844,7 +1955,7 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
   H = uni10.UniTensor([bdi, bdi, bdo, bdo])
   H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
   sz = matSz()
-  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  iden = matIden()
   szt=uni10.otimes(sz,iden)
   H.setRawElem(szt)
   szt1=uni10.otimes(iden,sz)
@@ -1862,7 +1973,7 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
   sz = matSz()
   sx = matSx()
   sy = matSy()
-  iden = uni10.Matrix(2,2, [1, 0, 0, 1])
+  iden = matIden()
   HH_tem=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy)
   H_tem=uni10.otimes(sz,iden)#+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
   H1_tem=uni10.otimes(iden,sz)#+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
@@ -3098,8 +3209,9 @@ def Reload_Full_previous(a_u, b_u, c_u, d_u):
  b_uf=uni10.UniTensor("Store/b_u")
  c_uf=uni10.UniTensor("Store/c_u")
  d_uf=uni10.UniTensor("Store/d_u")
- a_u=reconstruct_ab(a_u, a_uf)
 
+ #print "a_uf",a_uf
+ a_u=reconstruct_ab(a_u, a_uf)
  b_u=reconstruct_ab(b_u, b_uf)
  c_u=reconstruct_ab(c_u, c_uf)
  d_u=reconstruct_ab(d_u, d_uf)
@@ -3204,19 +3316,19 @@ def Decomposition(U):
 def slighty_random(a_u,b_u,c_u,d_u,a,b,c,d):
  rand=copy.copy(a_u)
  rand.randomize()
- a_u=a_u+(0.05)*rand
+ a_u=a_u+(0.001)*rand
 
  rand=copy.copy(b_u)
  rand.randomize()
- b_u=b_u+(0.05)*rand
+ b_u=b_u+(0.001)*rand
  
  rand=copy.copy(c_u)
  rand.randomize()
- c_u=c_u+(0.05)*rand
+ c_u=c_u+(0.001)*rand
  
  rand=copy.copy(d_u)
  rand.randomize()
- d_u=d_u+(0.05)*rand
+ d_u=d_u+(0.001)*rand
 
 
  a_u*=(1.00/MaxAbs(a_u)) 
@@ -4022,12 +4134,13 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  c_dp.setLabel([-19,-17,54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- A=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E1*E8)*(a_dp))
+ E_store=(((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp)))*(((E2*E3)*(b_up*b_dp)))
+ A=E_store*((E1*E8)*(a_dp))
  A.permute([55,16,17,18,2],3)
  D_a=A
 
  if Gauge is "Fixed":
-  A=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E1*E8)*(a_up))
+  A=E_store*((E1*E8)*(a_up))
   A.permute([-18,-2,55,-16,-17],2)
   A.transpose()
   D_a=D_a+A
@@ -4062,12 +4175,13 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  c_dp.setLabel([-19,-17,54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))*(((E2*E3)*(b_dp)))
+ E_store=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))
+ A=E_store*(((E2*E3)*(b_dp)))
  A.permute([56,18,20,6,4],3)
  D_b=A
 
  if Gauge is "Fixed":
-  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))*(((E2*E3)*(b_up)))
+  A=E_store*(((E2*E3)*(b_up)))
   A.permute([-6,-4,56,-18,-20],2)
   A.transpose()
   D_b=D_b+A
@@ -4102,12 +4216,14 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  c_dp.setLabel([-19,-17,54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- A=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))* ((E7*E6)*(c_dp))
+ E_store=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))
+
+ A=E_store * ((E7*E6)*(c_dp))
  A.permute([54,14,12,19,17],3)
  D_c=A
 
  if Gauge is "Fixed":
-  A=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))* ((E7*E6)*(c_up))
+  A=E_store * ((E7*E6)*(c_up))
   A.permute([-19,-17,54,-14,-12],2)
   A.transpose()
   D_c=D_c+A
@@ -4141,12 +4257,14 @@ def Obtain_grad_four(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, 
  c_dp.setLabel([-19,-17,54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_dp))
+ E_store=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))
+
+ A=E_store*((E4*E5)*(d_dp))
  A.permute([57,19,10,8,20],3)
  D_d=A
 
  if Gauge is "Fixed":
-  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up))
+  A=E_store*((E4*E5)*(d_up))
   A.permute([-8,-20,57,-19,-10],2)
   A.transpose()
   D_d=D_d+A
@@ -4236,13 +4354,17 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  c_dp.setLabel([-19,-17,54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- A=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E1*E8)*(a_dp))
+
+ E_store=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))
+
+
+ A=E_store*((E1*E8)*(a_dp))
  A.permute([55,16,17,18,2],3)
  D_a=A
 
 
  if Gauge is "Fixed":
-  A=(((((E4*E5)*(d_up*d_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E1*E8)*(a_up))
+  A=E_store*((E1*E8)*(a_up))
   A.permute([-18,-2,55,-16,-17],2)
   A.transpose()
   D_a=D_a+A
@@ -4275,12 +4397,14 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  c_dp.setLabel([-19,-17,54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))*(((E2*E3)*(b_dp)))
+ E_store=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))
+
+ A=E_store*(((E2*E3)*(b_dp)))
  A.permute([56,18,20,6,4],3)
  D_b=A
 
  if Gauge is "Fixed":
-  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*((E4*E5)*(d_up*d_dp)))*(((E2*E3)*(b_up)))
+  A=E_store*(((E2*E3)*(b_up)))
   A.permute([-6,-4,56,-18,-20],2)
   A.transpose()
   D_b=D_b+A
@@ -4314,12 +4438,14 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  c_dp.setLabel([-19,-17,54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- A=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))* ((E7*E6)*(c_dp))
+ E_store=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))
+
+ A=E_store * ((E7*E6)*(c_dp))
  A.permute([54,14,12,19,17],3)
  D_c=A
 
  if Gauge is "Fixed":
-  A=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))* ((E7*E6)*(c_up))
+  A=E_store * ((E7*E6)*(c_up))
   A.permute([-19,-17,54,-14,-12],2)
   A.transpose()
   D_c=D_c+A
@@ -4352,12 +4478,15 @@ def Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u,
  c_dp.setLabel([-19,-17,54,-14,-12])
  d_dp.setLabel([-8,-20,57,-19,-10])
 
- A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_dp))
+
+ E_store=(((((E1*E8)*(a_up*a_dp))*((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up*d_dp)))
+
+ A=E_store*((E4*E5)*(d_dp))
  A.permute([57,19,10,8,20],3)
  D_d=A
 
  if Gauge is "Fixed":
-  A=(((((E1*E8)*(a_up*a_dp))*((E7*E6)*(c_up*c_dp))))*(((E2*E3)*(b_up*b_dp))))*((E4*E5)*(d_up))
+  A=E_store *((E4*E5)*(d_up))
   A.permute([-8,-20,57,-19,-10],2)
   A.transpose()
   D_d=D_d+A
@@ -4901,6 +5030,35 @@ def Obtain_grad_four_MPO1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_
 
 
 
+def make_equall_dis(a_u,b_u,c_u,d_u,a,b,c,d):
+
+ for q in xrange(2):
+  c_u, d_u=basicC.equall_dis_H(c_u, d_u)
+  c_u, a_u=basicC.equall_dis_V(c_u, a_u)
+  a_u, b_u=basicC.equall_dis_H(a_u, b_u)
+  c_u, d_u=basicC.equall_dis_H(c_u, d_u)
+  d_u, b_u=basicC.equall_dis_V(d_u, b_u)
+  a_u, b_u=basicC.equall_dis_H(a_u, b_u)
+  d_u, b_u=basicC.equall_dis_V(d_u, b_u)
+  c_u, a_u=basicC.equall_dis_V(c_u, a_u)
+  Maxa=MaxAbs(a_u)
+  Maxb=MaxAbs(b_u)
+  Maxc=MaxAbs(c_u)
+  Maxd=MaxAbs(d_u)
+  #print Maxa, Maxb, Maxc, Maxd
+
+ a_u=max_ten(a_u)
+ b_u=max_ten(b_u) 
+ c_u=max_ten(c_u)
+ d_u=max_ten(d_u)
+
+ a=make_ab(a_u)
+ b=make_ab(b_u)
+ c=make_ab(c_u)
+ d=make_ab(d_u)
+
+
+ return a_u,b_u,c_u,d_u,a,b,c,d
 
 
 
