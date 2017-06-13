@@ -69,7 +69,7 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,h,Env,Env1,Env2,Env3,Gauge,
    t0=time.time()
 
 #################################################################################################
-#   
+##   
 #   a_u, b_u, a, b=basicB.Var_ab(a_u,b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_env,N_svd)
 #   #print time.time() - t0, "Seconds, Left"
 
@@ -123,6 +123,8 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,h,Env,Env1,Env2,Env3,Gauge,
    print 'E_s=', E_value, time.time() - t0
    M_value=basic.M_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model)
    print 'M_s=', M_value
+   basic.Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model)
+
    #break
 
 

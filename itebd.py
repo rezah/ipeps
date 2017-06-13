@@ -15,24 +15,21 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
  E_1=2.0
    
  if Model is "Heisenberg":
-   H0=basic.Heisenberg0(h[0],h[1])
-   H00=basic.Heisenberg00(h[0],h[1])
-   H1=basic.Heisenberg1(h[2])
-   H2=basic.threebody(h,d_phys)   
+   H0=basic.Heisenberg0(h,d_phys)
+   H00=basic.Heisenberg00(h,d_phys)
+   H1=basic.Heisenberg1(h,d_phys)
+   H2=basic.threebody(h,d_phys)
  if Model is "Heisenberg_Z2":
-   H0=basic.Heisenberg0_Z2(h[0],h[1],d_phys)
-   H00=basic.Heisenberg00_Z2(h[0],h[1],d_phys)
-   H1=basic.Heisenberg1_Z2(h[2],d_phys)
+   H0=basic.Heisenberg0_Z2(h,d_phys)
+   H00=basic.Heisenberg00_Z2(h,d_phys)
  if Model is "Heisenberg_U1":
-   H0=basic.Heisenberg0_U1(h[0],h[1],d_phys)
-   H00=basic.Heisenberg0_U1(h[0],h[1],d_phys)
-   H1=basic.Heisenberg1_U1(h[2],d_phys)
+   H0=basic.Heisenberg0_U1(h,d_phys)
+   H00=basic.Heisenberg00_U1(h,d_phys)
    H2=basic.threebody_U1(h,d_phys)   
-   H2=basic.threebody_U1_help(h,d_phys)   
+   #H2=basic.threebody_U1_help(h,d_phys)   
  if Model is "Heisenberg_U1Z2":
-   H0=basic.Heisenberg0_U1Z2(h[0],h[1],d_phys)
-   H00=basic.Heisenberg0_U1Z2(h[0],h[1],d_phys)
-   H1=basic.Heisenberg1_U1(h[2],d_phys)
+   H0=basic.Heisenberg0_U1Z2(h,d_phys)
+   H00=basic.Heisenberg0_U1Z2(h,d_phys)
   
  U = uni10.UniTensor(H0.bond(), "U");
  U0 = uni10.UniTensor(H00.bond(), "U");

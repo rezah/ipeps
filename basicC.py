@@ -7,7 +7,7 @@ import numpy as np
 #import scipy as sp
 #import line_profiler
 
-##@profile
+###@profile
 def Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist,MPO_list,Inv_method,N_svd,N_env,method,check_step):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic.Init_env(Env)
@@ -85,7 +85,7 @@ def Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N
 
  return a_up, b_up, c_up, d_up, ap, bp, cp, dp
 
-###@profile
+####@profile
 def Var_abd(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_grad, Opt_method,plist,MPO_list,Inv_method,N_svd,N_env,method,check_step):
 
  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=basic.Init_env(Env)
@@ -367,7 +367,7 @@ def energy_abd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,c_u,d_u, U):
 
 
  
-####@profile
+#####@profile
 def  Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U):
 
  U.setLabel([-54,-55,-56,0,1,2])
@@ -447,7 +447,7 @@ def  Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
 
  return  val_f
 
-###@profile
+####@profile
 def Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U, N_grad, Opt_method, Gauge):
 
 
@@ -823,7 +823,7 @@ def Do_optimization_Grad_MPO1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_lis
 
 
 
-####@profile
+#####@profile
 def  Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U):
 
  U.setLabel([-55,-56,-57,0,1,2])
@@ -900,7 +900,7 @@ def  Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up
  
  #print Val2[0], Val3[0]
  return  val_f
-###@profile
+####@profile
 def Do_optimization_Grad1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Gauge):
 
   time_val=0
@@ -924,7 +924,7 @@ def Do_optimization_Grad1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, 
    count+=1
    E1_val=Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
    Ef=E1_val
-   print 'E2=', E1_val, abs((E_previous-E1_val)/E1_val), count, time_val
+   print 'E2=', E1_val, abs((E_previous-E1_val)/E1_val), i,  count, time_val
    
    D_a,D_b,D_c,D_d=basic.Obtain_grad_four1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Gauge)
    D_a=(-1.0)*D_a
@@ -1172,7 +1172,7 @@ def svd_parity1(theta):
 
 
 
-####@profile
+#####@profile
 def inverse(Landa2):
  invLanda2=uni10.UniTensor(Landa2.bond())
  blk_qnums=Landa2.blockQnum()
@@ -1776,7 +1776,7 @@ def initialize_plist1(a_u, b_u, d_u, MPO_list):
 
  return plist
 
-##@profile
+#@profile
 def Do_optimization_MPO_positive(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step):
  
 # Distance_val=Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist)
@@ -1908,7 +1908,7 @@ def Do_optimization_MPO_positive(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_
 
 
 
-##@profile
+#@profile
 def obtain_N_mpo(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,c_u,a_u,b_u):
 
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
@@ -1944,7 +1944,7 @@ def obtain_N_mpo(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,c_u,a_u,b_u):
  N_mpo.permute([-54,-62,-55,-64,-56,-66,-68,54,62,55,64,56,66,68],7)
  return N_mpo
 
-##@profile
+#@profile
 def Dis_ff_mpo(N_mpo,plist,MPO_list):
 
  MPO_list[0].setLabel([-54,58,57,54])
@@ -2054,7 +2054,7 @@ def Dis_ff_mpo(N_mpo,plist,MPO_list):
 
 
 
-##@profile
+#@profile
 def  optimum_0_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
@@ -2163,7 +2163,12 @@ def  optimum_0_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
  plist0_d.setLabel([-58,-57,-54,100])
 
 
- A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+# A=(((plist0_d*plist1_d)*(plist2_d))*N_mpo)*((plist0*plist1)*(plist2))
+ 
+ A=(((((plist1_d)*(plist2_d))*N_mpo)*((plist1)*(plist2))) *(plist0*plist0_d))
+ 
+# A=(((plist1_d*plist1)*N_mpo)*(plist2_d*plist2))*((plist0_d*plist0))
+ 
  A.permute([-62,-58,-57,-17,62,58,57,17],4)
 
 # if Gauge is "Fixed":
@@ -2176,7 +2181,7 @@ def  optimum_0_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
 
- Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap=((plist0_d*plist1_d)*(plist2_d))*(N_mpo*((plist0_iden*plist1_iden)*(plist2_iden)))
  Ap.permute([-62,-58,-57,-17],4)
 
 # if Gauge is "Fixed":
@@ -2206,7 +2211,7 @@ def  optimum_0_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
    A.permute([62,58,57,17],3)   
    plist[0]=A 
 
-##@profile
+#@profile
 def  optimum_1_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
@@ -2315,7 +2320,11 @@ def  optimum_1_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
  plist1_d.setLabel([-55,-18,-58,-57,200,-66])
 
 
- A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+# A=(((plist0_d*plist1_d)*(plist2_d))*N_mpo)*((plist0*plist1)*(plist2))
+
+ A=(((plist0_d*plist0)*N_mpo)*(plist2_d*plist2))*((plist1_d*plist1))
+
+
  A.permute([-17,-64,-58,-57,17,64,58,57],4)
 
 # if Gauge is "Fixed":
@@ -2328,7 +2337,7 @@ def  optimum_1_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
 
- Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap=((plist0_d*plist1_d)*(plist2_d))*(N_mpo*((plist0_iden*plist1_iden)*(plist2_iden)))
  Ap.permute([-17,-64,-58,-57],4)
 
 
@@ -2361,7 +2370,7 @@ def  optimum_1_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
    A.permute([17,64,58,57],1)   
    plist[1]=A 
 
-##@profile
+#@profile
 def  optimum_2_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
  MPO_list[0].setLabel([-54,58,57,54])
@@ -2469,11 +2478,14 @@ def  optimum_2_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
  plist1_d.setLabel([-64,-55,-59,-60,-17,200])
 
 
- A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+# A=(((plist0_d*plist1_d)*(plist2_d))*N_mpo)*((plist0*plist1)*(plist2))
+ A=(((plist0_d*plist0)*N_mpo)*(plist2_d*plist2))*((plist1_d*plist1))
+
+
  A.permute([-66,-59,-60,-18,66,59,60,18],4)
 
 
- Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap=((plist0_d*plist1_d)*(plist2_d))*(N_mpo*((plist0_iden*plist1_iden)*(plist2_iden)))
  Ap.permute([-66,-59,-60,-18],4)
 
 
@@ -2503,7 +2515,7 @@ def  optimum_2_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
 
-##@profile
+#@profile
 def  optimum_3_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
  MPO_list[0].setLabel([-54,58,57,54])
@@ -2611,7 +2623,10 @@ def  optimum_3_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
  plist2_d.setLabel([-56,300,-59,-60])
 
 
- A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+# A=(((plist0_d*plist1_d)*(plist2_d))*N_mpo)*((plist0*plist1)*(plist2))
+
+ A=((((plist0_d*plist1_d))*N_mpo)*((plist0*plist1))) *(plist2*plist2_d)
+
  A.permute([-18,-68,-59,-60,18,68,59,60],4)
 
 # if Gauge is "Fixed":
@@ -2624,7 +2639,7 @@ def  optimum_3_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
 
- Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap=((plist0_d*plist1_d)*(plist2_d))*(N_mpo*((plist0_iden*plist1_iden)*(plist2_iden)))
  Ap.permute([-18,-68,-59,-60],4)
 
 
@@ -2658,7 +2673,7 @@ def  optimum_3_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
 
-###@profile
+####@profile
 def Do_optimization_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step):
  
  plist_f=[copy.copy(plist[i])  for i in xrange(len(plist)) ]
@@ -2886,7 +2901,7 @@ def optimum_2013(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u
   else: 
    plist[3]=plist_f[3]
 
-###@profile
+####@profile
 def optimum_0(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge):
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
 
@@ -3005,7 +3020,7 @@ def optimum_0(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,pl
 
 
 
-###@profile
+####@profile
 def optimum_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge):
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
 
@@ -3128,7 +3143,7 @@ def optimum_1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,pl
 
 
 
-###@profile
+####@profile
 def optimum_2(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge):
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
 
@@ -3252,7 +3267,7 @@ def optimum_2(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,pl
 
 
 
-###@profile
+####@profile
 def optimum_3(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,MPO_list,c_u,a_u,b_u,plist,Inv_method,Gauge):
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
 
@@ -3377,7 +3392,7 @@ def optimum_3(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,MPO_list,c_u,a_u,b_u,pli
 
 
 
-###@profile
+####@profile
 def  Dis_ff(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist):
 
  d.setLabel([19,-19,10,-10,8,-8,20,-20])
@@ -3509,7 +3524,7 @@ def Reload_plist1(plist):
  plist[3]=uni10.UniTensor("Store/plist1[3]")
  return plist
 
-#@profile
+##@profile
 def Do_optimization_MPO_positive1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step):
  
 # Distance_val=Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist)
@@ -3644,7 +3659,7 @@ def Do_optimization_MPO_positive1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO
 
 
 
-#@profile
+##@profile
 def obtain_N_mpo1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,d_u):
 
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
@@ -3679,7 +3694,7 @@ def obtain_N_mpo1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,a_u,b_u,d_u):
  N_mpo.permute([-54,-62,-55,-64,-56,-66,-68,54,62,55,64,56,66,68],7)
  return N_mpo
 
-#@profile
+##@profile
 def Dis_ff_mpo1(N_mpo,plist,MPO_list):
 
  MPO_list[0].setLabel([-54,58,57,54])
@@ -3796,7 +3811,7 @@ def Dis_ff_mpo1(N_mpo,plist,MPO_list):
  return val_1[0]-2.0*val_2[0]
 
 
-#@profile
+##@profile
 def  optimum_00_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
  MPO_list[0].setLabel([-54,58,57,54])
@@ -3909,11 +3924,13 @@ def  optimum_00_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
  plist0_d.setLabel([-58,-57,-54,100])
 
 
- A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+# A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A=(((((plist1_d)*(plist2_d))*N_mpo)*((plist1)*(plist2))) *(plist0*plist0_d))
+
  A.permute([-62,-58,-57,-18,62,58,57,18],4)
 
 
- Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap=((plist0_d*plist1_d)*(plist2_d))*(N_mpo*((plist0_iden*plist1_iden)*(plist2_iden)))
  Ap.permute([-62,-58,-57,-18],4)
 
 
@@ -3946,7 +3963,7 @@ def  optimum_00_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
    A.permute([62,58,57,18],3)   
    plist[0]=A 
 
-#@profile
+##@profile
 
 def  optimum_11_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
@@ -4062,12 +4079,14 @@ def  optimum_11_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
  plist1_d.setLabel([-68,-55,-58,-57,200,-20])
 
 
- A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+# A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A=(((plist0_d*plist0)*N_mpo)*(plist2_d*plist2))*((plist1_d*plist1))
+
  A.permute([-18,-64,-58,-57,18,64,58,57],4)
 
 
 
- Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap=((plist0_d*plist1_d)*(plist2_d))*(N_mpo*((plist0_iden*plist1_iden)*(plist2_iden)))
  Ap.permute([-18,-64,-58,-57],4)
 
 
@@ -4101,7 +4120,7 @@ def  optimum_11_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
 
-#@profile
+##@profile
 def  optimum_22_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
@@ -4217,11 +4236,13 @@ def  optimum_22_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
  plist1_d.setLabel([-64,-55,-59,-60,-18,200])
 
 
- A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+# A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A=(((plist0_d*plist0)*N_mpo)*(plist2_d*plist2))*((plist1_d*plist1))
+
  A.permute([-60,-59,-20,-68,60,59,20,68],4)
 
 
- Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap=((plist0_d*plist1_d)*(plist2_d))*(N_mpo*((plist0_iden*plist1_iden)*(plist2_iden)))
  Ap.permute([-60,-59,-20,-68],4)
 
 
@@ -4254,7 +4275,7 @@ def  optimum_22_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
 
-#@profile
+##@profile
 def  optimum_33_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
  
@@ -4369,11 +4390,13 @@ def  optimum_33_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
  plist2_d.setLabel([-56,300,-59,-60])
 
 
- A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+# A=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0*plist1)*(plist2))
+ A=((((plist0_d*plist1_d))*N_mpo)*((plist0*plist1))) *(plist2*plist2_d)
+
  A.permute([-66,-60,-59,-20,66,60,59,20],4)
 
 
- Ap=((plist0_d*plist1_d)*(plist2_d))*N_mpo*((plist0_iden*plist1_iden)*(plist2_iden))
+ Ap=((plist0_d*plist1_d)*(plist2_d))*(N_mpo*((plist0_iden*plist1_iden)*(plist2_iden)))
  Ap.permute([-66,-60,-59,-20],4)
 
 
@@ -4425,7 +4448,7 @@ def  optimum_33_positive(N_mpo,  MPO_list,plist,Inv_method,Gauge):
 
 
 
-###@profile
+####@profile
 def Do_optimization_MPO1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,N_grad,N_svd,Gauge,check_step):
  plist_f=[copy.copy(plist[i])  for i in xrange(len(plist)) ]
  
@@ -4669,7 +4692,7 @@ def optimum_2013s(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_
 
 
 
-###@profile
+####@profile
 def  Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist):
 
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
@@ -4758,7 +4781,7 @@ def  Dis_ff1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,pli
 
 
 
-###@profile
+####@profile
 def optimum_00(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge):
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
 
@@ -4881,7 +4904,7 @@ def optimum_00(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,p
 
 
 
-###@profile
+####@profile
 def optimum_11(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge):
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
 
@@ -5008,7 +5031,7 @@ def optimum_11(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,p
 
 
 
-###@profile
+####@profile
 def optimum_22(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge):
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
 
@@ -5132,7 +5155,7 @@ def optimum_22(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,a_u,b_u,d_u,p
 
 
 
-###@profile
+####@profile
 def optimum_33(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d,MPO_list,a_u,b_u,d_u,plist,Inv_method,Gauge):
  c.setLabel([14,-14,12,-12,19,-19,17,-17])
 
@@ -5272,7 +5295,7 @@ def  recover1( a_u,b_u, d_u, plist, MPO_list):
  return a_ut, b_ut,d_ut 
  
 
-##@profile
+###@profile
 def Do_optimization_svd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Inv_method,N_svd,Gauge,check_step):
 
  a_up_first=copy.copy(a_up) 
@@ -5349,41 +5372,43 @@ def Do_optimization_svd(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_
   Res1=Distance_val
   #print Res, Res1, Res1 < Res 
   #test=q
-  if Res1 < Res:
-    a_up_first=copy.copy(a_up) 
-    b_up_first=copy.copy(b_up)
-    c_up_first=copy.copy(c_up)
-    d_up_first=copy.copy(d_up)
-  else: 
-    a_up=copy.copy(a_up_first) 
-    b_up=copy.copy(b_up_first)
-    c_up=copy.copy(c_up_first)
-    d_up=copy.copy(d_up_first)
-    #test=q
-    break
- 
+
   count+=1
   if count > 100: print 'Num_Opt > 30'; break;
   if abs(Res) > 1.00e-10:
    if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
-    #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
+    print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     break
   else:
     if (abs(Distance_val) < 1.00e-8) or (  abs(Res1-Res) < 1.00e-11  ): 
      #print 'break, Dis', Distance_val[0], abs(Res1-Res)
      break
 
-# print test
-# if test != 0:
-##  a_up=copy.copy(a_up_first1)
-##  b_up=copy.copy(b_up_first1)
-##  c_up=copy.copy(c_up_first1)
-##  d_up=copy.copy(d_up_first1)
-#  a_up, b_up, c_up, d_up=Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Gauge)
+  if Res1 < Res:
+    a_up_first=copy.copy(a_up) 
+    b_up_first=copy.copy(b_up)
+    c_up_first=copy.copy(c_up)
+    d_up_first=copy.copy(d_up)
+  else:
+    a_up=copy.copy(a_up_first) 
+    b_up=copy.copy(b_up_first)
+    c_up=copy.copy(c_up_first)
+    d_up=copy.copy(d_up_first)
+    test=q+1
+    break
+ 
+
+ print test
+ if test != 0:
+  a_up=copy.copy(a_up_first1)
+  b_up=copy.copy(b_up_first1)
+  c_up=copy.copy(c_up_first1)
+  d_up=copy.copy(d_up_first1)
+  a_up, b_up, c_up, d_up=Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Gauge)
  return a_up, b_up, c_up, d_up
 
 
-##@profile
+###@profile
 def opt_a(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-54,-55,-56,0,1,2])
@@ -5499,7 +5524,7 @@ def opt_a(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, 
  return A
 
 
-##@profile
+###@profile
 def opt_b(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-54,-55,-56,0,1,2])
@@ -5622,7 +5647,7 @@ def opt_b(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, 
  return A
 
 
-##@profile
+###@profile
 def opt_c(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-54,-55,-56,0,1,2])
@@ -5739,7 +5764,7 @@ def opt_c(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, 
 
  return A
 
-##@profile
+###@profile
 def opt_d(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-54,-55,-56,0,1,2])
@@ -5865,7 +5890,7 @@ def opt_d(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, 
 
 
 
-##@profile
+###@profile
 def Do_optimization_svd1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Inv_method,N_svd,Gauge, check_step):
 
  a_up_first=copy.copy(a_up) 
@@ -5939,48 +5964,51 @@ def Do_optimization_svd1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c
    c_up=opt_c1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge)
 
 
-   Distance_val=Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
-   print 'Dis_svd2=', Distance_val, abs(Res1-Res) / abs(Res), q, time.time() - t0
+  Distance_val=Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
+  print 'Dis_svd2=', Distance_val, abs(Res1-Res) / abs(Res), q, time.time() - t0
 
-   Res=Res1
-   Res1=Distance_val
-   #print Res, Res1, Res1 < Res 
-   #test=q
-   if Res1 < Res:
-     a_up_first=copy.copy(a_up) 
-     b_up_first=copy.copy(b_up)
-     c_up_first=copy.copy(c_up)
-     d_up_first=copy.copy(d_up)
-   else: 
-     a_up=copy.copy(a_up_first) 
-     b_up=copy.copy(b_up_first)
-     c_up=copy.copy(c_up_first)
-     d_up=copy.copy(d_up_first)
-     #test=q
-     break
- 
+  Res=Res1
+  Res1=Distance_val
+  #print Res, Res1, Res1 < Res 
+  #test=q
+
   count+=1
   if count > 100: print 'Num_Opt > 30'; break;
   if abs(Res) > 1.00e-10:
    if (abs(Distance_val) < 1.00e-8) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
-    #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
+    print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     break
   else:
     if (abs(Distance_val) < 1.00e-8) or (  abs(Res1-Res) < 1.00e-11  ): 
      #print 'break, Dis', Distance_val[0], abs(Res1-Res)
      break
 
-# if test != 0:
-##  a_up=copy.copy(a_up_first1)
-##  b_up=copy.copy(b_up_first1)
-##  c_up=copy.copy(c_up_first1)
-##  d_up=copy.copy(d_up_first1)
-#  a_up, b_up, c_up, d_up=Do_optimization_Grad1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Gauge)
+
+  if Res1 < Res:
+    a_up_first=copy.copy(a_up) 
+    b_up_first=copy.copy(b_up)
+    c_up_first=copy.copy(c_up)
+    d_up_first=copy.copy(d_up)
+  else: 
+    a_up=copy.copy(a_up_first) 
+    b_up=copy.copy(b_up_first)
+    c_up=copy.copy(c_up_first)
+    d_up=copy.copy(d_up_first)
+    test=q+1
+    break
+
+
+ if test != 0:
+  a_up=copy.copy(a_up_first1)
+  b_up=copy.copy(b_up_first1)
+  c_up=copy.copy(c_up_first1)
+  d_up=copy.copy(d_up_first1)
+  a_up, b_up, c_up, d_up=Do_optimization_Grad1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Gauge)
 
  return a_up, b_up, c_up, d_up
 
 
-##@profile
+###@profile
 def opt_a1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-55,-56,-57,0,1,2])
@@ -6100,7 +6128,7 @@ def opt_a1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
  return A
 
 
-##@profile
+###@profile
 def opt_b1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-55,-56,-57,0,1,2])
@@ -6219,7 +6247,7 @@ def opt_b1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
  return A
 
 
-##@profile
+###@profile
 def opt_d1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-55,-56,-57,0,1,2])
@@ -6338,7 +6366,7 @@ def opt_d1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up,
 
  return A
 
-##@profile
+###@profile
 def opt_c1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,Inv_method,Gauge):
 
  U.setLabel([-55,-56,-57,0,1,2])
@@ -6482,7 +6510,7 @@ def Mat_uni_to_np(Mat_uni):
 
 
 
-####@profile
+#####@profile
 def solve_linear_eq(A,Ap):
  Ap_h=copy.copy(Ap)
  Ap_h.transpose()
@@ -6544,7 +6572,7 @@ def Normal_Singulars(S):
 
  return S
 
-#@profile
+##@profile
 def sqrt_general(N2):
   #N_init=copy.copy(N2)
   blk_qnums = N2.blockQnum()
@@ -6559,7 +6587,7 @@ def sqrt_general(N2):
    N2.putBlock(qnum,M)
   return N2
 
-##@profile 
+###@profile 
 def N_Positiv(N):
  #print N.printDiagram()#, sys.getsizeof(N)
  
