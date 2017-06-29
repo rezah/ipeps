@@ -21,18 +21,18 @@ def Short_TrotterSteps(N_iterF):
 # Delta_N=(1.0, N_iterF)
 # List_delN.append(Delta_N)
 
-# Delta_N=(0.08, N_iterF)
-# List_delN.append(Delta_N)
+ Delta_N=(0.08, N_iterF)
+ List_delN.append(Delta_N)
 
 
-# Delta_N=(0.07, N_iterF)
-# List_delN.append(Delta_N)
+ Delta_N=(0.07, N_iterF)
+ List_delN.append(Delta_N)
 
-# Delta_N=(0.06, N_iterF)
-# List_delN.append(Delta_N)
+ Delta_N=(0.06, N_iterF)
+ List_delN.append(Delta_N)
 
-# Delta_N=(0.05, N_iterF)
-# List_delN.append(Delta_N)
+ Delta_N=(0.05, N_iterF)
+ List_delN.append(Delta_N)
 
  Delta_N=(0.04, N_iterF)
  List_delN.append(Delta_N)
@@ -351,7 +351,7 @@ def Initialize_function(Gamma,Landa):
  #Gamma[0].randomize()
  for i in xrange(len(Gamma)):
   Gamma[i].randomize()
-  #Gamma[i].orthoRand()
+  Gamma[i].orthoRand()
   Gamma[i]=Gamma[i]*(1.00/MaxAbs(Gamma[i]))
   
  for i in xrange(len(Landa)):
@@ -525,10 +525,10 @@ def threebody(h,d_phys):
     sxtt=uni10.otimes(iden,sx)
     sytt=(-1.0)*uni10.otimes(iden,sy)
 
-    ham =(h[0])*(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))
+    ham =(h[1])*(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))
 
     
-    ham =ham + h[1]*(h[3]*uni10.otimes(iden,szt)+h[4]*uni10.otimes(iden,sxt)+h[5]*uni10.otimes(iden,syt))
+    ham =ham + h[0]*(h[3]*uni10.otimes(iden,szt)+h[4]*uni10.otimes(iden,sxt)+h[5]*uni10.otimes(iden,syt))
 
 
     ham =ham + 2.0*h[2]*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
@@ -573,10 +573,10 @@ def threebody_U1(h,d_phys):
     sxtt=uni10.otimes(iden,sx)
     sytt=(-1.0)*uni10.otimes(iden,sy)
 
-    ham =(h[0])*(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))
+    ham =(h[1])*(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))
 
     
-    ham =ham + h[1]*(h[3]*uni10.otimes(iden,szt)+h[4]*uni10.otimes(iden,sxt)+h[5]*uni10.otimes(iden,syt))
+    ham =ham + h[0]*(h[3]*uni10.otimes(iden,szt)+h[4]*uni10.otimes(iden,sxt)+h[5]*uni10.otimes(iden,syt))
 
 
     ham =ham + 2.0*h[2]*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
@@ -597,7 +597,7 @@ def threebody_U1(h,d_phys):
     ham= ham +  h[7]*C 
 
     H.setRawElem(ham)
-#    print ham, H
+    #print ham, H
 #    print H
     #print sx, sy, sz
     return H
@@ -1504,8 +1504,30 @@ def M_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_met
   E_3=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
   #print E_3
   E_4=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H1)
-  print "z"
-  print E_1, "    ", E_2, "\n",  E_3, "    ", E_4 
+  print "\n", "z"
+  print E_1, "    ", E_2, "\n",  E_3, "    ", E_4 , "\n"
+
+#  szt=uni10.otimes(sz,sz)
+#  H.setRawElem(szt)
+#  ZZ_1=M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
+#  ZZ_2=M_h(b_u,a_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model,H)
+#  ZZ_3=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
+#  ZZ_4=M_h(d_u,c_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model,H)
+#  max_list=[ZZ_1, ZZ_2, ZZ_3, ZZ_4]
+#  print 'ZZ-H'
+#  print ZZ_1, "    ", ZZ_2, "\n",  ZZ_3, "    ", ZZ_4 
+#  print 'ZZ_H', (sum(max_list)/4.00)-((E_1*E_1+E_2*E_2+E_3*E_3+E_4*E_4)/4.00) 
+
+
+#  ZZ_5=M_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
+#  ZZ_6=M_v(d_u,b_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model,H)
+#  ZZ_7=M_v(a_u,c_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
+#  ZZ_8=M_v(b_u,d_u,d,c,b,a,Env3,D,h,d_phys,chi,Corner_method,Model,H)
+#  print 'ZZ-V'
+#  print ZZ_5, "    ", ZZ_6, "\n",  ZZ_7, "    ", ZZ_8 
+#  max_list=[ZZ_5, ZZ_6, ZZ_7, ZZ_8]
+#  print 'ZZ_V', (sum(max_list)/4.00)-((E_1*E_1+E_2*E_2+E_3*E_3+E_4*E_4)/4.00) 
+
   return ((abs(E_1)+abs(E_2)+abs(E_3)+abs(E_4)) / 4.00)
  if Model is "Heisenberg_U1Z2":
   H0=Heisenberg0_U1Z2(h,d_phys)
@@ -1526,6 +1548,7 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   print 'bond-H'
   print E_1, "    ", E_2, "\n",  E_3, "    ", E_4 
   max_list=[E_1, E_2, E_3, E_4]
+  print 'ave_H', sum(max_list)/4.00 
   print 'max', max(max_list) 
   print 'min', min(max_list) 
   H=Heisenberg00(h,d_phys)
@@ -1536,14 +1559,16 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   print 'bond-V'
   print E_5, "    ", E_6, "\n",  E_7, "    ", E_8 
   max_list1=[E_5, E_6, E_7, E_8]
+  print 'ave_V', sum(max_list1)/4.00
   print 'max', max(max_list1) 
   print 'min', min(max_list1) 
 
   D_x=max(max_list) - min(max_list)
   D_y=max(max_list1) - min(max_list1)
-
+  D_R=max(max_list1)-min(max_list)
   print   'D_x=', D_x
   print   'D_y=', D_y
+  print   'D_R=', D_R
   
   
  if Model is "Heisenberg_U1":
@@ -1555,6 +1580,7 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   print 'bond-H'
   print E_1, "    ", E_2, "\n",  E_3, "    ", E_4 
   max_list=[E_1, E_2, E_3, E_4]
+  print 'ave_H', sum(max_list)/4.00 
   print 'max', max(max_list) 
   print 'min', min(max_list) 
   H=Heisenberg00_U1(h,d_phys)
@@ -1566,14 +1592,17 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   print 'bond-V'
   print E_5, "    ", E_6, "\n",  E_7, "    ", E_8 
   max_list1=[E_5, E_6, E_7, E_8]
+  print 'ave_V', sum(max_list1)/4.00
   print 'max', max(max_list1) 
   print 'min', min(max_list1) 
 
   D_x=max(max_list) - min(max_list)
   D_y=max(max_list1) - min(max_list1)
+  D_R=max(max_list1)-min(max_list)
 
   print   'D_x=', D_x
   print   'D_y=', D_y
+  print   'D_R=', D_R
   
  if Model is "Heisenberg_U1Z2":
   H0=Heisenberg0_U1Z2(h,d_phys)
@@ -1650,26 +1679,28 @@ def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
  if Model is "Heisenberg_U1":
   bdi = uni10.Bond(uni10.BD_IN, d_phys)
   bdo = uni10.Bond(uni10.BD_OUT, d_phys)
-  HH = uni10.UniTensor([bdi, bdi, bdo, bdo])
-  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
-  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  HH = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
+  H = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
   sz = matSz()
   sx = matSx()
   sy = matSy()
   iden = matIden()
+  iden_iden=uni10.otimes(iden,iden)
   HH_tem=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy)
-  H_tem=uni10.otimes(sz,iden)#+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
-  H1_tem=uni10.otimes(iden,sz)#+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
-  HH.setRawElem(HH_tem)
+  HHH_tem=uni10.otimes(HH_tem,HH_tem)
+  H_tem=uni10.otimes(HH_tem,iden_iden)
+  H1_tem=uni10.otimes(iden_iden,HH_tem)
+  HH.setRawElem(HHH_tem)
   H.setRawElem(H_tem)
   H1.setRawElem(H1_tem)
-  Iden=copy.copy(H)
+  Iden=copy.copy(HH)
   Iden.identity()
   #print HH_tem, HH, H_tem, H, H1_tem, H1
-  HH.setLabel([-10,-20,10,20])
-  H.setLabel([-10,-20,10,20])
-  H1.setLabel([-10,-20,10,20])
-  Iden.setLabel([-10,-20,10,20])
+  HH.setLabel([-10,-126,-20,-226,10,126,20,226])
+  H.setLabel([-10,-126,-20,-226,10,126,20,226])
+  H1.setLabel([-10,-126,-20,-226,10,126,20,226])
+  Iden.setLabel([-10,-126,-20,-226,10,126,20,226])
 
  vec_left=make_vleft(Tb4,Ta4,c1,c4)
  vec_right=make_vright(Ta2,Tb2,c2,c3)
@@ -1694,10 +1725,10 @@ def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
 
 
  print "\n"
-#######################a-a#####################################################
+#######################ab-ab#####################################################
 
- vec_left_1=Make_first_vecleft_a(vec_left, Ta1, Ta3,Tb1,Tb3,ap,b,c,d)
- vec_right_1=Make_first_vecright_a(vec_right, Ta1, Ta3,Tb1,Tb3,ap,b,c,d)
+ vec_left_1=Make_first_vecleft_a(vec_left, Ta1, Ta3,Tb1,Tb3,ap,bp,c,d)
+ vec_right_1=Make_first_vecright_a(vec_right, Ta1, Ta3,Tb1,Tb3,ap,bp,c,d)
 
  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,2)
  dis_val_list.append(2)
@@ -1714,17 +1745,19 @@ def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
 ###################################################################################
 
  print "\n"
-#######################b-b#####################################################
+#######################ab-ba#####################################################
 
- vec_left_1=Make_first_vecleft_b(vec_left, Ta1, Ta3,Tb1,Tb3,a,bp,c,d)
- vec_right_1=Make_first_vecright_b(vec_right, Ta1, Ta3,Tb1,Tb3,a,bp,c,d)
+ vec_left_1=Make_first_vecleft_a(vec_left, Ta1, Ta3,Tb1,Tb3,ap,bp,c,d)
+ #vec_right_1=Make_first_vecright_b(vec_right, Ta1, Ta3,Tb1,Tb3,a,bp,c,d)
+ vec_right_1=Make_first_vecright_b(vec_right, Ta1, Ta3,Tb1,Tb3,ap,bp,a,b,c,d)
 
- Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,2)
- dis_val_list1.append(2)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,3)
+ dis_val_list1.append(3)
  Corr_val_list1.append(Corr_val)
 
- dis_val=2
- for i in xrange(distance_final):
+ dis_val=3
+ for i in xrange(distance_final+1):
   dis_val+=2
   vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
   Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
@@ -1735,11 +1768,12 @@ def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
 
 
  print "\n"
-#######################c-c#####################################################
+#######################cd-cd#####################################################
 
- vec_left_1=Make_first_vecleft_c(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,cp,d)
- vec_right_1=Make_first_vecright_c(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,cp,d)
+ vec_left_1=Make_first_vecleft_c(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,cp,dp)
+ vec_right_1=Make_first_vecright_c(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,cp,dp)
 
+ #print vec_left_1.printDiagram()
  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,2)
  dis_val_list2.append(2)
  Corr_val_list2.append(Corr_val)
@@ -1755,17 +1789,17 @@ def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
 ###################################################################################
 
  print "\n"
-#######################d-d#####################################################
+#######################cd-dc#####################################################
 
- vec_left_1=Make_first_vecleft_d(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,c,dp)
- vec_right_1=Make_first_vecright_d(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,c,dp)
+ vec_left_1=Make_first_vecleft_d(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,cp,dp)
+ vec_right_1=Make_first_vecright_d(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,c,d,cp,dp)
 
- Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,2)
- dis_val_list3.append(2)
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,3)
+ dis_val_list3.append(3)
  Corr_val_list3.append(Corr_val)
 
- dis_val=2
- for i in xrange(distance_final):
+ dis_val=3
+ for i in xrange(distance_final+1):
   dis_val+=2
   vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
   Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
@@ -1774,128 +1808,20 @@ def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
   Corr_val_list3.append(Corr_val) 
 ###################################################################################
 
-############################################################################################################
-
-
- dis_val_listo=[]
- Corr_val_listo=[]
- dis_val_list1o=[]
- Corr_val_list1o=[]
- dis_val_list2o=[]
- Corr_val_list2o=[]
- dis_val_list3o=[]
- Corr_val_list3o=[]
-
- print "\n"
-
-######################a-bo#####################################################
-
- vec_left_1=Make_first_vecleft_a(vec_left, Ta1, Ta3,Tb1,Tb3,ap,b,c,d)
- vec_right_1=Make_first_vecright_b(vec_right, Ta1, Ta3,Tb1,Tb3,a,bp,c,d)
-
- Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,3)
- dis_val_listo.append(3)
- Corr_val_listo.append(Corr_val) 
-
- dis_val=3
- for i in xrange(distance_final):
-  dis_val+=2
-  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
-  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
-  print dis_val, Corr_val
-  dis_val_listo.append(dis_val)
-  Corr_val_listo.append(Corr_val) 
-##################################################################################
-
-
- print "\n"
-
-######################b-ao#####################################################
-
- vec_left_1=Make_first_vecleft_b(vec_left, Ta1, Ta3,Tb1,Tb3,a,bp,c,d)
- vec_right_1=Make_first_vecright_a(vec_right, Ta1, Ta3,Tb1,Tb3,ap,b,c,d)
-
- #Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,1)
- #dis_val_list1.append(2)
- #Corr_val_list1.append(Corr_val)
-
- dis_val=1
- for i in xrange(distance_final+1):
-  dis_val+=2
-  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
-  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
-  print dis_val, Corr_val
-  dis_val_list1o.append(dis_val)
-  Corr_val_list1o.append(Corr_val) 
-##################################################################################
-
-
- print "\n"
-
-#######################c-do#####################################################
-
- vec_left_1=Make_first_vecleft_c(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,cp,d)
- vec_right_1=Make_first_vecright_d(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,c,dp)
-
- Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,3)
- dis_val_list2o.append(3)
- Corr_val_list2o.append(Corr_val)
-
- dis_val=3
- for i in xrange(distance_final):
-  dis_val+=2
-  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
-  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
-  print dis_val, Corr_val
-  dis_val_list2o.append(dis_val)
-  Corr_val_list2o.append(Corr_val) 
-###################################################################################
-
- print "\n"
-
-#######################d-co#####################################################
-
- vec_left_1=Make_first_vecleft_d(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,c,dp)
- vec_right_1=Make_first_vecright_c(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,cp,d)
-
-# Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,2)
-# dis_val_list3.append(2)
-# Corr_val_list3.append(Corr_val)
-
- dis_val=1
- for i in xrange(distance_final+1):
-  dis_val+=2
-  vec_left_1=Make_midle_vecleft(vec_left_1, Ta1, Ta3,Tb1,Tb3,a,b,c,d)
-  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_right_1, vec_left_1,dis_val)
-  print dis_val, Corr_val
-  dis_val_list3o.append(dis_val)
-  Corr_val_list3o.append(Corr_val) 
-###################################################################################
-
-
  print dis_val_list,'\n,\n'
  print Corr_val_list,'\n,\n'
  print Corr_val_list1,'\n,\n'
  print Corr_val_list2,'\n,\n'
  print Corr_val_list3,'\n,\n'
 
- print dis_val_listo,'\n,\n'
- print Corr_val_listo,'\n,\n'
- print Corr_val_list1o,'\n,\n'
- print Corr_val_list2o,'\n,\n'
- print Corr_val_list3o,'\n,\n'
+
+ Corr_val_list_ave=[ (sum(t)*(1.0/2.0)) for t in zip(Corr_val_list, Corr_val_list2)]
+ Corr_val_list_ave1=[ (sum(t)*(1.0/2.0)) for t in zip(Corr_val_list1, Corr_val_list3)]
+ Corr_val_list_final=Corr_val_list_ave+Corr_val_list_ave1
+ dis_val_list_final=dis_val_list+dis_val_list3
 
 
- Corr_val_list_ave=[ (sum(t)*(1.0/16.0)) for t in zip(Corr_val_list, Corr_val_list1, Corr_val_list2, Corr_val_list3)]
- print Corr_val_list_ave,'\n,\n'
-
-
- Corr_val_list_avo=[ (sum(t)*(1.0/16.0)) for t in zip(Corr_val_listo, Corr_val_list1o, Corr_val_list2o, Corr_val_list3o)]
- print Corr_val_list_avo,'\n,\n'
-
-
- Corr_val_list_final=Corr_val_list_ave+Corr_val_list_avo
- dis_val_list_final=dis_val_list+dis_val_listo
+ print Corr_val_list_final,'\n,\n'
 
  print '\n,\n'
  print dis_val_list_final
@@ -1948,26 +1874,28 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
  if Model is "Heisenberg_U1":
   bdi = uni10.Bond(uni10.BD_IN, d_phys)
   bdo = uni10.Bond(uni10.BD_OUT, d_phys)
-  HH = uni10.UniTensor([bdi, bdi, bdo, bdo])
-  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
-  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  HH = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
+  H = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
   sz = matSz()
   sx = matSx()
   sy = matSy()
   iden = matIden()
+  iden_iden=uni10.otimes(iden,iden)
   HH_tem=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy)
-  H_tem=uni10.otimes(sz,iden)#+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
-  H1_tem=uni10.otimes(iden,sz)#+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
-  HH.setRawElem(HH_tem)
+  HHH_tem=uni10.otimes(HH_tem,HH_tem)
+  H_tem=uni10.otimes(HH_tem,iden_iden)
+  H1_tem=uni10.otimes(iden_iden,HH_tem)
+  HH.setRawElem(HHH_tem)
   H.setRawElem(H_tem)
   H1.setRawElem(H1_tem)
-  Iden=copy.copy(H)
+  Iden=copy.copy(HH)
   Iden.identity()
   #print HH_tem, HH, H_tem, H, H1_tem, H1
-  HH.setLabel([-10,-20,10,20])
-  H.setLabel([-10,-20,10,20])
-  H1.setLabel([-10,-20,10,20])
-  Iden.setLabel([-10,-20,10,20])
+  HH.setLabel([-10,-126,-20,-226,10,126,20,226])
+  H.setLabel([-10,-126,-20,-226,10,126,20,226])
+  H1.setLabel([-10,-126,-20,-226,10,126,20,226])
+  Iden.setLabel([-10,-126,-20,-226,10,126,20,226])
 
  vec_down=make_down(c4,Ta3, Tb3,c3)
  vec_up=make_up(c1,Tb1, Ta1,c2)
@@ -1984,8 +1912,7 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
  dis_val_list3=[]
  Corr_val_list3=[]
 
-# Corr_length=ED_right(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,vec_right)
-# print "Corr_length",Corr_length
+
  vec_up_copy=copy.copy(vec_up)
  Corr_length=ED_up(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,vec_up_copy)
  print "Corr_length",Corr_length
@@ -1994,9 +1921,9 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
 
 
  print "\n"
-#######################a-a#####################################################
- vec_down_1=Make_first_vecdown_a(vec_down, ap, b, c, d, Tb2, Ta2, Ta4, Tb4)
- vec_up_1=Make_first_vecup_a(vec_up, ap, b, c, d, Tb2, Ta2, Ta4, Tb4)
+#######################ac-ac#####################################################
+ vec_down_1=Make_first_vecdown_a(vec_down, ap, b, cp, d, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_a(vec_up, ap, b, cp, d, Tb2, Ta2, Ta4, Tb4)
 
  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
  dis_val_list.append(2)
@@ -2013,12 +1940,35 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
 ###################################################################################
 
  print "\n"
-########################b-b#####################################################
+########################ac-ca#####################################################
 
- vec_down_1=Make_first_vecdown_b(vec_down, a, bp, c, d, Tb2, Ta2, Ta4, Tb4)
- vec_up_1=Make_first_vecup_b(vec_up, a, bp, c, d, Tb2, Ta2, Ta4, Tb4)
+ vec_down_1=Make_first_vecdown_c(vec_down, ap, b, cp, d, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_c(vec_up, a, b, c, d,ap,cp, Tb2, Ta2, Ta4, Tb4)
 
- Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,3)
+ dis_val_list2.append(3)
+ Corr_val_list2.append(Corr_val) 
+
+ dis_val=3
+ for i in xrange(distance_final+1):
+  dis_val+=2
+  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
+  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
+  print dis_val, Corr_val
+  dis_val_list2.append(dis_val)
+  Corr_val_list2.append(Corr_val) 
+####################################################################################
+
+ print "\n"
+
+
+
+########################bd-bd#####################################################
+
+ vec_down_1=Make_first_vecdown_b(vec_down, a, bp, c, dp, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_b(vec_up, a, bp, c, dp, Tb2, Ta2, Ta4, Tb4)
+
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
  dis_val_list1.append(2)
  Corr_val_list1.append(Corr_val) 
 
@@ -2031,40 +1981,20 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
   dis_val_list1.append(dis_val)
   Corr_val_list1.append(Corr_val) 
 ####################################################################################
-
-
  print "\n"
-########################c-c#####################################################
 
- vec_down_1=Make_first_vecdown_c(vec_down, a, b, cp, d, Tb2, Ta2, Ta4, Tb4)
- vec_up_1=Make_first_vecup_c(vec_up, a, b, cp, d, Tb2, Ta2, Ta4, Tb4)
 
- Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
- dis_val_list2.append(2)
- Corr_val_list2.append(Corr_val) 
+########################bd-db#####################################################
 
- dis_val=2
- for i in xrange(distance_final):
-  dis_val+=2
-  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
-  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
-  print dis_val, Corr_val
-  dis_val_list2.append(dis_val)
-  Corr_val_list2.append(Corr_val) 
-####################################################################################
+ vec_down_1=Make_first_vecdown_d(vec_down, a, bp, c, dp, Tb2, Ta2, Ta4, Tb4)
+ vec_up_1=Make_first_vecup_d(vec_up, a, b, c, d,bp,dp, Tb2, Ta2, Ta4, Tb4)
 
- print "\n"
-########################d-d#####################################################
-
- vec_down_1=Make_first_vecdown_d(vec_down, a, b, c, dp, Tb2, Ta2, Ta4, Tb4)
- vec_up_1=Make_first_vecup_d(vec_up, a, b, c, dp, Tb2, Ta2, Ta4, Tb4)
-
- Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
- dis_val_list3.append(2)
+ Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,3)
+ dis_val_list3.append(3)
  Corr_val_list3.append(Corr_val) 
 
- dis_val=2
- for i in xrange(distance_final):
+ dis_val=3
+ for i in xrange(distance_final+1):
   dis_val+=2
   vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
   Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
@@ -2076,125 +2006,25 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
 #############################################################################################################
 
 
- dis_val_listo=[]
- Corr_val_listo=[]
- dis_val_list1o=[]
- Corr_val_list1o=[]
- dis_val_list2o=[]
- Corr_val_list2o=[]
- dis_val_list3o=[]
- Corr_val_list3o=[]
-
- print "\n"
-
-#######################a-co#####################################################
-
- vec_down_1=Make_first_vecdown_a(vec_down, ap, b, c, d, Tb2, Ta2, Ta4, Tb4)
- vec_up_1=Make_first_vecup_c(vec_up, a, b, cp, d, Tb2, Ta2, Ta4, Tb4)
-
-# Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
-# dis_val_listo.append(2)
-# Corr_val_listo.append(Corr_val) 
-
- dis_val=1
- for i in xrange(distance_final+1):
-  dis_val+=2
-  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
-  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
-  print dis_val, Corr_val
-  dis_val_listo.append(dis_val)
-  Corr_val_listo.append(Corr_val) 
-
-###################################################################################
-
-
- print "\n"
-
-#######################c-ao#####################################################
- vec_down_1=Make_first_vecdown_c(vec_down, a, b, cp, d, Tb2, Ta2, Ta4, Tb4)
- vec_up_1=Make_first_vecup_a(vec_up, ap, b, c, d, Tb2, Ta2, Ta4, Tb4)
-
- Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,3)
- dis_val_list1o.append(3)
- Corr_val_list1o.append(Corr_val) 
-
- dis_val=3
- for i in xrange(distance_final):
-  dis_val+=2
-  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
-  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
-  print dis_val, Corr_val
-  dis_val_list1o.append(dis_val)
-  Corr_val_list1o.append(Corr_val) 
-###################################################################################
-
-
- print "\n"
-
-########################b-do#####################################################
-
- vec_down_1=Make_first_vecdown_b(vec_down, a, bp, c, d, Tb2, Ta2, Ta4, Tb4)
- vec_up_1=Make_first_vecup_d(vec_up, a, b, c, dp, Tb2, Ta2, Ta4, Tb4)
-
-# Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,2)
-# dis_val_list2.append(2)
-# Corr_val_list2.append(Corr_val) 
-
- dis_val=1
- for i in xrange(distance_final+1):
-  dis_val+=2
-  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
-  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
-  print dis_val, Corr_val
-  dis_val_list2o.append(dis_val)
-  Corr_val_list2o.append(Corr_val) 
-####################################################################################
-
- print "\n"
-
-########################d-bo#####################################################
-
- vec_down_1=Make_first_vecdown_d(vec_down, a, b, c, dp, Tb2, Ta2, Ta4, Tb4)
- vec_up_1=Make_first_vecup_b(vec_up, a, bp, c, d, Tb2, Ta2, Ta4, Tb4)
-
- Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,3)
- dis_val_list3o.append(3)
- Corr_val_list3o.append(Corr_val) 
-
- dis_val=3
- for i in xrange(distance_final):
-  dis_val+=2
-  vec_down_1=Make_midle_vecdown(vec_down_1,a,b,c,d,Tb2, Ta2, Ta4, Tb4)
-  Corr_val=Corr_val_function(Iden,HH,H,H1,vec_down_1, vec_up_1,dis_val)
-  print dis_val, Corr_val
-  dis_val_list3o.append(dis_val)
-  Corr_val_list3o.append(Corr_val) 
-####################################################################################
-
-
  print dis_val_list,'\n,\n'
  print Corr_val_list,'\n,\n'
  print Corr_val_list1,'\n,\n'
  print Corr_val_list2,'\n,\n'
  print Corr_val_list3,'\n,\n'
 
- print dis_val_listo,'\n,\n'
- print Corr_val_listo,'\n,\n'
- print Corr_val_list1o,'\n,\n'
- print Corr_val_list2o,'\n,\n'
- print Corr_val_list3o,'\n,\n'
+ Corr_val_list_ave=[ (sum(t)*(1.0/2.0)) for t in zip(Corr_val_list, Corr_val_list1)]
 
 
- Corr_val_list_ave=[ (sum(t)*(1.0/16.0)) for t in zip(Corr_val_list, Corr_val_list1, Corr_val_list2, Corr_val_list3)]
+ Corr_val_list_ave1=[ (sum(t)*(1.0/2.0)) for t in zip( Corr_val_list2, Corr_val_list3)]
+
+
+
  print Corr_val_list_ave,'\n,\n'
+ print Corr_val_list_ave1,'\n,\n'
 
 
- Corr_val_list_avo=[ (sum(t)*(1.0/16.0)) for t in zip(Corr_val_listo, Corr_val_list1o, Corr_val_list2o, Corr_val_list3o)]
- print Corr_val_list_avo,'\n,\n'
-
-
- Corr_val_list_final=Corr_val_list_ave+Corr_val_list_avo
- dis_val_list_final=dis_val_list+dis_val_listo
+ Corr_val_list_final=Corr_val_list_ave+Corr_val_list_ave1
+ dis_val_list_final=dis_val_list+dis_val_list3
 
  print '\n,\n'
  print dis_val_list_final
@@ -2640,17 +2470,12 @@ def Multi_u(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
 
 
 
-
-
-
-
-
-
 def  Corr_val_function(Iden,HH,H,H1,vec_right, vec_left,dis_val):
-
- vec_left.setLabel([10,23, 16, -16 , 9,-9, 2,-10])
- vec_right.setLabel([20,23,16,-16 , 9,-9,2,-20])
- Cor_norm=(vec_left*Iden)*vec_right
+ IdenIden=copy.copy(HH)
+ IdenIden.identity()
+ vec_left.setLabel([126,10,23, 16, -16 , 9,-9, 2,-10,-126])
+ vec_right.setLabel([226,20,23,16,-16 , 9,-9,2,-20,-226])
+ Cor_norm=(vec_left*IdenIden)*vec_right
  Corr_val=(vec_left*HH)*vec_right
  Corr_val1=(vec_left*H)*vec_right
  Corr_val2=(vec_left*H1)*vec_right
@@ -2708,12 +2533,12 @@ def  Make_first_vecleft_a(vec_left, Ta1, Ta3,Tb1,Tb3,ap,b,c,d):
  CTM_1.putTensor('c',c)
  CTM_1.putTensor('d',d)
  vec=CTM_1.launch()
- vec.permute([10,23, 16, -16 , 9,-9, 2,-10],0)
+ vec.permute([126,10,23, 16, -16 , 9,-9, 2,-10,-126],0)
  vec=max_ten(vec)
  return vec
 
 
-def Make_first_vecright_a(vec_right, Ta1, Ta3,Tb1,Tb3,ap,b,c,d):
+def Make_first_vecright_a(vec_right, Ta1, Ta3,Tb1,Tb3,ap,bp,c,d):
 
  CTM_1 = uni10.Network("Network/RightCorra.net")
  CTM_1.putTensor('vec_right',vec_right)
@@ -2722,11 +2547,11 @@ def Make_first_vecright_a(vec_right, Ta1, Ta3,Tb1,Tb3,ap,b,c,d):
  CTM_1.putTensor('Tb1',Tb1)
  CTM_1.putTensor('Tb3',Tb3)
  CTM_1.putTensor('a',ap)
- CTM_1.putTensor('b',b)
+ CTM_1.putTensor('b',bp)
  CTM_1.putTensor('c',c)
  CTM_1.putTensor('d',d)
  vec=CTM_1.launch()
- vec.permute([10,21,14,-14 , 7,-7,0,-10],6)
+ vec.permute([126,10,21,14,-14 , 7,-7,0,-10,-126],10)
  vec=max_ten(vec)
  return vec
 
@@ -2748,10 +2573,24 @@ def  Make_first_vecleft_b(vec_left, Ta1, Ta3,Tb1,Tb3,a,bp,c,d):
  return vec
 
 
-def Make_first_vecright_b(vec_right, Ta1, Ta3,Tb1,Tb3,a,bp,c,d):
+def Make_first_vecright_b(vec_right, Ta1, Ta3,Tb1,Tb3,ap,bp,a,b,c,d):
 
  CTM_1 = uni10.Network("Network/RightCorrb.net")
  CTM_1.putTensor('vec_right',vec_right)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',ap)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec.permute([10,21,14,-14 , 7,-7,0,-10],8)
+ vec=max_ten(vec)
+
+ CTM_1 = uni10.Network("Network/RightCorrb1.net")
+ CTM_1.putTensor('vec_right',vec)
  CTM_1.putTensor('Ta1',Ta1)
  CTM_1.putTensor('Ta3',Ta3)
  CTM_1.putTensor('Tb1',Tb1)
@@ -2761,12 +2600,13 @@ def Make_first_vecright_b(vec_right, Ta1, Ta3,Tb1,Tb3,a,bp,c,d):
  CTM_1.putTensor('c',c)
  CTM_1.putTensor('d',d)
  vec=CTM_1.launch()
- vec.permute([10,21,14,-14 , 7,-7,0,-10],6)
+ vec.permute([126,10,21,14,-14 , 7,-7,0,-10,-126],10)
  vec=max_ten(vec)
+
  return vec
 
 
-def  Make_first_vecleft_c(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,cp,d):
+def  Make_first_vecleft_c(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,c,d):
 
  CTM_1 = uni10.Network("Network/LeftCorrc.net")
  CTM_1.putTensor('vec_left',vec_left)
@@ -2776,15 +2616,15 @@ def  Make_first_vecleft_c(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,cp,d):
  CTM_1.putTensor('Tb3',Tb3)
  CTM_1.putTensor('a',a)
  CTM_1.putTensor('b',b)
- CTM_1.putTensor('c',cp)
+ CTM_1.putTensor('c',c)
  CTM_1.putTensor('d',d)
  vec=CTM_1.launch()
- vec.permute([10,23, 16, -16 , 9,-9, 2,-10],0)
+ vec.permute([126,10,23, 16, -16 , 9,-9, 2,-10,-126],0)
  vec=max_ten(vec)
  return vec
 
 
-def Make_first_vecright_c(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,cp,d):
+def Make_first_vecright_c(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,c,d):
 
  CTM_1 = uni10.Network("Network/RightCorrc.net")
  CTM_1.putTensor('vec_right',vec_right)
@@ -2794,15 +2634,15 @@ def Make_first_vecright_c(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,cp,d):
  CTM_1.putTensor('Tb3',Tb3)
  CTM_1.putTensor('a',a)
  CTM_1.putTensor('b',b)
- CTM_1.putTensor('c',cp)
+ CTM_1.putTensor('c',c)
  CTM_1.putTensor('d',d)
  vec=CTM_1.launch()
- vec.permute([10,21,14,-14 , 7,-7,0,-10],6)
+ vec.permute([126,10,21,14,-14 , 7,-7,0,-10,-126],10)
  vec=max_ten(vec)
  return vec
 
 
-def  Make_first_vecleft_d(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,c,dp):
+def  Make_first_vecleft_d(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,cp,dp):
 
  CTM_1 = uni10.Network("Network/LeftCorrd.net")
  CTM_1.putTensor('vec_left',vec_left)
@@ -2812,15 +2652,15 @@ def  Make_first_vecleft_d(vec_left, Ta1, Ta3,Tb1,Tb3,a,b,c,dp):
  CTM_1.putTensor('Tb3',Tb3)
  CTM_1.putTensor('a',a)
  CTM_1.putTensor('b',b)
- CTM_1.putTensor('c',c)
+ CTM_1.putTensor('c',cp)
  CTM_1.putTensor('d',dp)
  vec=CTM_1.launch()
- vec.permute([10,23, 16, -16 , 9,-9, 2,-10],0)
+ vec.permute([126,10,23, 16, -16 , 9,-9, 2,-10,-126],0)
  vec=max_ten(vec)
  return vec
 
 
-def Make_first_vecright_d(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,c,dp):
+def Make_first_vecright_d(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,c,d,cp,dp):
 
  CTM_1 = uni10.Network("Network/RightCorrd.net")
  CTM_1.putTensor('vec_right',vec_right)
@@ -2830,10 +2670,25 @@ def Make_first_vecright_d(vec_right, Ta1, Ta3,Tb1,Tb3,a,b,c,dp):
  CTM_1.putTensor('Tb3',Tb3)
  CTM_1.putTensor('a',a)
  CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',cp)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ vec.permute([10,21,14,-14 , 7,-7,0,-10],10)
+ vec=max_ten(vec)
+
+
+ CTM_1 = uni10.Network("Network/RightCorrd1.net")
+ CTM_1.putTensor('vec_right',vec)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
  CTM_1.putTensor('c',c)
  CTM_1.putTensor('d',dp)
  vec=CTM_1.launch()
- vec.permute([10,21,14,-14 , 7,-7,0,-10],6)
+ vec.permute([126,10,21,14,-14 , 7,-7,0,-10,-126],10)
  vec=max_ten(vec)
  return vec
 
@@ -2850,7 +2705,7 @@ def  Make_midle_vecleft(vec_left, Ta1, Ta3,Tb1,Tb3,ap,b,c,d):
  CTM_1.putTensor('c',c)
  CTM_1.putTensor('d',d)
  vec=CTM_1.launch()
- vec.permute([10,23, 16, -16 , 9,-9, 2,-10],0)
+ vec.permute([126,10,23, 16, -16 , 9,-9, 2,-10,-126],0)
  vec=max_ten(vec)
  return vec
 
@@ -2889,7 +2744,7 @@ def  make_up(c1,Tb1, Ta1,c2):
 
 
 
-def  Make_first_vecdown_a(vec_down, ap, b, c, d, Tb2, Ta2, Ta4, Tb4):
+def  Make_first_vecdown_a(vec_down, ap, b, cp, d, Tb2, Ta2, Ta4, Tb4):
 
  CTM_1 = uni10.Network("Network/DownCorra.net")
  CTM_1.putTensor('vec_down',vec_down)
@@ -2899,7 +2754,7 @@ def  Make_first_vecdown_a(vec_down, ap, b, c, d, Tb2, Ta2, Ta4, Tb4):
  CTM_1.putTensor('Tb4',Tb4)
  CTM_1.putTensor('a',ap)
  CTM_1.putTensor('b',b)
- CTM_1.putTensor('c',c)
+ CTM_1.putTensor('c',cp)
  CTM_1.putTensor('d',d)
  vec=CTM_1.launch()
  #print CTM_1
@@ -2997,7 +2852,7 @@ def  Make_first_vecdown_c(vec_down, a, b, cp, d, Tb2, Ta2, Ta4, Tb4):
  #vec.permute([10,3, 4, -4 , 5, -5 , 6,-10],8)
  return vec
 
-def Make_first_vecup_c(vec_up, a, b, cp, d, Tb2, Ta2, Ta4, Tb4):
+def Make_first_vecup_c(vec_up, a, b, c, d,ap,cp, Tb2, Ta2, Ta4, Tb4):
 
  CTM_1 = uni10.Network("Network/UpCorrc.net")
  CTM_1.putTensor('vec_up',vec_up)
@@ -3010,6 +2865,20 @@ def Make_first_vecup_c(vec_up, a, b, cp, d, Tb2, Ta2, Ta4, Tb4):
  CTM_1.putTensor('c',cp)
  CTM_1.putTensor('d',d)
  vec=CTM_1.launch()
+
+ CTM_1 = uni10.Network("Network/UpCorrc1.net")
+ CTM_1.putTensor('vec_up',vec)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',ap)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+
+
  return vec
 
 
@@ -3032,7 +2901,7 @@ def  Make_first_vecdown_d(vec_down, a, b, c, dp, Tb2, Ta2, Ta4, Tb4):
  #vec.permute([10,3, 4, -4 , 5, -5 , 6,-10],8)
  return vec
 
-def Make_first_vecup_d(vec_up, a, b, c, dp, Tb2, Ta2, Ta4, Tb4):
+def Make_first_vecup_d(vec_up, a, b, c, d,bp,dp, Tb2, Ta2, Ta4, Tb4):
 
  CTM_1 = uni10.Network("Network/UpCorrd.net")
  CTM_1.putTensor('vec_up',vec_up)
@@ -3045,6 +2914,19 @@ def Make_first_vecup_d(vec_up, a, b, c, dp, Tb2, Ta2, Ta4, Tb4):
  CTM_1.putTensor('c',c)
  CTM_1.putTensor('d',dp)
  vec=CTM_1.launch()
+
+ CTM_1 = uni10.Network("Network/UpCorrd1.net")
+ CTM_1.putTensor('vec_up',vec)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',bp)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+
  return vec
 
 

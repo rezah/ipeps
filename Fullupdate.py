@@ -12,7 +12,7 @@ import basic
 import basicB
 import basicC
 
-def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,h,Env,Env1,Env2,Env3,Gauge,Corner_method,N_iterF,Acc_E,Model,N_grad, Opt_method,Inv_method,N_svd,N_env,method,check_step):
+def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,h,Env,Env1,Env2,Env3,Gauge,Corner_method,N_iterF,Acc_E,Model,N_grad, Opt_method,Inv_method,N_svd,N_env,method,check_step,iteration_per_step):
 
  H0, H00, H1, H2=basic.choose_model(Model, h, d_phys)
 
@@ -94,14 +94,14 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,h,Env,Env1,Env2,Env3,Gauge,
 
 ######################################################################################
 
-   print "\n"
-   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist,MPO_list,Inv_method,N_svd,N_env,method,check_step)
-   print "\n"
-   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_cab(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist1,MPO_list,Inv_method,N_svd,N_env,method,check_step)
-   print "\n"
-   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_cab(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist2,MPO_list,Inv_method,N_svd,N_env,method,check_step)
-   print "\n"
-   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_cab(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist3,MPO_list,Inv_method,N_svd,N_env,method,check_step)
+#   print "\n"
+#   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist,MPO_list,Inv_method,N_svd,N_env,method,check_step)
+#   print "\n"
+#   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_cab(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist1,MPO_list,Inv_method,N_svd,N_env,method,check_step)
+#   print "\n"
+#   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_cab(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist2,MPO_list,Inv_method,N_svd,N_env,method,check_step)
+#   print "\n"
+#   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_cab(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist3,MPO_list,Inv_method,N_svd,N_env,method,check_step)
 
 ###########################
 
@@ -132,18 +132,23 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,h,Env,Env1,Env2,Env3,Gauge,
    E_1=E_value
    if E_1 < E_min:
     E_min=E_1
+    print 'delta=', delta    
     print "E_m=", E_min
     basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
     basic.Store_EnvEnv(Env,Env1,Env2,Env3)
     basicC.Store_plist(plist)
     basicC.Store_plist1(plist00)
-   elif q>2:
+   elif q > iteration_per_step:
     a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
     basic.Reload_EnvEnv(Env,Env1,Env2,Env3)
     basicC.Reload_plist(plist)
     basicC.Reload_plist1(plist00)
     E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model,N_env)
+    print 'delta=', delta
     print "E_min=", E_value
+    M_value=basic.M_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model)
+    print 'M_s=', M_value
+    basic.Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model)
     break; 
 
    print 'E_d=', abs((E_0-E_1) / E_0) , 'Num_iter=', q 
@@ -156,10 +161,13 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,h,Env,Env1,Env2,Env3,Gauge,
     basicC.Reload_plist(plist)
     basicC.Reload_plist1(plist00)
     E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model,N_env)
+    print 'E_t=', E_value    
+    M_value=basic.M_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model)
+    print 'M_s=', M_value
+    basic.Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_method,Model)
     #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
     E_0=10.0
     E_1=20.0
-    print 'E_t=', E_value
     break;
 
  
