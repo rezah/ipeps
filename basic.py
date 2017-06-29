@@ -1505,7 +1505,7 @@ def M_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_met
   #print E_3
   E_4=M_h(c_u,d_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H1)
   print "\n", "z"
-  print E_1, "    ", E_2, "\n",  E_3, "    ", E_4 , "\n"
+  print E_1, "    ", E_2, "\n",  E_3, "    ", E_4 
 
 #  szt=uni10.otimes(sz,sz)
 #  H.setRawElem(szt)
@@ -1600,9 +1600,9 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   D_y=max(max_list1) - min(max_list1)
   D_R=max(max_list1)-min(max_list)
 
-  print   'D_x=', D_x
-  print   'D_y=', D_y
-  print   'D_R=', D_R
+  print  'D_x=', D_x
+  print  'D_y=', D_y
+  print  'D_R=', D_R
   
  if Model is "Heisenberg_U1Z2":
   H0=Heisenberg0_U1Z2(h,d_phys)
@@ -1645,21 +1645,29 @@ def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
  if Model is "Heisenberg":
   bdi = uni10.Bond(uni10.BD_IN, d_phys)
   bdo = uni10.Bond(uni10.BD_OUT, d_phys)
-  HH = uni10.UniTensor([bdi, bdi, bdo, bdo])
-  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
-  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  HH = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
+  H = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
   sz = matSz()
   sx = matSx()
   sy = matSy()
   iden = matIden()
-  HH=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)(-1.0)*uni10.otimes(sy,sy)
-  H=uni10.otimes(sz,iden)+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
-  H1=uni10.otimes(iden,sz)+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
-  HH.setLabel([-10,-20,10,20])
-  H.setLabel([-10,-20,10,20])
-  H1.setLabel([-10,-20,10,20])
-  Iden.setLabel([-10,-20,10,20])
-
+  iden = matIden()
+  iden_iden=uni10.otimes(iden,iden)
+  HH_tem=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy)
+  HHH_tem=uni10.otimes(HH_tem,HH_tem)
+  H_tem=uni10.otimes(HH_tem,iden_iden)
+  H1_tem=uni10.otimes(iden_iden,HH_tem)
+  HH.putBlock(HHH_tem)
+  H.putBlock(H_tem)
+  H1.putBlock(H1_tem)
+  Iden=copy.copy(HH)
+  Iden.identity()
+  #print HH_tem, HH, H_tem, H, H1_tem, H1
+  HH.setLabel([-10,-126,-20,-226,10,126,20,226])
+  H.setLabel([-10,-126,-20,-226,10,126,20,226])
+  H1.setLabel([-10,-126,-20,-226,10,126,20,226])
+  Iden.setLabel([-10,-126,-20,-226,10,126,20,226])
  if Model is "Heisenberg_Z2":
   #print d_phys
   bdi = uni10.Bond(uni10.BD_IN, d_phys)
@@ -1840,20 +1848,28 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
  if Model is "Heisenberg":
   bdi = uni10.Bond(uni10.BD_IN, d_phys)
   bdo = uni10.Bond(uni10.BD_OUT, d_phys)
-  HH = uni10.UniTensor([bdi, bdi, bdo, bdo])
-  H = uni10.UniTensor([bdi, bdi, bdo, bdo])
-  H1 = uni10.UniTensor([bdi, bdi, bdo, bdo])
+  HH = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
+  H = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
+  H1 = uni10.UniTensor([bdi, bdi,bdi, bdi, bdo, bdo,bdo, bdo])
   sz = matSz()
   sx = matSx()
   sy = matSy()
   iden = matIden()
-  HH=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)(-1.0)*uni10.otimes(sy,sy)
-  H=uni10.otimes(sz,iden)+uni10.otimes(sx,iden)#+(-1.0)*uni10.otimes(sy,iden)
-  H1=uni10.otimes(iden,sz)+uni10.otimes(iden,sx)#+(-1.0)*uni10.otimes(iden,sy)
-  HH.setLabel([-10,-20,10,20])
-  H.setLabel([-10,-20,10,20])
-  H1.setLabel([-10,-20,10,20])
-  Iden.setLabel([-10,-20,10,20])
+  iden = matIden()
+  iden_iden=uni10.otimes(iden,iden)
+  HH_tem=uni10.otimes(sz,sz)+uni10.otimes(sx,sx)+(-1.0)*uni10.otimes(sy,sy)
+  HHH_tem=uni10.otimes(HH_tem,HH_tem)
+  H_tem=uni10.otimes(HH_tem,iden_iden)
+  H1_tem=uni10.otimes(iden_iden,HH_tem)
+  HH.putBlock(HHH_tem)
+  H.putBlock(H_tem)
+  H1.putBlock(H1_tem) 
+  Iden=copy.copy(HH)
+  Iden.identity()
+  HH.setLabel([-10,-126,-20,-226,10,126,20,226])
+  H.setLabel([-10,-126,-20,-226,10,126,20,226])
+  H1.setLabel([-10,-126,-20,-226,10,126,20,226])
+  Iden.setLabel([-10,-126,-20,-226,10,126,20,226])
 
  if Model is "Heisenberg_Z2":
   #print d_phys

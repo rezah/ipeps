@@ -94,14 +94,14 @@ def Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,d_phys,D,h,Env,Env1,Env2,Env3,Gauge,
 
 ######################################################################################
 
-#   print "\n"
-#   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist,MPO_list,Inv_method,N_svd,N_env,method,check_step)
-#   print "\n"
-#   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_cab(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist1,MPO_list,Inv_method,N_svd,N_env,method,check_step)
-#   print "\n"
-#   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_cab(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist2,MPO_list,Inv_method,N_svd,N_env,method,check_step)
-#   print "\n"
-#   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_cab(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist3,MPO_list,Inv_method,N_svd,N_env,method,check_step)
+   print "\n"
+   a_u, b_u,c_u,d_u, a,b,c,d=basicC.Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist,MPO_list,Inv_method,N_svd,N_env,method,check_step)
+   print "\n"
+   b_u, a_u,d_u,c_u, b,a,d,c=basicC.Var_cab(b_u, a_u,d_u,c_u,b,a,d,c,Env1,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist1,MPO_list,Inv_method,N_svd,N_env,method,check_step)
+   print "\n"
+   c_u, d_u,a_u,b_u, c,d,a,b=basicC.Var_cab(c_u, d_u,a_u,b_u,c,d,a,b,Env2,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist2,MPO_list,Inv_method,N_svd,N_env,method,check_step)
+   print "\n"
+   d_u, c_u,b_u,a_u, d,c,b,a=basicC.Var_cab(d_u, c_u,b_u,a_u,d,c,b,a,Env3,D,U2,d_phys,chi,Gauge,Corner_method,H2,N_grad, Opt_method,plist3,MPO_list,Inv_method,N_svd,N_env,method,check_step)
 
 ###########################
 
