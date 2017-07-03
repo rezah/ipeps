@@ -37,12 +37,14 @@ def Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N
 
  if method is "SVD_QR":
    a_up, b_up, c_up, d_up=Do_optimization_SVD_QR(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, Inv_method, N_grad,N_svd,Gauge,check_step,U)
-
+#   Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
+#   print "DisFFinal", Dis_val
+#   Do_optimization_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, MPO_list, c_u, a_u, b_u, plist, Inv_method, N_grad,N_svd,Gauge,check_step)
+#   Do_optimization_MPO_positive(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, MPO_list, c_u, a_u, b_u, plist, Inv_method, N_grad,N_svd,Gauge,check_step)
 
  if method is "SVD_mpo":
    #Do_optimization_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, MPO_list, c_u, a_u, b_u, plist, Inv_method, N_grad,N_svd,Gauge,check_step)
    Do_optimization_MPO_positive(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, MPO_list, c_u, a_u, b_u, plist, Inv_method, N_grad,N_svd,Gauge,check_step)
-
    equall_dis_plist(plist)
    c_up,a_up,b_up=recover(c_u, a_u, b_u, plist, MPO_list)
    normal_plist(plist)

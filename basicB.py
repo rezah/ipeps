@@ -64,7 +64,6 @@ def Var_ab(a_u, b_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N_env,N_sv
  Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, U,a_u,b_u,a_up,b_up)
  print "Dis_final", Dis_val
 
-
  a_up=basic.max_ten(a_up)
  b_up=basic.max_ten(b_up)
 

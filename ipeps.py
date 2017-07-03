@@ -5,43 +5,43 @@ import basic_H
 import itebd
 import Fullupdate
 ###################### Initialize parameters ###########################
-Model="Heisenberg"
+#Model="Heisenberg"
 #Model="Heisenberg_Z2"
-#Model="Heisenberg_U1"
+Model="Heisenberg_U1"
 #Model="Heisenberg_U1Z2"
 
-D=[3]
-chi=[20]
-d_phys=[8]
-d_phys=[2]
+#D=[4]
+#chi=[20]
+#d_phys=[8]
+#d_phys=[2]
 #d_phys=[3]
 
 #D=[2,2]
 #chi=[10,10]
 #d_phys=[1,1]
 
-#D=[1,2,1]
-#chi=[2,2,10,10,10,2,2]
-#d_phys=[1,1]
+D=[1,2,1]
+chi=[2,2,5,10,10,2,2]
+d_phys=[1,1]
 ##d_phys=[1,1,1]
 
 #D=[2,2,2,2,2,2]
 #chi=[10,10,10,10,10,10]
 #d_phys=[1,1]
 
-method="SVD"            #SVD, Grad, SVD_mpo, SVD_QR 
+method="SVD_mpo"            #SVD, Grad, SVD_mpo, SVD_QR 
 Inv_method='SVD'         #SVD, CG
 Grad_method="CG"        # CG,ST
 Gauge='Fixed'
 Corner_method='CTMFull'   #CTMRG, CTMFull
 check_step='off'            #on, off
 fixbond_itebd='off'            #on, off
-itebd_method='long'            #long, short
+itebd_method='short'            #long, short
 start_itebd=1.0
 division_itebd=5
 iteration_per_step=1
 
-N_grad=120
+N_grad=150
 N_env=[25,1.00e-8]
 N_svd=[20,1.00e-8]
 N_iteritebd=40
@@ -108,7 +108,7 @@ h_coupling=[J1_x, J1_y, J2,  h_z,h_x, h_y, K_1, K_2]
 #########################################################################################
 
 
-#Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
+Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
 #Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,q_phys,D,N_iteritebd,h_coupling,Model,q_D,fixbond_itebd,start_itebd, division_itebd,itebd_method)
 basic.Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8)
 
@@ -144,7 +144,7 @@ basic.Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h_coupling,
 #basic.Reload_EnvEnv(Env,Env1,Env2,Env3)
 #a_u,b_u,c_u,d_u,a,b,c,d=basic.increase_norm(a_u,b_u,c_u,d_u,a,b,c,d, 0.5)
 #print a_u
-#a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,q_phys,D,h_coupling,Env,Env1,Env2,Env3,Gauge,Corner_method,N_iterFull,Acc_E,Model,N_grad, Grad_method,Inv_method,N_svd,N_env,method,check_step,iteration_per_step)
+a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,q_phys,D,h_coupling,Env,Env1,Env2,Env3,Gauge,Corner_method,N_iterFull,Acc_E,Model,N_grad, Grad_method,Inv_method,N_svd,N_env,method,check_step,iteration_per_step)
 
 #E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h_coupling,q_phys,chi,Corner_method,Model,N_env)
 #print "E_final", E_value
@@ -153,12 +153,12 @@ basic.Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h_coupling,
 #basic.Reload_EnvEnv(Env,Env1,Env2,Env3)
 
 #############################################
-basic.CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrHH,fileCorrLength)
+#basic.CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrHH,fileCorrLength)
 #basic.CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrVV,fileCorrLength)
 #basic.CorrelationH(b_u,a_u,d_u,c_u,b,a,d,c,Env1,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrHH1,fileCorrLength)
 #basic.CorrelationV(b_u,a_u,d_u,c_u,b,a,d,c,Env1,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrVV1,fileCorrLength)
 #############################################
-basic_H.CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrH,fileCorrLength)
+#basic_H.CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrH,fileCorrLength)
 #basic_H.CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrV,fileCorrLength)
 #################################################
 
