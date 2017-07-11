@@ -446,6 +446,8 @@ def Heisenberg0(h, d_phys):
     iden = matIden()
 
     ham =(h[0])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+    ham =(1.0)*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+
     H.putBlock(ham)
     return H
 
@@ -463,6 +465,8 @@ def Heisenberg00(h, d_phys):
     iden = matIden()
 
     ham =(h[1])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+    ham =(1.0)*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+
     H.putBlock(ham)
     return H
 
@@ -579,7 +583,7 @@ def threebody_U1(h,d_phys):
     ham =ham + h[0]*(h[3]*uni10.otimes(iden,szt)+h[4]*uni10.otimes(iden,sxt)+h[5]*uni10.otimes(iden,syt))
 
 
-    ham =ham + 2.0*h[2]*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
+    ham =ham + 1.0*h[2]*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
 
 
     A=(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))*(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))
@@ -592,7 +596,7 @@ def threebody_U1(h,d_phys):
     ham= ham +  h[6]*B 
 
 
-    C=2.0*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
+    C=1.0*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
     
     ham= ham +  h[7]*C 
 
@@ -601,6 +605,22 @@ def threebody_U1(h,d_phys):
 #    print H
     #print sx, sy, sz
     return H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def Heisenberg0_U1(h, d_phys):
     bdi = uni10.Bond(uni10.BD_IN, d_phys)
@@ -613,7 +633,7 @@ def Heisenberg0_U1(h, d_phys):
     iden=matIden()
     iden = matIden()
 
-    ham =(h[0])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+    ham =(h[1])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
     H.setRawElem(ham)
     #print H, ham
 
@@ -1146,7 +1166,7 @@ def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corne
 # return (E_5+E_6+E_7+E_8)/4.00
 
  #return (E_1+E_2+E_3+E_4)/4.00 
- return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/8.00
+ return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/4.00
 # return (E_ab+E_ba)/2.0
 # return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
  #return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
@@ -1206,7 +1226,7 @@ def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_met
 # return (E_5+E_6+E_7+E_8)/4.00
 
  #return (E_1+E_2+E_3+E_4)/4.00 
- return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/8.00
+ return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/4.00
 # return (E_ab+E_ba)/2.0
 # return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
  #return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
