@@ -42,8 +42,13 @@ def Var_cab(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N
 
  if method is "SVD_mix":
    a_up, b_up, c_up, d_up=SVD_mix(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, Inv_method, N_grad,N_svd,Gauge,check_step,U,a_up, b_up, c_up, d_up)
-   #N_svd1=copy.copy(N_svd)
-   #N_svd1[0]=3
+
+
+
+ if method is "SVD_mg":
+   a_up, b_up, c_up, d_up=SVD_mix(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, Inv_method, N_grad,N_svd,Gauge,check_step,U,a_up, b_up, c_up, d_up)
+   a_up, b_up, c_up, d_up=Do_optimization_Grad(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Gauge)
+
 
 
 
@@ -125,6 +130,9 @@ def Var_abd(a_u, b_u,c_u,d_u,a,b,c,d,Env,D,U,d_phys,chi,Gauge,Corner_method,H0,N
  if method is "SVD_mix":
    a_up, b_up, c_up, d_up=SVD_mix1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, Inv_method, N_grad,N_svd,Gauge,check_step,U,a_up, b_up, c_up, d_up)
 
+ if method is "SVD_mg":
+   a_up, b_up, c_up, d_up=SVD_mix1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, Inv_method, N_grad,N_svd,Gauge,check_step,U,a_up, b_up, c_up, d_up)
+   a_up, b_up, c_up, d_up=Do_optimization_Grad1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U,N_grad, Opt_method,Gauge)
 
 
  if method is "SVD_mpo":
@@ -185,7 +193,7 @@ def    SVD_mix1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, 
    t0=0
    t0=time.time()
 
-   for i in xrange(10):
+   for i in xrange(N_svd[2]):
 #    Dis_val=Dis_f1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
 #    if i==0:
 #     Dis_val_min=Dis_val
@@ -217,7 +225,7 @@ def   SVD_mix(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, In
    t0=0
    t0=time.time()
    
-   for i in xrange(10):
+   for i in xrange(N_svd[2]):
 #    Dis_val=Dis_f(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_u, b_u, c_u, d_u, a_up, b_up, c_up, d_up, U)
 #    print "Dis", Dis_val, time.time() - t0
 #    if i==0:
@@ -1904,8 +1912,9 @@ def   Do_optimization_SVD_QR_upper(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a
  Res1=Distance_val
  count=0
  check_val=0
+ t0=time.time()
+
  for q in xrange(N_svd[0]):
-  t0=time.time()
   if check_step is 'on':
    Dis1=Dis_f_QR_upper(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
    r_up=optimum_0_QR_upper(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up,U)
@@ -1943,7 +1952,7 @@ def   Do_optimization_SVD_QR_upper(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a
   Distance_val=Dis_f_QR_upper(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
   Res=Res1
   Res1=Distance_val
-  print 'Dis-QR1_up=', Distance_val, abs(Res1-Res) / abs(Res), q, time.time() - t0
+  #print 'Dis-QR1_up=', Distance_val, abs(Res1-Res) / abs(Res), q
 #  print  Res1 , Res,Res1 < Res 
 
   if Res1 < Res:
@@ -1960,15 +1969,15 @@ def   Do_optimization_SVD_QR_upper(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a
   if count > 550: print 'Num_Opt > 550'; break;
   if abs(Res) > 1.00e-10:
    if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
-    print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
+    #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     check_val=0
     break
   else:
     if (abs(Distance_val) < 1.00e-7) or (  abs(Res1-Res) < 1.00e-11  ): 
-     print 'break, Dis', Distance_val, abs(Res1-Res)
+     #print 'break, Dis', Distance_val, abs(Res1-Res)
      break
-# Distance_val=Dis_f_QR(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
-# print 'DisF_QR_final', Distance_val
+ Distance_val=Dis_f_QR_upper(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
+ print 'Dis', Distance_val, 't', time.time() - t0
  #if check_val!=0: 
   #Do_optimization_Grad_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,N_grad)
 
@@ -2404,8 +2413,9 @@ def   Do_optimization_SVD_QR_down(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_
  Res1=Distance_val
  count=0
  check_val=0
+ t0=time.time()
+
  for q in xrange(N_svd[0]):
-  t0=time.time()
   if check_step is 'on':
    Dis1=Dis_f_QR_down(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
    r_up=optimum_0_QR_down(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up,U)
@@ -2443,7 +2453,7 @@ def   Do_optimization_SVD_QR_down(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_
   Distance_val=Dis_f_QR_down(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
   Res=Res1
   Res1=Distance_val
-  print 'Dis-QR1_d=', Distance_val, abs(Res1-Res) / abs(Res), q, time.time() - t0
+  #print 'Dis-QR1_d=', Distance_val, abs(Res1-Res) / abs(Res), q, time.time() - t0
 #  print  Res1 , Res,Res1 < Res 
 
   if Res1 < Res:
@@ -2460,15 +2470,15 @@ def   Do_optimization_SVD_QR_down(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a_
   if count > 550: print 'Num_Opt > 550'; break;
   if abs(Res) > 1.00e-10:
    if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
-    print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
+    #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     check_val=0
     break
   else:
     if (abs(Distance_val) < 1.00e-7) or (  abs(Res1-Res) < 1.00e-11  ): 
-     print 'break, Dis', Distance_val, abs(Res1-Res)
+     #print 'break, Dis', Distance_val, abs(Res1-Res)
      break
-# Distance_val=Dis_f_QR(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
-# print 'DisF_QR_final', Distance_val
+ Distance_val=Dis_f_QR_down(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
+ print 'Dis', Distance_val, 't', time.time() - t0
  #if check_val!=0: 
   #Do_optimization_Grad_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,N_grad)
 
@@ -3342,8 +3352,8 @@ def   Do_optimization_SVD_QR_upper1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, 
  Res1=Distance_val
  count=0
  check_val=0
+ t0=time.time()
  for q in xrange(N_svd[0]):
-  t0=time.time()
   if check_step is 'on':
    Dis1=Dis_f_QR_upper1(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
    r_up=optimum_0_QR_upper1(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up,U)
@@ -3379,7 +3389,7 @@ def   Do_optimization_SVD_QR_upper1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, 
   Distance_val=Dis_f_QR_upper1(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
   Res=Res1
   Res1=Distance_val
-  print 'Dis-QR2_u=', Distance_val, abs(Res1-Res) / abs(Res), q, time.time() - t0
+  #print 'Dis-QR2_u=', Distance_val, abs(Res1-Res) / abs(Res), q
 #  print  Res1 , Res,Res1 < Res 
 
   if Res1 < Res:
@@ -3396,20 +3406,19 @@ def   Do_optimization_SVD_QR_upper1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, 
   if count > 550: print 'Num_Opt > 550'; break;
   if abs(Res) > 1.00e-10:
    if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
-    print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
+    #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     check_val=0
     break
   else:
     if (abs(Distance_val) < 1.00e-7) or (  abs(Res1-Res) < 1.00e-11  ): 
-     print 'break, Dis', Distance_val, abs(Res1-Res)
+     #print 'break, Dis', Distance_val, abs(Res1-Res)
      break
-# Distance_val=Dis_f_QR(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
-# print 'DisF_QR_final', Distance_val
+ Distance_val=Dis_f_QR_upper1(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
+ print 'Dis2', Distance_val, 't', time.time() - t0
  #if check_val!=0: 
   #Do_optimization_Grad_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,N_grad)
 
  a_up, d_up =reproduce_ad1(r_up, r1_up,q_u, qq_u)
-
 
  return a_up, b_up, c_up, d_up
 
@@ -3850,8 +3859,9 @@ def   Do_optimization_SVD_QR_down1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a
  Res1=Distance_val
  count=0
  check_val=0
+ t0=time.time()
+
  for q in xrange(N_svd[0]):
-  t0=time.time()
   if check_step is 'on':
    Dis1=Dis_f_QR_down1(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
    r_up=optimum_0_QR_down1(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up,U)
@@ -3889,7 +3899,7 @@ def   Do_optimization_SVD_QR_down1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a
   Distance_val=Dis_f_QR_down1(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
   Res=Res1
   Res1=Distance_val
-  print 'Dis-QR2_d=', Distance_val, abs(Res1-Res) / abs(Res), q, time.time() - t0
+  #print 'Dis-QR2_d=', Distance_val, abs(Res1-Res) / abs(Res), q, time.time() - t0
 #  print  Res1 , Res,Res1 < Res 
 
   if Res1 < Res:
@@ -3906,15 +3916,15 @@ def   Do_optimization_SVD_QR_down1(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c, d, a
   if count > 550: print 'Num_Opt > 550'; break;
   if abs(Res) > 1.00e-10:
    if (abs(Distance_val) < 1.00e-7) or ((abs(Res1-Res) / abs(Res)) < N_svd[1]): 
-    print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
+    #print 'break, Dis', Distance_val, (abs(Res1-Res) / abs(Res)), count
     check_val=0
     break
   else:
     if (abs(Distance_val) < 1.00e-7) or (  abs(Res1-Res) < 1.00e-11  ): 
-     print 'break, Dis', Distance_val, abs(Res1-Res)
+     #print 'break, Dis', Distance_val, abs(Res1-Res)
      break
-# Distance_val=Dis_f_QR(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
-# print 'DisF_QR_final', Distance_val
+ Distance_val=Dis_f_QR_down1(N_u, N_uper, N_down, r_u, r1_u,r_up, r1_up, a_u,b_u,c_u,d_u,a_up, b_up, c_up, d_up )
+ print 'Dis2', Distance_val,'t', time.time() - t0
  #if check_val!=0: 
   #Do_optimization_Grad_MPO(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, MPO_list,c_u,a_u,b_u,plist,N_grad)
 

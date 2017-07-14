@@ -21,21 +21,21 @@ def Short_TrotterSteps(N_iterF):
 # Delta_N=(1.0, N_iterF)
 # List_delN.append(Delta_N)
 
- Delta_N=(0.08, N_iterF)
- List_delN.append(Delta_N)
+# Delta_N=(0.08, N_iterF)
+# List_delN.append(Delta_N)
 
 
- Delta_N=(0.07, N_iterF)
- List_delN.append(Delta_N)
+# Delta_N=(0.07, N_iterF)
+# List_delN.append(Delta_N)
 
- Delta_N=(0.06, N_iterF)
- List_delN.append(Delta_N)
+# Delta_N=(0.06, N_iterF)
+# List_delN.append(Delta_N)
 
- Delta_N=(0.05, N_iterF)
- List_delN.append(Delta_N)
+# Delta_N=(0.05, N_iterF)
+# List_delN.append(Delta_N)
 
- Delta_N=(0.04, N_iterF)
- List_delN.append(Delta_N)
+# Delta_N=(0.04, N_iterF)
+# List_delN.append(Delta_N)
 
  Delta_N=(0.03, N_iterF)
  List_delN.append(Delta_N)
@@ -446,8 +446,6 @@ def Heisenberg0(h, d_phys):
     iden = matIden()
 
     ham =(h[0])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
-    ham =(1.0)*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
-
     H.putBlock(ham)
     return H
 
@@ -465,8 +463,6 @@ def Heisenberg00(h, d_phys):
     iden = matIden()
 
     ham =(h[1])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
-    ham =(1.0)*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
-
     H.putBlock(ham)
     return H
 
@@ -583,7 +579,7 @@ def threebody_U1(h,d_phys):
     ham =ham + h[0]*(h[3]*uni10.otimes(iden,szt)+h[4]*uni10.otimes(iden,sxt)+h[5]*uni10.otimes(iden,syt))
 
 
-    ham =ham + 1.0*h[2]*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
+    ham =ham + 2.0*h[2]*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
 
 
     A=(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))*(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))
@@ -596,7 +592,7 @@ def threebody_U1(h,d_phys):
     ham= ham +  h[6]*B 
 
 
-    C=1.0*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
+    C=2.0*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
     
     ham= ham +  h[7]*C 
 
@@ -605,20 +601,6 @@ def threebody_U1(h,d_phys):
 #    print H
     #print sx, sy, sz
     return H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -633,7 +615,7 @@ def Heisenberg0_U1(h, d_phys):
     iden=matIden()
     iden = matIden()
 
-    ham =(h[1])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+    ham =(h[0])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
     H.setRawElem(ham)
     #print H, ham
 
@@ -1165,8 +1147,8 @@ def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corne
  #return E_5
 # return (E_5+E_6+E_7+E_8)/4.00
 
- #return (E_1+E_2+E_3+E_4)/4.00 
- return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/4.00
+# return (E_1+E_2+E_3+E_4)/4.00 
+ return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/8.00
 # return (E_ab+E_ba)/2.0
 # return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
  #return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
@@ -1225,8 +1207,8 @@ def E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,Corner_met
  #return E_5
 # return (E_5+E_6+E_7+E_8)/4.00
 
- #return (E_1+E_2+E_3+E_4)/4.00 
- return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/4.00
+# return (E_1+E_2+E_3+E_4)/4.00 
+ return (E_1+E_2+E_3+E_4+E_5+E_6+E_7+E_8)/8.00
 # return (E_ab+E_ba)/2.0
 # return ((E_ca+E_ac+E_db+E_bd) / 4.00) + ((E_ab+E_ba+E_cd+E_dc) / 4.00)#+((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
  #return ((E_val1+E_val2+E_val3+E_val4) / 4.00) + ((E_val5+E_val6+E_val7+E_val8) / 4.00)
@@ -1571,7 +1553,7 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   print 'ave_H', sum(max_list)/4.00 
   print 'max', max(max_list) 
   print 'min', min(max_list) 
-  H=Heisenberg00(h,d_phys)
+  H=Heisenberg0(h,d_phys)
   E_5=M_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
   E_6=M_v(d_u,b_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model,H)
   E_7=M_v(a_u,c_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
@@ -1603,7 +1585,7 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   print 'ave_H', sum(max_list)/4.00 
   print 'max', max(max_list) 
   print 'min', min(max_list) 
-  H=Heisenberg00_U1(h,d_phys)
+  H=Heisenberg0_U1(h,d_phys)
 
   E_5=M_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
   E_6=M_v(d_u,b_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model,H)

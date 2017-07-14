@@ -1,0 +1,176 @@
+<html><head>
+<title>ipeps.py</title>
+<meta name="Generator" content="htmlizer/[twisted, version 16.0.0]" />
+<link rel="alternate" href="ipeps.py" type="text/x-python" />
+
+</head>
+<body>
+<pre><span class="py-src-keyword">import</span> <span class="py-src-variable">pyUni10</span> <span class="py-src-keyword">as</span> <span class="py-src-variable">uni10</span>
+<span class="py-src-keyword">import</span> <span class="py-src-variable">copy</span>
+<span class="py-src-keyword">import</span> <span class="py-src-variable">basic</span>
+<span class="py-src-keyword">import</span> <span class="py-src-variable">basic_H</span>
+<span class="py-src-keyword">import</span> <span class="py-src-variable">itebd</span>
+<span class="py-src-keyword">import</span> <span class="py-src-variable">Fullupdate</span>
+<span class="py-src-comment">###################### Initialize parameters ###########################</span>
+<span class="py-src-variable">Model</span>=<span class="py-src-string">"Heisenberg"</span>
+<span class="py-src-comment">#Model="Heisenberg_Z2"</span>
+<span class="py-src-comment">#Model="Heisenberg_U1"</span>
+<span class="py-src-comment">#Model="Heisenberg_U1Z2"</span>
+
+<span class="py-src-variable">D</span>=[<span class="py-src-number">3</span>]
+<span class="py-src-variable">chi</span>=[<span class="py-src-number">20</span>]
+<span class="py-src-comment">#d_phys=[8]</span>
+<span class="py-src-variable">d_phys</span>=[<span class="py-src-number">2</span>]
+<span class="py-src-comment">#d_phys=[3]</span>
+
+<span class="py-src-comment">#D=[2,2]</span>
+<span class="py-src-comment">#chi=[10,10]</span>
+<span class="py-src-comment">#d_phys=[1,1]</span>
+
+<span class="py-src-comment">#D=[1,2,1]</span>
+<span class="py-src-comment">#chi=[2,2,5,10,5,5,2]</span>
+<span class="py-src-comment">#d_phys=[1,1]</span>
+<span class="py-src-comment">###d_phys=[1,1,1]</span>
+
+<span class="py-src-comment">#D=[2,2,2,2,2,2]</span>
+<span class="py-src-comment">#chi=[10,10,10,10,10,10]</span>
+<span class="py-src-comment">#d_phys=[1,1]</span>
+
+<span class="py-src-variable">method</span>=<span class="py-src-string">"Grad"</span>            <span class="py-src-comment">#SVD, Grad, SVD_mpo, SVD_QR, SVD_mix,SVD_mg</span>
+<span class="py-src-variable">Inv_method</span>=<span class="py-src-string">'SVD'</span>         <span class="py-src-comment">#SVD, CG</span>
+<span class="py-src-variable">Grad_method</span>=<span class="py-src-string">"CG"</span>        <span class="py-src-comment"># CG,ST</span>
+<span class="py-src-variable">Gauge</span>=<span class="py-src-string">'Fixed'</span>
+<span class="py-src-variable">Corner_method</span>=<span class="py-src-string">'CTMFull'</span>   <span class="py-src-comment">#CTMRG, CTMFull</span>
+<span class="py-src-variable">check_step</span>=<span class="py-src-string">'off'</span>            <span class="py-src-comment">#on, off</span>
+<span class="py-src-variable">fixbond_itebd</span>=<span class="py-src-string">'off'</span>            <span class="py-src-comment">#on, off</span>
+<span class="py-src-variable">itebd_method</span>=<span class="py-src-string">'short'</span>            <span class="py-src-comment">#long, short</span>
+<span class="py-src-variable">start_itebd</span>=<span class="py-src-number">1.0</span>
+<span class="py-src-variable">division_itebd</span>=<span class="py-src-number">5</span>
+<span class="py-src-variable">iteration_per_step</span>=<span class="py-src-number">1</span>
+
+<span class="py-src-variable">N_grad</span>=<span class="py-src-number">150</span>
+<span class="py-src-variable">N_env</span>=[<span class="py-src-number">20</span>,<span class="py-src-number">1.00e-8</span>]
+<span class="py-src-variable">N_svd</span>=[<span class="py-src-number">10</span>,<span class="py-src-number">1.00e-9</span>]
+<span class="py-src-variable">N_iteritebd</span>=<span class="py-src-number">40</span>
+<span class="py-src-variable">N_iterFull</span>=<span class="py-src-number">100</span>
+<span class="py-src-variable">Acc_E</span>=<span class="py-src-number">1.00e-7</span>
+<span class="py-src-variable">distance_val</span>=<span class="py-src-number">2</span>
+
+<span class="py-src-variable">J1_x</span>=<span class="py-src-number">1.0</span>
+<span class="py-src-variable">J1_y</span>=<span class="py-src-number">1.00</span>
+<span class="py-src-variable">J2</span>=<span class="py-src-number">0.0</span>
+<span class="py-src-variable">h_z</span>=<span class="py-src-number">1.0</span>
+<span class="py-src-variable">h_x</span>=<span class="py-src-number">1.0</span>
+<span class="py-src-variable">h_y</span>=<span class="py-src-number">1.0</span>
+<span class="py-src-variable">K_1</span>=<span class="py-src-number">0.0</span>
+<span class="py-src-variable">K_2</span>=<span class="py-src-number">0.0</span>
+
+<span class="py-src-comment">###################################################################</span>
+
+<span class="py-src-variable">q_D</span>, <span class="py-src-variable">q_chi</span>, <span class="py-src-variable">q_phys</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">full_make_bond</span>(<span class="py-src-variable">Model</span>, <span class="py-src-variable">D</span>, <span class="py-src-variable">chi</span>, <span class="py-src-variable">d_phys</span>)
+
+
+<span class="py-src-variable">Gamma_a</span>,<span class="py-src-variable">Gamma_b</span>,<span class="py-src-variable">Gamma_c</span>,<span class="py-src-variable">Gamma_d</span>,<span class="py-src-variable">Landa_1</span>,<span class="py-src-variable">Landa_2</span>,<span class="py-src-variable">Landa_3</span>,<span class="py-src-variable">Landa_4</span>,<span class="py-src-variable">Landa_5</span>, <span class="py-src-variable">Landa_6</span>, <span class="py-src-variable">Landa_7</span>,<span class="py-src-variable">Landa_8</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">produce_GammaLanda</span>(<span class="py-src-variable">q_D</span>, <span class="py-src-variable">q_phys</span>)
+
+<span class="py-src-comment">#Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.produce_GammaLanda_manual(q_D, q_phys)</span>
+
+
+
+<span class="py-src-variable">Gamma</span>=[<span class="py-src-variable">Gamma_a</span>,<span class="py-src-variable">Gamma_b</span>,<span class="py-src-variable">Gamma_c</span>,<span class="py-src-variable">Gamma_d</span>]
+<span class="py-src-variable">Landa</span>=[<span class="py-src-variable">Landa_1</span>,<span class="py-src-variable">Landa_2</span>,<span class="py-src-variable">Landa_3</span>,<span class="py-src-variable">Landa_4</span>,<span class="py-src-variable">Landa_5</span>,<span class="py-src-variable">Landa_6</span>,<span class="py-src-variable">Landa_7</span>,<span class="py-src-variable">Landa_8</span>]
+<span class="py-src-variable">basic</span>.<span class="py-src-variable">Initialize_function</span>(<span class="py-src-variable">Gamma</span>,<span class="py-src-variable">Landa</span>)
+<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">produce_abcd_gamma</span>(<span class="py-src-variable">Landa</span>, <span class="py-src-variable">Gamma_a</span>,<span class="py-src-variable">Gamma_b</span>,<span class="py-src-variable">Gamma_c</span>,<span class="py-src-variable">Gamma_d</span>)
+
+
+<span class="py-src-comment">###</span>
+<span class="py-src-comment">#a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()</span>
+<span class="py-src-comment">##a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full_previous(a_u, b_u, c_u, d_u)</span>
+<span class="py-src-comment">##print a_u</span>
+<span class="py-src-comment">##a_u,b_u,c_u,d_u,a,b,c,d=basic.slighty_random(a_u,b_u,c_u,d_u,a,b,c,d)</span>
+<span class="py-src-comment">#Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]</span>
+<span class="py-src-comment">#Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8=basic.produce_gamma_abcd(a_u,b_u,c_u,d_u,Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8)</span>
+<span class="py-src-comment">##</span>
+
+<span class="py-src-variable">Env</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">produce_env_init</span>(<span class="py-src-variable">q_chi</span>,<span class="py-src-variable">q_D</span>)
+<span class="py-src-variable">Env1</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">Rand_env_total</span>(<span class="py-src-variable">Env</span>)
+<span class="py-src-variable">Env2</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">Rand_env_total</span>(<span class="py-src-variable">Env</span>)
+<span class="py-src-variable">Env3</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">Rand_env_total</span>(<span class="py-src-variable">Env</span>)
+
+<span class="py-src-variable">fileCorrH</span> = <span class="py-src-variable">open</span>(<span class="py-src-string">"Data/CorrelationH.txt"</span>, <span class="py-src-string">"w"</span>)
+<span class="py-src-variable">fileCorrV</span> = <span class="py-src-variable">open</span>(<span class="py-src-string">"Data/CorrelationV.txt"</span>, <span class="py-src-string">"w"</span>)
+<span class="py-src-variable">fileCorrLength</span> = <span class="py-src-variable">open</span>(<span class="py-src-string">"Data/CorrelationLength.txt"</span>, <span class="py-src-string">"w"</span>)
+
+<span class="py-src-variable">fileCorrHH</span> = <span class="py-src-variable">open</span>(<span class="py-src-string">"Data/CorrelationHH.txt"</span>, <span class="py-src-string">"w"</span>)
+<span class="py-src-variable">fileCorrVV</span> = <span class="py-src-variable">open</span>(<span class="py-src-string">"Data/CorrelationVV.txt"</span>, <span class="py-src-string">"w"</span>)
+<span class="py-src-variable">fileCorrLength</span> = <span class="py-src-variable">open</span>(<span class="py-src-string">"Data/CorrelationLength.txt"</span>, <span class="py-src-string">"w"</span>)
+
+<span class="py-src-variable">fileCorrHH1</span> = <span class="py-src-variable">open</span>(<span class="py-src-string">"Data/CorrelationHH1.txt"</span>, <span class="py-src-string">"w"</span>)
+<span class="py-src-variable">fileCorrVV1</span> = <span class="py-src-variable">open</span>(<span class="py-src-string">"Data/CorrelationVV1.txt"</span>, <span class="py-src-string">"w"</span>)
+<span class="py-src-variable">fileCorrLength1</span> = <span class="py-src-variable">open</span>(<span class="py-src-string">"Data/CorrelationLength1.txt"</span>, <span class="py-src-string">"w"</span>)
+
+
+<span class="py-src-comment">#for hz , J1, J2 in zip( J_z, J1_list, J2_list):</span>
+<span class="py-src-keyword">print</span> <span class="py-src-variable">J1_x</span>, <span class="py-src-variable">J1_y</span>, <span class="py-src-variable">J2</span>,  <span class="py-src-variable">h_z</span>,<span class="py-src-variable">h_x</span>, <span class="py-src-variable">h_y</span>, <span class="py-src-variable">K_1</span>, <span class="py-src-variable">K_2</span> 
+<span class="py-src-variable">h_coupling</span>=[<span class="py-src-variable">J1_x</span>, <span class="py-src-variable">J1_y</span>, <span class="py-src-variable">J2</span>,  <span class="py-src-variable">h_z</span>,<span class="py-src-variable">h_x</span>, <span class="py-src-variable">h_y</span>, <span class="py-src-variable">K_1</span>, <span class="py-src-variable">K_2</span>]
+<span class="py-src-comment">#########################################################################################</span>
+
+
+<span class="py-src-variable">Gamma_a</span>,<span class="py-src-variable">Gamma_b</span>,<span class="py-src-variable">Gamma_c</span>,<span class="py-src-variable">Gamma_d</span>,<span class="py-src-variable">Landa_1</span>,<span class="py-src-variable">Landa_2</span>,<span class="py-src-variable">Landa_3</span>,<span class="py-src-variable">Landa_4</span>,<span class="py-src-variable">Landa_5</span>, <span class="py-src-variable">Landa_6</span>, <span class="py-src-variable">Landa_7</span>,<span class="py-src-variable">Landa_8</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">Reload_itebd</span>()
+<span class="py-src-comment">#Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,q_phys,D,N_iteritebd,h_coupling,Model,q_D,fixbond_itebd,start_itebd, division_itebd,itebd_method)</span>
+<span class="py-src-variable">basic</span>.<span class="py-src-variable">Store_itebd</span>(<span class="py-src-variable">Gamma_a</span>,<span class="py-src-variable">Gamma_b</span>,<span class="py-src-variable">Gamma_c</span>,<span class="py-src-variable">Gamma_d</span>,<span class="py-src-variable">Landa_1</span>,<span class="py-src-variable">Landa_2</span>,<span class="py-src-variable">Landa_3</span>,<span class="py-src-variable">Landa_4</span>,<span class="py-src-variable">Landa_5</span>, <span class="py-src-variable">Landa_6</span>, <span class="py-src-variable">Landa_7</span>,<span class="py-src-variable">Landa_8</span>)
+
+<span class="py-src-keyword">print</span> <span class="py-src-variable">Landa_1</span>, <span class="py-src-string">'\n'</span>, <span class="py-src-variable">Landa_2</span>, <span class="py-src-string">'\n'</span>,<span class="py-src-variable">Landa_3</span> ,<span class="py-src-string">'\n'</span>,<span class="py-src-variable">Landa_4</span> ,<span class="py-src-string">'\n'</span>,<span class="py-src-variable">Landa_5</span>, <span class="py-src-string">'\n'</span>,<span class="py-src-variable">Landa_6</span>, <span class="py-src-string">'\n'</span>,<span class="py-src-variable">Landa_7</span>, <span class="py-src-string">'\n'</span>, <span class="py-src-variable">Landa_8</span> 
+
+<span class="py-src-variable">Landa</span>=[<span class="py-src-variable">Landa_1</span>,<span class="py-src-variable">Landa_2</span>,<span class="py-src-variable">Landa_3</span>,<span class="py-src-variable">Landa_4</span>,<span class="py-src-variable">Landa_5</span>,<span class="py-src-variable">Landa_6</span>,<span class="py-src-variable">Landa_7</span>,<span class="py-src-variable">Landa_8</span>]
+<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">produce_abcd_gamma</span>(<span class="py-src-variable">Landa</span>, <span class="py-src-variable">Gamma_a</span>,<span class="py-src-variable">Gamma_b</span>,<span class="py-src-variable">Gamma_c</span>,<span class="py-src-variable">Gamma_d</span>)
+
+<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">increase_norm</span>(<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>, <span class="py-src-number">6.00</span>)
+<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">make_equall_dis</span>(<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>)
+
+<span class="py-src-comment">#print a_u, b_u, c_u, d_u</span>
+<span class="py-src-comment">#a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()</span>
+<span class="py-src-comment">#basic.Reload_EnvEnv(Env,Env1,Env2,Env3)</span>
+<span class="py-src-variable">E_value</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">E_total</span>(<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>,<span class="py-src-variable">Env</span>,<span class="py-src-variable">Env1</span>,<span class="py-src-variable">Env2</span>,<span class="py-src-variable">Env3</span>,<span class="py-src-variable">D</span>,<span class="py-src-variable">h_coupling</span>,<span class="py-src-variable">q_phys</span>,<span class="py-src-variable">chi</span>,<span class="py-src-variable">Corner_method</span>,<span class="py-src-variable">Model</span>,<span class="py-src-variable">N_env</span>)
+<span class="py-src-keyword">print</span> <span class="py-src-string">'E_toal='</span>, <span class="py-src-variable">E_value</span>
+<span class="py-src-variable">basic</span>.<span class="py-src-variable">Store_EnvEnv</span>(<span class="py-src-variable">Env</span>,<span class="py-src-variable">Env1</span>,<span class="py-src-variable">Env2</span>,<span class="py-src-variable">Env3</span>)
+<span class="py-src-variable">M_value</span>=<span class="py-src-variable">basic</span>.<span class="py-src-variable">M_total</span>(<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>,<span class="py-src-variable">Env</span>,<span class="py-src-variable">Env1</span>,<span class="py-src-variable">Env2</span>,<span class="py-src-variable">Env3</span>,<span class="py-src-variable">D</span>,<span class="py-src-variable">h_coupling</span>,<span class="py-src-variable">q_phys</span>,<span class="py-src-variable">chi</span>,<span class="py-src-variable">Corner_method</span>,<span class="py-src-variable">Model</span>)
+<span class="py-src-keyword">print</span> <span class="py-src-string">'M_s='</span>, <span class="py-src-variable">M_value</span>, <span class="py-src-string">'\n'</span>
+<span class="py-src-variable">basic</span>.<span class="py-src-variable">Translational_sym</span>(<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>,<span class="py-src-variable">Env</span>,<span class="py-src-variable">Env1</span>,<span class="py-src-variable">Env2</span>,<span class="py-src-variable">Env3</span>,<span class="py-src-variable">D</span>,<span class="py-src-variable">h_coupling</span>,<span class="py-src-variable">q_phys</span>,<span class="py-src-variable">chi</span>,<span class="py-src-variable">Corner_method</span>,<span class="py-src-variable">Model</span>)
+<span class="py-src-comment">###########################################################################################</span>
+
+<span class="py-src-comment">############################################################################</span>
+<span class="py-src-comment">#basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)</span>
+<span class="py-src-comment">#a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()</span>
+<span class="py-src-comment">#a_u,b_u,c_u,d_u,a,b,c,d=basic.slighty_random(a_u,b_u,c_u,d_u,a,b,c,d)</span>
+<span class="py-src-comment">#a_u,b_u,c_u,d_u,a,b,c,d=basic.total_random(a_u,b_u,c_u,d_u,a,b,c,d)</span>
+<span class="py-src-comment">#a_u,b_u,c_u,d_u,a,b,c,d=basic.total_random1(a_u,b_u,c_u,d_u,a,b,c,d)</span>
+<span class="py-src-comment">#a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full_previous(a_u, b_u, c_u, d_u)</span>
+<span class="py-src-comment">#basic.Reload_EnvEnv(Env,Env1,Env2,Env3)</span>
+<span class="py-src-comment">#a_u,b_u,c_u,d_u,a,b,c,d=basic.slighty_random(a_u,b_u,c_u,d_u,a,b,c,d)</span>
+<span class="py-src-comment">#a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()</span>
+<span class="py-src-comment">#basic.Reload_EnvEnv(Env,Env1,Env2,Env3)</span>
+<span class="py-src-comment">#a_u,b_u,c_u,d_u,a,b,c,d=basic.increase_norm(a_u,b_u,c_u,d_u,a,b,c,d, 0.5)</span>
+<span class="py-src-comment">#print a_u</span>
+<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>,<span class="py-src-variable">Env</span>,<span class="py-src-variable">Env1</span>,<span class="py-src-variable">Env2</span>,<span class="py-src-variable">Env3</span>=<span class="py-src-variable">Fullupdate</span>.<span class="py-src-variable">Full_Update</span>(<span class="py-src-variable">a_u</span>,<span class="py-src-variable">b_u</span>,<span class="py-src-variable">c_u</span>,<span class="py-src-variable">d_u</span>,<span class="py-src-variable">a</span>,<span class="py-src-variable">b</span>,<span class="py-src-variable">c</span>,<span class="py-src-variable">d</span>,<span class="py-src-variable">chi</span>,<span class="py-src-variable">q_phys</span>,<span class="py-src-variable">D</span>,<span class="py-src-variable">h_coupling</span>,<span class="py-src-variable">Env</span>,<span class="py-src-variable">Env1</span>,<span class="py-src-variable">Env2</span>,<span class="py-src-variable">Env3</span>,<span class="py-src-variable">Gauge</span>,<span class="py-src-variable">Corner_method</span>,<span class="py-src-variable">N_iterFull</span>,<span class="py-src-variable">Acc_E</span>,<span class="py-src-variable">Model</span>,<span class="py-src-variable">N_grad</span>, <span class="py-src-variable">Grad_method</span>,<span class="py-src-variable">Inv_method</span>,<span class="py-src-variable">N_svd</span>,<span class="py-src-variable">N_env</span>,<span class="py-src-variable">method</span>,<span class="py-src-variable">check_step</span>,<span class="py-src-variable">iteration_per_step</span>)
+
+<span class="py-src-comment">#E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h_coupling,q_phys,chi,Corner_method,Model,N_env)</span>
+<span class="py-src-comment">#print "E_final", E_value</span>
+<span class="py-src-comment">#basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)</span>
+<span class="py-src-comment">#basic.Store_EnvEnv(Env,Env1,Env2,Env3)</span>
+<span class="py-src-comment">#basic.Reload_EnvEnv(Env,Env1,Env2,Env3)</span>
+
+<span class="py-src-comment">#############################################</span>
+<span class="py-src-comment">#basic.CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrHH,fileCorrLength)</span>
+<span class="py-src-comment">#basic.CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrVV,fileCorrLength)</span>
+<span class="py-src-comment">#basic.CorrelationH(b_u,a_u,d_u,c_u,b,a,d,c,Env1,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrHH1,fileCorrLength)</span>
+<span class="py-src-comment">#basic.CorrelationV(b_u,a_u,d_u,c_u,b,a,d,c,Env1,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrVV1,fileCorrLength)</span>
+<span class="py-src-comment">#############################################</span>
+<span class="py-src-comment">#basic_H.CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrH,fileCorrLength)</span>
+<span class="py-src-comment">#basic_H.CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrV,fileCorrLength)</span>
+<span class="py-src-comment">#################################################</span>
+
+
+
+
+</pre>
+</body>
