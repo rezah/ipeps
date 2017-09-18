@@ -13,6 +13,8 @@ import basicB
 import basicC
 import numpy as np
 from numpy import linalg as LA
+import cmath
+import math
 
 
 def MaxAbs(c):
@@ -108,10 +110,749 @@ def Init_env(Env):
  Tb2=copy.copy(Env[9])
  Tb3=copy.copy(Env[10])
  Tb4=copy.copy(Env[11])
- return  c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4
+ return  c1, c2, c3, c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4
+
+
+def Spectrum(a_u,b_u,c_u,d_u,a,b,c,d,Env,fileSpectrum):
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+ CTM_1 = uni10.Network("Network1/Spect.net")
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ Spec_tensor=CTM_1.launch()
+ Spec_tensor.permute([0, 7, -7 , 14,-14,21 , 2,9,-9,16,-16,23],6)
+ print  Spec_tensor.printDiagram() 
+ blk_qnums = Spec_tensor.blockQnum()
+ eig_list=[]
+ q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ for qnum in blk_qnums:
+  #if qnum == q0_even:
+   print  "Sector", qnum 
+   M=Spec_tensor.getBlock(qnum)
+   A_np=Mat_uni_to_np(M)
+   e=LA.eigvals(A_np)
+   #print e,"\n,\n"
+   #D_eig[0]=Mat_nptoUni(w)
+   #D_eig[1]=Mat_np_to_Uni(v)
+   #eig=M.eig()
+   #e=eig[0]
+   #d=int(e.row())
+   d=np.size(e,0)
+   for q in xrange(d): 
+    if abs(e[q]) > 1.e-6:
+     print  e[q], abs(e[q])#,-1*math.log(abs(e[q])), cmath.phase(e[q])#, np.angle(e[q],deg=True)     
+     eig_list.append(e[q])
+
+ maxabs = np.abs(eig_list).max()
+ eig_new_list = [i * (1.0/maxabs) for i in eig_list]
+ print  eig_new_list, maxabs, np.abs(eig_new_list).max()
+ img_ten=[ i.imag     for i in eig_new_list]
+ real_ten=[ i.real     for i in eig_new_list]
+ abslog_ten=[ -0.5*math.log(abs(i))     for i in eig_new_list]
+ phase_ten=[ cmath.phase(i)     for i in eig_new_list]
+
+ for i in xrange(len(real_ten)):
+  fileSpectrum.write(str(real_ten[i]) + " " + str(img_ten[i])+" "+str(phase_ten[i])+" "+str(abslog_ten[i]) + "\n")
+  fileSpectrum.flush()
+     
+def Spectrum_Arnoldi_right0(a_u,b_u,c_u,d_u,a,b,c,d,Env,fileSpectrum,fileSpectrum2,fileSpectrum4,Arnoldi_bond):
+
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+ vec_right=make_vright(Ta2,Tb2,c2,c3)
+
+
+ q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+ q_list=[q0_even]     
+ bdo = uni10.Bond(uni10.BD_OUT, q_list)
+ bd0=vec_right.bond(0)
+ bd1=vec_right.bond(1)
+ bd2=vec_right.bond(2)
+ bd3=vec_right.bond(3)
+ bd4=vec_right.bond(4)
+ bd5=vec_right.bond(5)
+
+ vec_right=uni10.UniTensor([bd0,bd1,bd2,bd3,bd4,bd5,bdo], "vec_right")
+ vec_right.randomize()
+ vec_right.setLabel([5,2,-2,3,-3,6,202])
+ eig_list=ED_right(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,vec_right,Arnoldi_bond)
+
+ maxabs = np.abs(eig_list).max()
+ eig_new_list = [i * (1.0/maxabs) for i in eig_list]
+ print  maxabs, np.abs(eig_new_list).max(), maxabs
+ img_ten=[ i.imag     for i in eig_new_list]
+ real_ten=[ i.real     for i in eig_new_list]
+ abslog_ten=[ -0.5*math.log(abs(i))     for i in eig_new_list]
+ phase_ten=[ cmath.phase(i)     for i in eig_new_list]
+
+ for i in xrange(len(real_ten)):
+  fileSpectrum.write(str(real_ten[i]) + " " + str(img_ten[i])+" "+str(phase_ten[i])+" "+str(abslog_ten[i]) + "\n")
+  fileSpectrum.flush()
+
+
+ q0_even = uni10.Qnum(2,uni10.PRT_EVEN);
+ q_list=[q0_even]     
+ bdo = uni10.Bond(uni10.BD_OUT, q_list)
+ bd0=vec_right.bond(0)
+ bd1=vec_right.bond(1)
+ bd2=vec_right.bond(2)
+ bd3=vec_right.bond(3)
+ bd4=vec_right.bond(4)
+ bd5=vec_right.bond(5)
+
+ vec_right2=uni10.UniTensor([bd0,bd1,bd2,bd3,bd4,bd5,bdo], "vec_right2")
+ vec_right2.randomize()
+ vec_right2.setLabel([5,2,-2,3,-3,6,202])
+
+ eig_list2=ED_right2(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,vec_right2,Arnoldi_bond)
+
+
+ maxabs2 = np.abs(eig_list2).max()
+ eig_new_list = [i * (1.0/maxabs) for i in eig_list2]
+ print  maxabs, np.abs(eig_new_list).max(), maxabs2
+ img_ten=[ i.imag     for i in eig_new_list]
+ real_ten=[ i.real     for i in eig_new_list]
+ abslog_ten=[ -0.5*math.log(abs(i))     for i in eig_new_list]
+ phase_ten=[ cmath.phase(i)     for i in eig_new_list]
+
+ for i in xrange(len(real_ten)):
+  fileSpectrum2.write(str(real_ten[i]) + " " + str(img_ten[i])+" "+str(phase_ten[i])+" "+str(abslog_ten[i]) + "\n")
+  fileSpectrum2.flush()
 
 
 
+ q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ q_list=[q0_even]     
+ #bdi = uni10.Bond(uni10.BD_IN, q_D)
+ bdo = uni10.Bond(uni10.BD_OUT, q_list)
+ bd0=vec_right.bond(0)
+ bd1=vec_right.bond(1)
+ bd2=vec_right.bond(2)
+ bd3=vec_right.bond(3)
+ bd4=vec_right.bond(4)
+ bd5=vec_right.bond(5)
+
+ vec_right4=uni10.UniTensor([bd0,bd1,bd2,bd3,bd4,bd5,bdo], "vec_right4")
+ vec_right4.randomize()
+ vec_right4.setLabel([5,2,-2,3,-3,6,202])
+ eig_list4=ED_right4(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,vec_right4,Arnoldi_bond)
+
+
+ maxabs4 = np.abs(eig_list4).max()
+ eig_new_list = [i * (1.0/maxabs) for i in eig_list4]
+ print  maxabs, np.abs(eig_new_list).max(), maxabs4
+ img_ten=[ i.imag     for i in eig_new_list]
+ real_ten=[ i.real     for i in eig_new_list]
+ abslog_ten=[ -0.5*math.log(abs(i))     for i in eig_new_list]
+ phase_ten=[ cmath.phase(i)     for i in eig_new_list]
+
+
+ for i in xrange(len(real_ten)):
+  fileSpectrum4.write(str(real_ten[i]) + " " + str(img_ten[i])+" "+str(phase_ten[i])+" "+str(abslog_ten[i]) + "\n")
+  fileSpectrum4.flush()
+
+
+
+def Spectrum_Arnoldi_right1(a_u,b_u,c_u,d_u,a,b,c,d,Env,fileSpectrum,fileSpectrum2,fileSpectrum4,Arnoldi_bond):
+
+ c1,c2,c3,c4, Ta1, Ta2, Ta3, Ta4, Tb1, Tb2, Tb3, Tb4=Init_env(Env)
+
+
+ vec_right=make_up(c1,Tb1, Ta1,c2)
+
+
+
+ q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+ q_list=[q0_even]     
+ #bdi = uni10.Bond(uni10.BD_IN, q_D)
+ bdo = uni10.Bond(uni10.BD_OUT, q_list)
+ bd0=vec_right.bond(0)
+ bd1=vec_right.bond(1)
+ bd2=vec_right.bond(2)
+ bd3=vec_right.bond(3)
+ bd4=vec_right.bond(4)
+ bd5=vec_right.bond(5)
+
+ 
+
+ vec_right=uni10.UniTensor([bd0,bd1,bd2,bd3,bd4,bd5,bdo], "vec_right")
+ vec_right.randomize()
+ vec_right.setLabel([5,2,-2,3,-3,6,202])
+ #print vec_right.printDiagram()
+ 
+ eig_list=ED_up0(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,vec_right,Arnoldi_bond)
+
+ maxabs = np.abs(eig_list).max()
+ eig_new_list = [i * (1.0/maxabs) for i in eig_list]
+ print   maxabs, np.abs(eig_new_list).max()
+ img_ten=[ i.imag     for i in eig_new_list]
+ real_ten=[ i.real     for i in eig_new_list]
+ abslog_ten=[ -0.5*math.log(abs(i))     for i in eig_new_list]
+ phase_ten=[ cmath.phase(i)     for i in eig_new_list]
+ #cmath.phase(i), np.angle(i, deg=True)
+
+ for i in xrange(len(real_ten)):
+  fileSpectrum.write(str(real_ten[i]) + " " + str(img_ten[i])+" "+str(phase_ten[i])+" "+str(abslog_ten[i]) + "\n")
+  fileSpectrum.flush()
+
+
+ q0_even = uni10.Qnum(2,uni10.PRT_EVEN);
+ q_list=[q0_even]     
+ #bdi = uni10.Bond(uni10.BD_IN, q_D)
+ bdo = uni10.Bond(uni10.BD_OUT, q_list)
+ bd0=vec_right.bond(0)
+ bd1=vec_right.bond(1)
+ bd2=vec_right.bond(2)
+ bd3=vec_right.bond(3)
+ bd4=vec_right.bond(4)
+ bd5=vec_right.bond(5)
+
+ vec_right2=uni10.UniTensor([bd0,bd1,bd2,bd3,bd4,bd5,bdo], "vec_right2")
+ #M=vec_right.getblock(q0_even)
+ #vec_right2.putblock(M,q0_even)
+ vec_right2.randomize()
+ vec_right2.setLabel([5,2,-2,3,-3,6,202])
+ #print vec_right2.printDiagram(), vec_right.printDiagram()
+ eig_list2=ED_up2(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,vec_right2,Arnoldi_bond)
+
+
+ maxabs2 = np.abs(eig_list2).max()
+ eig_new_list = [i * (1.0/maxabs) for i in eig_list2]
+ print   maxabs, np.abs(eig_new_list).max(), maxabs2
+ img_ten=[ i.imag     for i in eig_new_list]
+ real_ten=[ i.real     for i in eig_new_list]
+ abslog_ten=[ -0.5*math.log(abs(i))     for i in eig_new_list]
+ phase_ten=[ cmath.phase(i)     for i in eig_new_list]
+ #cmath.phase(i), np.angle(i, deg=True)
+
+ for i in xrange(len(real_ten)):
+  fileSpectrum2.write(str(real_ten[i]) + " " + str(img_ten[i])+" "+str(phase_ten[i])+" "+str(abslog_ten[i]) + "\n")
+  fileSpectrum2.flush()
+
+
+
+ q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ q_list=[q0_even]     
+ #bdi = uni10.Bond(uni10.BD_IN, q_D)
+ bdo = uni10.Bond(uni10.BD_OUT, q_list)
+ bd0=vec_right.bond(0)
+ bd1=vec_right.bond(1)
+ bd2=vec_right.bond(2)
+ bd3=vec_right.bond(3)
+ bd4=vec_right.bond(4)
+ bd5=vec_right.bond(5)
+
+ vec_right4=uni10.UniTensor([bd0,bd1,bd2,bd3,bd4,bd5,bdo], "vec_right4")
+ #M=vec_right.getblock(q0_even)
+ #vec_right2.putblock(M,q0_even)
+ vec_right4.randomize()
+ vec_right4.setLabel([5,2,-2,3,-3,6,202])
+ #print vec_right2.printDiagram(), vec_right.printDiagram()
+ eig_list4=ED_up4(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,vec_right4,Arnoldi_bond)
+
+
+ maxabs4 = np.abs(eig_list4).max()
+ eig_new_list = [i * (1.0/maxabs) for i in eig_list4]
+ print   maxabs, np.abs(eig_new_list).max(), maxabs4
+ img_ten=[ i.imag     for i in eig_new_list]
+ real_ten=[ i.real     for i in eig_new_list]
+ abslog_ten=[ -0.5*math.log(abs(i))     for i in eig_new_list]
+ phase_ten=[ cmath.phase(i)     for i in eig_new_list]
+ #cmath.phase(i), np.angle(i, deg=True)
+
+ for i in xrange(len(real_ten)):
+  fileSpectrum4.write(str(real_ten[i]) + " " + str(img_ten[i])+" "+str(phase_ten[i])+" "+str(abslog_ten[i]) + "\n")
+  fileSpectrum4.flush()
+
+
+
+
+
+
+def Spectrum_Arnoldi_full(a,b,c,d,fileSpectrum6,fileSpectrum8,fileSpectrum10,Arnoldi_bond):
+
+
+
+
+ q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+ q_list=[q0_even]     
+ bdi = uni10.Bond(uni10.BD_IN, q_list)
+
+ bd0=a.bond(4)
+ bd1=a.bond(5)
+
+ bd2=b.bond(4)
+ bd3=b.bond(5)
+
+ bd4=a.bond(4)
+ bd5=a.bond(5)
+
+ bd6=b.bond(4)
+ bd7=b.bond(5)
+
+ bd8=a.bond(4)
+ bd9=a.bond(5)
+
+ bd10=a.bond(4)
+ bd11=a.bond(5)
+
+
+ vec_right=uni10.UniTensor([bdi,bd0,bd1,bd2,bd3,bd4,bd5,bd6,bd7,bd8,bd9,bd10,bd11], "vec_right")
+ vec_right.transpose()
+ #print vec_right.printDiagram() 
+ vec_right.randomize()
+ vec_right.setLabel([3,-3,6,-6,9,-9,12,-12,15,-15,18,-18,202])
+ #print vec_right.printDiagram()
+ 
+ eig_list, eig_phase=ED_full(a, b, c, d,vec_right,Arnoldi_bond)
+
+ maxabs = np.abs(eig_list).max()
+ eig_new_list = [i * (1.0/maxabs) for i in eig_list]
+ print   maxabs, np.abs(eig_new_list).max()
+ img_ten=[ i.imag     for i in eig_new_list]
+ real_ten=[ i.real     for i in eig_new_list]
+ abslog_ten=[ -0.5*math.log(abs(i))     for i in eig_new_list]
+ phase_ten=[ cmath.phase(i)     for i in eig_new_list]
+ #cmath.phase(i), np.angle(i, deg=True)
+
+ for i in xrange(len(real_ten)):
+  fileSpectrum.write(str(real_ten[i]) + " " + str(img_ten[i])+" "+str(phase_ten[i])+" "+str(abslog_ten[i]) + " "+str(eig_phase[i]) +"\n")
+  fileSpectrum.flush()
+
+
+##############################################################################################
+def ED_full(a, b, c, d,Vec_uni,Arnoldi_bond):
+  q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+  Vec_F=Vec_uni.getBlock(q0_even)
+  D=Vec_F.row()
+  print "D=",  D
+  e_np=0
+  m=Arnoldi_bond
+  W=0
+  num=0
+  E1=0
+  Vec_F=Vec_F*(1.00/Vec_F.norm())
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   #print j, m
+   if (j%1)==0: print j;  
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(q0_even,vec_tem)
+   r_midle=Multi_full_right(Vec_uni,a, b)
+   Vec_uni.putBlock(q0_even,r_midle)
+   print "hi"
+   r=Multi_full_right(Vec_uni,c, d)
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  e_np, D_eig=eig_np_full(h)
+  #Lambda, index, Lambda_comp =find_maxindex(D_eig[0])
+  for i in xrange(m):
+
+  
+	eig_list=[]
+	eig_phase=[]
+
+	d=np.size(e_np,0)
+	print e_np
+	for q in xrange(d): 
+			if abs(e_np[q]) > 1.e-6:
+				#print  e_np[q], abs(e_np[q])#,-1*math.log(abs(e[q])), cmath.phase(e[q])#, np.angle(e[q],deg=True)     
+				eig_list.append(e_np[q])
+				eigvec=return_vec(D_eig[1], q )
+				Q=make_Q(q_vec)
+				Q.resize(D,m)
+				Vec_F=Q*eigvec
+				Vec_FL=Q*eigvec
+				Vec_uni_new=uni10.UniTensor(uni10.CTYPE,list(Vec_uni.bond()))
+				Vec_uni_new.putBlock(q0_even,Vec_FL)
+				#print eigvec.row(), eigvec.col()#,D_eig[1] #, Vec_uni 
+				Vec_uni_new.setLabel([1,-1,2,-2,3,-3,4,-4,5,-5,6,-6,202])
+				Vec_uni1=copy.copy(Vec_uni_new)
+				Vec_uni1.permute([5,-5,6,-6,1,-1,2,-2,3,-3,4,-4,202],12)
+				Vec_uni1.setLabel([1,-1,2,-2,3,-3,4,-4,5,-5,6,-6,202])
+				Vec_uni1.cTranspose()
+				Result_dat=Vec_uni_new*Vec_uni1
+				print Result_dat[0],cmath.phase(Result_dat[0])
+				eig_phase.append(cmath.phase(Result_dat[0]))
+
+  return eig_list, eig_phase
+
+
+
+##############################################################################################
+def ED_up4(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,Vec_uni,Arnoldi_bond):
+  q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+  Vec_F=Vec_uni.getBlock(q0_even)
+  D=Vec_F.row()
+  print "D=",  D
+  e_np=0
+  m=Arnoldi_bond
+  W=0
+  num=0
+  E1=0
+  Vec_F=Vec_F*(1.00/Vec_F.norm())
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   #print j, m
+   if (j%20)==0: print j;  
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(q0_even,vec_tem)
+   r=Multi_u4(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4)
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  e_np=eig_np(h)
+  #print D_eig[0]
+  #Lambda, index, Lambda_comp=find_maxindex(D_eig[0])
+  #eigvec=return_vec(D_eig[1], index )
+  #print 'r0', Lambda, Lambda_comp
+  #Q=make_Q(q_vec)
+  #Q.resize(D,m)
+  #Vec_F=Q*eigvec
+  #Vec_FL=Q*eigvec
+ 
+  
+  eig_list=[]
+  d=np.size(e_np,0)
+  #print d
+  for q in xrange(d): 
+    if abs(e_np[q]) > 1.e-6:
+     #print  e_np[q], abs(e_np[q])#,-1*math.log(abs(e[q])), cmath.phase(e[q])#, np.angle(e[q],deg=True)     
+     eig_list.append(e_np[q])
+
+
+  return eig_list
+
+
+
+##############################################################################################
+def ED_up2(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,Vec_uni,Arnoldi_bond):
+  q0_even = uni10.Qnum(2,uni10.PRT_EVEN);
+  Vec_F=Vec_uni.getBlock(q0_even)
+  D=Vec_F.row()
+  print "D=",  D
+  e_np=0
+  m=Arnoldi_bond
+  W=0
+  num=0
+  E1=0
+  Vec_F=Vec_F*(1.00/Vec_F.norm())
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   #print j, m
+   if (j%20)==0: print j;  
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(q0_even,vec_tem)
+   r=Multi_u2(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4)
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  e_np=eig_np(h)
+  #print D_eig[0]
+  #Lambda, index, Lambda_comp=find_maxindex(D_eig[0])
+  #eigvec=return_vec(D_eig[1], index )
+  #print 'r0', Lambda, Lambda_comp
+  #Q=make_Q(q_vec)
+  #Q.resize(D,m)
+  #Vec_F=Q*eigvec
+  #Vec_FL=Q*eigvec
+ 
+  
+  eig_list=[]
+  d=np.size(e_np,0)
+  #print d
+  for q in xrange(d): 
+    if abs(e_np[q]) > 1.e-6:
+     #print  e_np[q], abs(e_np[q])#,-1*math.log(abs(e[q])), cmath.phase(e[q])#, np.angle(e[q],deg=True)     
+     eig_list.append(e_np[q])
+
+
+  return eig_list
+
+
+
+
+
+
+##############################################################################################
+def ED_up0(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,Vec_uni,Arnoldi_bond):
+  q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+  Vec_F=Vec_uni.getBlock(q0_even)
+  D=Vec_F.row()
+  print "D=",  D
+  e_np=0
+  m=Arnoldi_bond
+  W=0
+  num=0
+  E1=0
+  Vec_F=Vec_F*(1.00/Vec_F.norm())
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   #print j, m
+   if (j%20)==0: print j;  
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(q0_even,vec_tem)
+   r=Multi_u0(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4)
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  e_np=eig_np(h)
+  #print D_eig[0]
+  #Lambda, index, Lambda_comp=find_maxindex(D_eig[0])
+  #eigvec=return_vec(D_eig[1], index )
+  #print 'r0', Lambda, Lambda_comp
+  #Q=make_Q(q_vec)
+  #Q.resize(D,m)
+  #Vec_F=Q*eigvec
+  #Vec_FL=Q*eigvec
+ 
+  
+  eig_list=[]
+  d=np.size(e_np,0)
+  #print d
+  for q in xrange(d): 
+    if abs(e_np[q]) > 1.e-6:
+     #print  e_np[q], abs(e_np[q])#,-1*math.log(abs(e[q])), cmath.phase(e[q])#, np.angle(e[q],deg=True)     
+     eig_list.append(e_np[q])
+
+
+  return eig_list
+
+
+##############################################################################################
+def ED_right4(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,Vec_uni,Arnoldi_bond):
+  q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+  Vec_F=Vec_uni.getBlock(q0_even)
+  D=Vec_F.row()
+  print "D=",  D
+  e_np=0
+  m=Arnoldi_bond
+  W=0
+  num=0
+  E1=0
+  Vec_F=Vec_F*(1.00/Vec_F.norm())
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   #print j, m
+   if (j%20)==0: print j;  
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(q0_even,vec_tem)
+   r=Multi_r4(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3)
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  e_np=eig_np(h)
+  #print D_eig[0]
+  #Lambda, index, Lambda_comp=find_maxindex(D_eig[0])
+  #eigvec=return_vec(D_eig[1], index )
+  #print 'r0', Lambda, Lambda_comp
+  #Q=make_Q(q_vec)
+  #Q.resize(D,m)
+  #Vec_F=Q*eigvec
+  #Vec_FL=Q*eigvec
+ 
+  
+  eig_list=[]
+  d=np.size(e_np,0)
+  #print d
+  for q in xrange(d): 
+    if abs(e_np[q]) > 1.e-6:
+     #print  e_np[q], abs(e_np[q])#,-1*math.log(abs(e[q])), cmath.phase(e[q])#, np.angle(e[q],deg=True)     
+     eig_list.append(e_np[q])
+
+
+  return eig_list
+
+
+
+##############################################################################################
+def ED_right2(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,Vec_uni,Arnoldi_bond):
+  q0_even = uni10.Qnum(2,uni10.PRT_EVEN);
+  Vec_F=Vec_uni.getBlock(q0_even)
+  D=Vec_F.row()
+  print "D=",  D
+  e_np=0
+  m=Arnoldi_bond
+  W=0
+  num=0
+  E1=0
+  Vec_F=Vec_F*(1.00/Vec_F.norm())
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   #print j, m
+   if (j%20)==0: print j;  
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(q0_even,vec_tem)
+   r=Multi_r2(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3)
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  e_np=eig_np(h)
+  #print D_eig[0]
+  #Lambda, index, Lambda_comp=find_maxindex(D_eig[0])
+  #eigvec=return_vec(D_eig[1], index )
+  #print 'r0', Lambda, Lambda_comp
+  #Q=make_Q(q_vec)
+  #Q.resize(D,m)
+  #Vec_F=Q*eigvec
+  #Vec_FL=Q*eigvec
+ 
+  
+  eig_list=[]
+  d=np.size(e_np,0)
+  #print d
+  for q in xrange(d): 
+    if abs(e_np[q]) > 1.e-6:
+     #print  e_np[q], abs(e_np[q])#,-1*math.log(abs(e[q])), cmath.phase(e[q])#, np.angle(e[q],deg=True)     
+     eig_list.append(e_np[q])
+
+
+  return eig_list
+
+
+
+
+
+
+##############################################################################################
+def ED_right(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,Vec_uni,Arnoldi_bond):
+  q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+  Vec_F=Vec_uni.getBlock(q0_even)
+  D=Vec_F.row()
+  print "D=",  D
+  e_np=0
+  m=Arnoldi_bond
+  W=0
+  num=0
+  E1=0
+  Vec_F=Vec_F*(1.00/Vec_F.norm())
+  r=copy.copy(Vec_F)
+  #r = r* (1.00/r.norm()) 
+  q_vec=[]
+  q_vec.append(copy.copy(r))
+  h=uni10.Matrix(m,m)
+  h.set_zero()
+  for j in xrange(m):
+   #print j, m
+   if (j%20)==0: print j;  
+   vec_tem=copy.copy(q_vec[j])
+   Vec_uni.putBlock(q0_even,vec_tem)
+   r=Multi_r0(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3)
+   for i in xrange(j+1):
+    q_vec_trans=copy.copy(q_vec[i])
+    q_vec_trans.transpose()
+    dot_vec=q_vec_trans*r
+    h[i*m+j]=dot_vec.trace()
+    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
+   if j<(m-1):
+    h[((j+1)*m)+j]=r.norm()
+    if r.norm() > 1.0e-8:
+     q_vec.append(r*(1.00/r.norm()))
+    else:  break; 
+  e_np=eig_np(h)
+  #print D_eig[0]
+  #Lambda, index, Lambda_comp=find_maxindex(D_eig[0])
+  #eigvec=return_vec(D_eig[1], index )
+  #print 'r0', Lambda, Lambda_comp
+  #Q=make_Q(q_vec)
+  #Q.resize(D,m)
+  #Vec_F=Q*eigvec
+  #Vec_FL=Q*eigvec
+ 
+  
+  eig_list=[]
+  d=np.size(e_np,0)
+  #print d
+  for q in xrange(d): 
+    if abs(e_np[q]) > 1.e-6:
+     #print  e_np[q], abs(e_np[q])#,-1*math.log(abs(e[q])), cmath.phase(e[q])#, np.angle(e[q],deg=True)     
+     eig_list.append(e_np[q])
+
+
+  return eig_list
 
 def CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,distance_final,fileCorr,fileCorrLength):
 
@@ -728,10 +1469,11 @@ def CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,
 def Mat_np_to_Uni(Mat_np):
  d0=np.size(Mat_np,0)
  d1=np.size(Mat_np,1)
- Mat_uni=uni10.Matrix(d0,d1)
+ Mat_uni=uni10.CMatrix(d0,d1)
  for i in xrange(d0):
   for j in xrange(d1):
    Mat_uni[i*d1+j]=Mat_np[i,j]
+   #print "reza", Mat_np[i,j], Mat_uni[i*d1+j] 
  return  Mat_uni
 
 
@@ -753,13 +1495,22 @@ def Mat_uni_to_np(Mat_uni):
  return  Mat_np
 
 def eig_np(A):
+ A_np=Mat_uni_to_np(A)
+ w= LA.eigvals(A_np)
+ return w
+
+
+
+def eig_np_full(A):
  D_eig=[A]*2
  A_np=Mat_uni_to_np(A)
  w, v = LA.eig(A_np)
- #print w,"\n,\n"#, v
+ #print w,"\n,\n", v
  D_eig[0]=Mat_nptoUni(w)
  D_eig[1]=Mat_np_to_Uni(v)
- return D_eig
+ return w, D_eig
+
+
 
 def  make_Q(q_vec): 
  D=int(q_vec[0].row())
@@ -772,9 +1523,10 @@ def  make_Q(q_vec):
 
 def return_vec(A, index ):
  D=int(A.row())
- vec_tem=uni10.Matrix(D,1)
+ vec_tem=uni10.CMatrix(D,1)
  for i in xrange(D): 
-  vec_tem[i]=A[i*D+index].real
+  vec_tem[i]=A[i*D+index]
+  #print "A", A[i*D+index], vec_tem[i]
  return vec_tem
 
 
@@ -790,155 +1542,6 @@ def find_maxindex(A):
  return max_val, index, A[index] 
 
 
-##############################################################################################
-def ED_right(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,Vec_uni):
-
- Vec_F=Vec_uni.getBlock()
- D=Vec_F.row()
- #print "D=",  D
-
- m=10
- W=2
- num=0
- E1=0
- p=0
-
- while p  <  (W+1):
-  #print "norm", p, Vec_F.norm(),Vec_F[0], Vec_F[1], Vec_F[2], Vec_F[3] 
-  r=copy.copy(Vec_F)
-  #r = r* (1.00/r.norm()) 
-  q_vec=[]
-  q_vec.append(copy.copy(r))
-  h=uni10.Matrix(m,m)
-  h.set_zero()
-  for j in xrange(m):
-   vec_tem=copy.copy(q_vec[j])
-   Vec_uni.putBlock(vec_tem)
-   r=Multi_r(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3)
-   for i in xrange(j+1):
-    q_vec_trans=copy.copy(q_vec[i])
-    q_vec_trans.transpose()
-    dot_vec=q_vec_trans*r
-    h[i*m+j]=dot_vec.trace()
-    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
-   if j<(m-1):
-    h[((j+1)*m)+j]=r.norm()
-    if r.norm() > 1.0e-8:
-     q_vec.append(r*(1.00/r.norm()))
-    else:  break; 
-  D_eig=eig_np(h)
-  Lambda, index, Lambda_comp =find_maxindex(D_eig[0])
-  eigvec=return_vec(D_eig[1], index )
-  print 'r0', Lambda, Lambda_comp
-  Q=make_Q(q_vec)
-  Q.resize(D,m)
-  Vec_F=Q*eigvec
-  Vec_FL=Q*eigvec
-  if p==W and num==0:
-   p=-1
-   m+=5
-   E1=copy.copy(Lambda)
-   num+=1
-  elif p==W:
-   num+=1
-   if abs(Lambda) > 1.e-9: 
-    if  (((abs(Lambda-E1))/(abs(Lambda)))< 1.e-9): num+=1
-    elif m<=20:
-     p=-1
-     m+=5
-     E1=Lambda
-   else:
-    if  (abs(Lambda-E1))< 1.e-9:
-     num+=1
-    elif m<=20: 
-     p=-1
-     m+=5
-     E1=Lambda
-  p+=1
-
-
- E1L=copy.copy(E1)
- Vec_FL=Vec_FL*(1.00/Vec_FL.norm())
- m=10
- W=2
- num=0
- E1=0
- p=0
- Vec_F.randomize()
- Vec_F=Vec_F*(1.00/Vec_F.norm())
- while p  <  (W+1):
-  #print "norm", p, Vec_F.norm(),Vec_F[0], Vec_F[1], Vec_F[2], Vec_F[3] 
-  r=copy.copy(Vec_F)
- 
-  Vec_FL_trans=copy.copy(Vec_FL)
-  Vec_FL_trans.transpose()
-  dot_vec=Vec_FL_trans*r
-  dot_val=dot_vec.trace()
-  r=r+(-1.00*dot_val*Vec_FL)
-  
-  
-  #r = r* (1.00/r.norm()) 
-  q_vec=[]
-  q_vec.append(copy.copy(r))
-  h=uni10.Matrix(m,m)
-  h.set_zero()
-  for j in xrange(m):
-   vec_tem=copy.copy(q_vec[j])
-   Vec_uni.putBlock(vec_tem)
-   r=Multi_r(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3)
-
-   Vec_FL_trans=copy.copy(Vec_FL)
-   Vec_FL_trans.transpose()
-   dot_vec=Vec_FL_trans*r
-   dot_val=dot_vec.trace()
-   r=r+(-1.00*dot_val*Vec_FL)
-
-
-
-   for i in xrange(j+1):
-    q_vec_trans=copy.copy(q_vec[i])
-    q_vec_trans.transpose()
-    dot_vec=q_vec_trans*r
-    h[i*m+j]=dot_vec.trace()
-    r=r+((-1.00)*(h[i*m+j]*q_vec[i]))
-   if j<(m-1):
-    h[((j+1)*m)+j]=r.norm()
-    if r.norm() > 1.0e-8:
-     q_vec.append(r*(1.00/r.norm()))
-    else:  break; 
-  D_eig=eig_np(h)
-  Lambda, index, Lambda_comp=find_maxindex(D_eig[0])
-  eigvec=return_vec(D_eig[1], index )
-  print 'r1', Lambda, Lambda_comp
-  Q=make_Q(q_vec)
-  Q.resize(D,m)
-  Vec_F=Q*eigvec
-  if p==W and num==0:
-   p=-1
-   m+=5
-   E1=copy.copy(Lambda)
-   num+=1
-  elif p==W:
-   num+=1
-   if abs(Lambda) > 1.e-9: 
-    if  (((abs(Lambda-E1))/(abs(Lambda)))< 1.e-9): num+=1
-    elif m<=20:
-     p=-1
-     m+=5
-     E1=Lambda
-   else:
-    if  (abs(Lambda-E1))< 1.e-9:
-     num+=1
-    elif m<=20: 
-     p=-1
-     m+=5
-     E1=Lambda
-  p+=1
-
- Length=abs(E1/E1L)
- Length_val=-2.0*(1.00/math.log(Length))
- print "Length", Length,Length_val 
- return Length_val
 
 
 def ED_up(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,Vec_uni):
@@ -1118,6 +1721,85 @@ def Multi_r(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3):
 
 
 
+def Multi_full_right(Vec_uni,a,b):
+ q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+ CTM_1 = uni10.Network("Network1/Full.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('a1',a)
+ CTM_1.putTensor('b1',b)
+ CTM_1.putTensor('a2',a)
+ CTM_1.putTensor('b2',b)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.setLabel([3,-3,6,-6,9,-9,12,-12,15,-15,18,-18,202]) 
+ vec.permute([3,-3,6,-6,9,-9,12,-12,15,-15,18,-18,202],12)
+ #print vec.printDiagram() 
+ Vec_M=vec.getBlock(q0_even)
+ return Vec_M
+
+
+
+def Multi_r0(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3):
+ q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+ CTM_1 = uni10.Network("Network1/Right2.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([21,14,-14 , 7,-7,0,202],6)
+ #print vec.printDiagram() 
+ Vec_M=vec.getBlock(q0_even)
+ return Vec_M
+
+
+def Multi_r2(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3):
+ q0_even = uni10.Qnum(2,uni10.PRT_EVEN);
+ CTM_1 = uni10.Network("Network1/Right2.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([21,14,-14 , 7,-7,0,202],6)
+ #print vec.printDiagram() 
+ Vec_M=vec.getBlock(q0_even)
+ return Vec_M
+
+def Multi_r4(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3):
+ q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ CTM_1 = uni10.Network("Network1/Right2.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('Ta1',Ta1)
+ CTM_1.putTensor('Ta3',Ta3)
+ CTM_1.putTensor('Tb1',Tb1)
+ CTM_1.putTensor('Tb3',Tb3)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([21,14,-14 , 7,-7,0,202],6)
+ #print vec.printDiagram() 
+ Vec_M=vec.getBlock(q0_even)
+ return Vec_M
+
+
 def Multi_u(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
  CTM_1 = uni10.Network("Network1/Up.net")
  CTM_1.putTensor('Vec_uni',Vec_uni)
@@ -1133,6 +1815,61 @@ def Multi_u(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
  #print CTM_1
  vec.permute([17, 18, -18, 19, -19,  20],6)
  Vec_M=vec.getBlock()
+ return Vec_M
+
+
+def Multi_u0(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
+ q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
+ CTM_1 = uni10.Network("Network1/Up2.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([17, 18, -18, 19, -19,  20,202],6)
+ Vec_M=vec.getBlock(q0_even)
+ return Vec_M
+
+def Multi_u2(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
+ q0_even = uni10.Qnum(2,uni10.PRT_EVEN);
+ CTM_1 = uni10.Network("Network1/Up2.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([17, 18, -18, 19, -19,  20,202],6)
+ Vec_M=vec.getBlock(q0_even)
+ return Vec_M
+
+def Multi_u4(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
+ q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ CTM_1 = uni10.Network("Network1/Up2.net")
+ CTM_1.putTensor('Vec_uni',Vec_uni)
+ CTM_1.putTensor('Ta2',Ta2)
+ CTM_1.putTensor('Ta4',Ta4)
+ CTM_1.putTensor('Tb2',Tb2)
+ CTM_1.putTensor('Tb4',Tb4)
+ CTM_1.putTensor('a',a)
+ CTM_1.putTensor('b',b)
+ CTM_1.putTensor('c',c)
+ CTM_1.putTensor('d',d)
+ vec=CTM_1.launch()
+ #print CTM_1
+ vec.permute([17, 18, -18, 19, -19,  20,202],6)
+ Vec_M=vec.getBlock(q0_even)
  return Vec_M
 
 

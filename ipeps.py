@@ -21,7 +21,7 @@ Model="Heisenberg_U1"
 #d_phys=[1,1]
 
 D=[1,2,1]
-chi=[5,5,5,10,5,5,2]
+chi=[2,2,2,10,2,2,2]
 d_phys=[1,1]
 #d_phys=[1,1,1]
 
@@ -29,7 +29,7 @@ d_phys=[1,1]
 #chi=[10,10,10,10,10,10]
 #d_phys=[1,1]
 
-method="SVD_mg"            #SVD, Grad, SVD_mpo, SVD_QR, SVD_mix,SVD_mg
+method="SVD_mix"            #SVD, Grad, SVD_mpo, SVD_QR, SVD_mix,SVD_mg
 Inv_method='SVD'         #SVD, CG
 Grad_method="CG"        # CG,ST
 Gauge='Fixed'
@@ -44,11 +44,11 @@ iteration_per_step=1
 N_grad=150
 N_env=[20,1.00e-8]
 N_svd=[10,1.00e-9,20]
-N_iteritebd=40
+N_iteritebd=20
 N_iterFull=100
 Acc_E=1.00e-7
 distance_val=2
-
+Arnoldi_bond=5
 J1_x=1.0
 J1_y=1.0
 J2=0.0
@@ -92,6 +92,21 @@ Env3=basic.Rand_env_total(Env)
 fileCorrH = open("Data/CorrelationH.txt", "w")
 fileCorrV = open("Data/CorrelationV.txt", "w")
 fileCorrLength = open("Data/CorrelationLength.txt", "w")
+fileSpectrum = open("Data/Spectrum.txt", "w")
+fileSpectrum2 = open("Data/Spectrum2.txt", "w")
+fileSpectrum4 = open("Data/Spectrum4.txt", "w")
+
+fileSpectrum6 = open("Data/Spectrum6.txt", "w")
+fileSpectrum8 = open("Data/Spectrum8.txt", "w")
+fileSpectrum10 = open("Data/Spectrum10.txt", "w")
+
+
+
+fileSpectrum0 = open("Data/Spectrum0.txt", "w")
+fileSpectrum1 = open("Data/Spectrum1.txt", "w")
+fileSpectrum3 = open("Data/Spectrum3.txt", "w")
+
+
 
 fileCorrHH = open("Data/CorrelationHH.txt", "w")
 fileCorrVV = open("Data/CorrelationVV.txt", "w")
@@ -109,7 +124,7 @@ h_coupling=[J1_x, J1_y, J2,  h_z,h_x, h_y, K_1, K_2]
 
 
 Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=basic.Reload_itebd()
-#Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,q_phys,D,N_iteritebd,h_coupling,Model,q_D,fixbond_itebd,start_itebd, division_itebd,itebd_method)
+Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8=itebd.itebd_eff(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,q_phys,D,N_iteritebd,h_coupling,Model,q_D,fixbond_itebd,start_itebd, division_itebd,itebd_method)
 basic.Store_itebd(Gamma_a,Gamma_b,Gamma_c,Gamma_d,Landa_1,Landa_2,Landa_3,Landa_4,Landa_5, Landa_6, Landa_7,Landa_8)
 
 #print Landa_1, '\n', Landa_2, '\n',Landa_3 ,'\n',Landa_4 ,'\n',Landa_5, '\n',Landa_6, '\n',Landa_7, '\n', Landa_8 
@@ -120,8 +135,8 @@ a_u,b_u,c_u,d_u,a,b,c,d=basic.produce_abcd_gamma(Landa, Gamma_a,Gamma_b,Gamma_c,
 a_u,b_u,c_u,d_u,a,b,c,d=basic.increase_norm(a_u,b_u,c_u,d_u,a,b,c,d, 6.00)
 a_u,b_u,c_u,d_u,a,b,c,d=basic.make_equall_dis(a_u,b_u,c_u,d_u,a,b,c,d)
 
-#print a_u, b_u, c_u, d_u
 #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
+#print a_u.printDiagram(), b_u.printDiagram(), c_u.printDiagram(), d_u.printDiagram()
 basic.Reload_EnvEnv(Env,Env1,Env2,Env3)
 E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h_coupling,q_phys,chi,Corner_method,Model,N_env)
 print 'E_toal=', E_value
@@ -144,7 +159,9 @@ basic.Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h_coupling,
 #basic.Reload_EnvEnv(Env,Env1,Env2,Env3)
 #a_u,b_u,c_u,d_u,a,b,c,d=basic.increase_norm(a_u,b_u,c_u,d_u,a,b,c,d, 0.5)
 #print a_u
-a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,q_phys,D,h_coupling,Env,Env1,Env2,Env3,Gauge,Corner_method,N_iterFull,Acc_E,Model,N_grad, Grad_method,Inv_method,N_svd,N_env,method,check_step,iteration_per_step)
+
+
+#a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3=Fullupdate.Full_Update(a_u,b_u,c_u,d_u,a,b,c,d,chi,q_phys,D,h_coupling,Env,Env1,Env2,Env3,Gauge,Corner_method,N_iterFull,Acc_E,Model,N_grad, Grad_method,Inv_method,N_svd,N_env,method,check_step,iteration_per_step)
 
 #E_value=basic.E_total(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h_coupling,q_phys,chi,Corner_method,Model,N_env)
 #print "E_final", E_value
@@ -161,6 +178,10 @@ a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3=Fullupdate.Full_Update(a_u,b_u,c_u,d_
 #basic_H.CorrelationH(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrH,fileCorrLength)
 #basic_H.CorrelationV(a_u,b_u,c_u,d_u,a,b,c,d,Env,D,h_coupling,q_phys,chi,Corner_method,Model,distance_val,fileCorrV,fileCorrLength)
 #################################################
+#basic_H.Spectrum(a_u,b_u,c_u,d_u,a,b,c,d,Env,fileSpectrum)
+#basic_H.Spectrum_Arnoldi_right0(a_u,b_u,c_u,d_u,a,b,c,d,Env,fileSpectrum,fileSpectrum2,fileSpectrum4,Arnoldi_bond)
+#basic_H.Spectrum_Arnoldi_right1(a_u,b_u,c_u,d_u,a,b,c,d,Env,fileSpectrum0,fileSpectrum1,fileSpectrum3,Arnoldi_bond)
+basic_H.Spectrum_Arnoldi_full(a,b,c,d,fileSpectrum6,fileSpectrum8,fileSpectrum10,Arnoldi_bond)
 
 
 

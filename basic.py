@@ -34,8 +34,8 @@ def Short_TrotterSteps(N_iterF):
 # Delta_N=(0.05, N_iterF)
 # List_delN.append(Delta_N)
 
-# Delta_N=(0.04, N_iterF)
-# List_delN.append(Delta_N)
+ Delta_N=(0.04, N_iterF)
+ List_delN.append(Delta_N)
 
  Delta_N=(0.03, N_iterF)
  List_delN.append(Delta_N)
@@ -1627,8 +1627,6 @@ def M_h(a_u,b_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H0):
  E1, E2, E3, E4, E5, E6, E7, E8=basicB.produce_Env(a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,d_phys)
  E_ab=basicB.Energy_ab(E1, E2, E3, E4, E5, E6, E7, E8, a, b, c,d, H0,a_u,b_u)
  return E_ab
-
-
 
 
 
