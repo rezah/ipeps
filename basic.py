@@ -8,7 +8,7 @@ import random
 import copy
 import time
 import Move
-import MoveCorbz
+import MoveCorboz
 import MoveFull
 import basic_FU
 
