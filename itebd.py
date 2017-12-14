@@ -78,7 +78,6 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
      Gamma=[Gamma_a,Gamma_b]
      Landa=[Landa_1,Landa_2,Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8]
    #rlink
-
      basicitebd.update_rlink_eff(Gamma,Landa,U,D,d_phys,q_D,fixbond_itebd)
    #ulink
      Gamma=[Gamma_a, Gamma_c]
@@ -95,7 +94,6 @@ Landa_3,Landa_4,Landa_5,Landa_6,Landa_7,Landa_8,chi,d_phys,D,N_iterF, h,Model,q_
      Gamma=[ Gamma_b,Gamma_d]
      Landa=[Landa_3,Landa_7,Landa_1,Landa_8,Landa_6,Landa_5,Landa_2,Landa_4]
      basicitebd.update_ulink_eff(Gamma,Landa,U0,D,d_phys,q_D,fixbond_itebd)
-
 
      Gamma=[Gamma_c,Gamma_d]
      Landa=[Landa_6,Landa_4,Landa_5,Landa_2,Landa_3,Landa_1,Landa_8,Landa_7]

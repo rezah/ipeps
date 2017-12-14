@@ -225,7 +225,7 @@ def Spectrum_Arnoldi_right0(a_u,b_u,c_u,d_u,a,b,c,d,Env,fileSpectrum,fileSpectru
 
 
 
- q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ q0_even = uni10.Qnum(-2,uni10.PRT_EVEN);
  q_list=[q0_even]     
  #bdi = uni10.Bond(uni10.BD_IN, q_D)
  bdo = uni10.Bond(uni10.BD_OUT, q_list)
@@ -335,7 +335,7 @@ def Spectrum_Arnoldi_right1(a_u,b_u,c_u,d_u,a,b,c,d,Env,fileSpectrum,fileSpectru
 
 
 
- q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ q0_even = uni10.Qnum(-2,uni10.PRT_EVEN);
  q_list=[q0_even]     
  #bdi = uni10.Bond(uni10.BD_IN, q_D)
  bdo = uni10.Bond(uni10.BD_OUT, q_list)
@@ -374,8 +374,6 @@ def Spectrum_Arnoldi_right1(a_u,b_u,c_u,d_u,a,b,c,d,Env,fileSpectrum,fileSpectru
 
 
 def Spectrum_Arnoldi_full(a,b,c,d,fileSpectrum6,fileSpectrum8,fileSpectrum10,Arnoldi_bond):
-
-
 
 
  q0_even = uni10.Qnum(0,uni10.PRT_EVEN);
@@ -499,7 +497,7 @@ def ED_full(a, b, c, d,Vec_uni,Arnoldi_bond):
 
 ##############################################################################################
 def ED_up4(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,Vec_uni,Arnoldi_bond):
-  q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+  q0_even = uni10.Qnum(-2,uni10.PRT_EVEN);
   Vec_F=Vec_uni.getBlock(q0_even)
   D=Vec_F.row()
   print "D=",  D
@@ -678,7 +676,7 @@ def ED_up0(c1,Tb1, Ta1,c2, a, b, c, d, Tb2, Ta2, Ta4, Tb4,Vec_uni,Arnoldi_bond):
 
 ##############################################################################################
 def ED_right4(c2, Ta2, Tb2, c3, a, b, c, d, Tb1, Ta1, Ta3, Tb3,Vec_uni,Arnoldi_bond):
-  q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+  q0_even = uni10.Qnum(-2,uni10.PRT_EVEN);
   Vec_F=Vec_uni.getBlock(q0_even)
   D=Vec_F.row()
   print "D=",  D
@@ -1781,7 +1779,7 @@ def Multi_r2(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3):
  return Vec_M
 
 def Multi_r4(Vec_uni,a,b,c,d,Tb1,Ta1,Ta3,Tb3):
- q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ q0_even = uni10.Qnum(-2,uni10.PRT_EVEN);
  CTM_1 = uni10.Network("Network1/Right2.net")
  CTM_1.putTensor('Vec_uni',Vec_uni)
  CTM_1.putTensor('Ta1',Ta1)
@@ -1855,7 +1853,7 @@ def Multi_u2(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
  return Vec_M
 
 def Multi_u4(Vec_uni,a, b, c, d, Tb2, Ta2, Ta4, Tb4):
- q0_even = uni10.Qnum(4,uni10.PRT_EVEN);
+ q0_even = uni10.Qnum(-2,uni10.PRT_EVEN);
  CTM_1 = uni10.Network("Network1/Up2.net")
  CTM_1.putTensor('Vec_uni',Vec_uni)
  CTM_1.putTensor('Ta2',Ta2)

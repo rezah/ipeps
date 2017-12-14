@@ -21,18 +21,18 @@ def Short_TrotterSteps(N_iterF):
 # Delta_N=(1.0, N_iterF)
 # List_delN.append(Delta_N)
 
-# Delta_N=(0.08, N_iterF)
-# List_delN.append(Delta_N)
+ Delta_N=(0.08, N_iterF)
+ List_delN.append(Delta_N)
 
 
-# Delta_N=(0.07, N_iterF)
-# List_delN.append(Delta_N)
+ Delta_N=(0.07, N_iterF)
+ List_delN.append(Delta_N)
 
-# Delta_N=(0.06, N_iterF)
-# List_delN.append(Delta_N)
+ Delta_N=(0.06, N_iterF)
+ List_delN.append(Delta_N)
 
-# Delta_N=(0.05, N_iterF)
-# List_delN.append(Delta_N)
+ Delta_N=(0.05, N_iterF)
+ List_delN.append(Delta_N)
 
  Delta_N=(0.04, N_iterF)
  List_delN.append(Delta_N)
@@ -154,8 +154,8 @@ def full_make_bond(Model, D, chi, d_phys):
   #q_list=[q_3_even,q_2_even,q_1_even,q0_even,q1_even, q2_even,q3_even]
   #q_list=[q_1_even,q1_even]
 
-  q_phys=[q_1_even,q1_even]
-  #q_phys=[q_1_even,q0_even,q1_even]
+  #q_phys=[q_1_even,q1_even]
+  q_phys=[q_1_even,q0_even,q1_even]
 
  ##########################  Z2*U(1)  ################################
  if Model is "Heisenberg_U1Z2":
@@ -376,30 +376,30 @@ def Initialize_function(Gamma,Landa):
   Landa[i]=Landa[i]*(1.00/MaxAbs(Landa[i]))
 
  
-def matSx():
-  spin = 0.5
-  dim = int(spin * 2 + 1)
-  Mat=(0.5)*uni10.Matrix(dim, dim, [0.0, 1.0, 1.00, 0.0])
-  return Mat 
+#def matSx():
+#  spin = 0.5
+#  dim = int(spin * 2 + 1)
+#  Mat=(0.5)*uni10.Matrix(dim, dim, [0.0, 1.0, 1.00, 0.0])
+#  return Mat 
 
-def matSz():
-  spin = 0.5
-  dim = int(spin * 2 + 1)
-  Mat=(0.5)*uni10.Matrix(dim, dim, [1.0, 0, 0, -1.0]);
-  return Mat 
+#def matSz():
+#  spin = 0.5
+#  dim = int(spin * 2 + 1)
+#  Mat=(0.5)*uni10.Matrix(dim, dim, [1.0, 0, 0, -1.0]);
+#  return Mat 
 
-def matSy():
-  spin = 0.5
-  dim = int(spin * 2 + 1)
-  Mat=(0.5)*uni10.Matrix(dim, dim, [0.0, -1.00, 1.00, 0.00]);
-  return Mat 
+#def matSy():
+#  spin = 0.5
+#  dim = int(spin * 2 + 1)
+#  Mat=(0.5)*uni10.Matrix(dim, dim, [0.0, -1.00, 1.00, 0.00]);
+#  return Mat 
 
 
-def matIden():
-    spin_t=0.5
-    dimT = int(2*spin_t + 1)
-    Mat=uni10.Matrix(dimT, dimT,[1,0,0,1])
-    return Mat
+#def matIden():
+#    spin_t=0.5
+#    dimT = int(2*spin_t + 1)
+#    Mat=uni10.Matrix(dimT, dimT,[1,0,0,1])
+#    return Mat
 
 
 #cx_mat X1(3,3);  X1.zeros();         X1(0,1)=1; X1(1,0)=1; X1(1,2)=1,X1(2,1)=1;
@@ -407,30 +407,30 @@ def matIden():
 #cx_mat Y1(3,3);  Y1.zeros();         Y1(0,1)=-1; Y1(1,0)=1; Y1(1,2)=-1,Y1(2,1)=1;
 
 
-#def matSx():
-#    spin_t=1
-#    dimT = int(2*spin_t + 1)
-#    Mat=(1.0/(2.0**(0.5)))*uni10.Matrix(dimT, dimT,[0, 1.0, 0 ,1.0,0, 1.0,0,1.0,0])
-#    return Mat 
-#    
-#def matSy():
-#    spin_t=1
-#    dimT = int(2*spin_t + 1)
-#    Mat=(1.0/(2.0**(0.5)))*uni10.Matrix(dimT, dimT,[0,-1.0,0,1.0,0,-1.0,0,1.0,0])
-#    return Mat 
-#   
+def matSx():
+    spin_t=1
+    dimT = int(2*spin_t + 1)
+    Mat=(1.0/(2.0**(0.5)))*uni10.Matrix(dimT, dimT,[0, 1.0, 0 ,1.0,0, 1.0,0,1.0,0])
+    return Mat 
+    
+def matSy():
+    spin_t=1
+    dimT = int(2*spin_t + 1)
+    Mat=(1.0/(2.0**(0.5)))*uni10.Matrix(dimT, dimT,[0,-1.0,0,1.0,0,-1.0,0,1.0,0])
+    return Mat 
+   
 
-#def matSz():
-#    spin_t=1
-#    dimT = int(2*spin_t + 1)
-#    Mat=uni10.Matrix(dimT, dimT,[1,0,0,0,0,0,0,0,-1])
-#    return Mat
+def matSz():
+    spin_t=1
+    dimT = int(2*spin_t + 1)
+    Mat=uni10.Matrix(dimT, dimT,[1,0,0,0,0,0,0,0,-1])
+    return Mat
 
-#def matIden():
-#    spin_t=1
-#    dimT = int(2*spin_t + 1)
-#    Mat=uni10.Matrix(dimT, dimT,[1,0,0,0,1,0,0,0,1])
-#    return Mat
+def matIden():
+    spin_t=1
+    dimT = int(2*spin_t + 1)
+    Mat=uni10.Matrix(dimT, dimT,[1,0,0,0,1,0,0,0,1])
+    return Mat
 
 
 
@@ -442,14 +442,18 @@ def Heisenberg0(h, d_phys):
     sx = matSx()
     sy = matSy()
     sz = matSz()
-    iden=matIden()
     iden = matIden()
 
-    ham =(h[0])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+
+    ham=(h[0])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+
+
+    A=(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+    #print h[6],ham,A
+    ham=ham + h[6]*A
+    #print "h[6]", h[6]
     H.putBlock(ham)
     return H
-
-
 
 def Heisenberg00(h, d_phys):
 
@@ -459,14 +463,17 @@ def Heisenberg00(h, d_phys):
     sx = matSx()
     sy = matSy()
     sz = matSz()
-    iden=matIden()
     iden = matIden()
 
-    ham =(h[1])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+    ham=(h[1])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+
+
+    A=(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+    #print h[6],ham,A
+    ham=ham + h[6]*A
+    #print "h[6]", h[6]
     H.putBlock(ham)
     return H
-
-
 
 
 def Heisenberg1(h, d_phys):
@@ -477,7 +484,6 @@ def Heisenberg1(h, d_phys):
     sy = matSy()
     sz = matSz()
     iden=matIden()
-    iden = matIden()
 
     ham =(h[2]*2)*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
     H.putBlock(ham)
@@ -527,7 +533,7 @@ def threebody(h,d_phys):
 
     ham =(h[1])*(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))
 
-    
+
     ham =ham + h[0]*(h[3]*uni10.otimes(iden,szt)+h[4]*uni10.otimes(iden,sxt)+h[5]*uni10.otimes(iden,syt))
 
 
@@ -535,24 +541,20 @@ def threebody(h,d_phys):
 
 
     A=(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))*(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))
-    
 
-    ham= ham +  h[6]*A 
+    ham= ham + h[6]*A 
 
     B=(h[3]*uni10.otimes(iden,szt)+h[4]*uni10.otimes(iden,sxt)+h[5]*uni10.otimes(iden,syt))*(h[3]*uni10.otimes(iden,szt)+h[4]*uni10.otimes(iden,sxt)+h[5]*uni10.otimes(iden,syt))
-    
-    ham= ham +  h[6]*B 
 
+    ham= ham + h[6]*B
 
-    C=2.0*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
-    
-    ham= ham +  h[7]*C 
+    C=(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
 
+    ham= ham + h[7]*2.0*C 
 #    H.setRawElem(ham)
     H.putBlock(ham)
 #    print ham, H
 #    print H
-    #print sx, sy, sz
     return H
 
 def threebody_U1(h,d_phys):
@@ -581,7 +583,6 @@ def threebody_U1(h,d_phys):
 
     ham =ham + 2.0*h[2]*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
 
-
     A=(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))*(h[3]*uni10.otimes(szt,iden)+h[4]*uni10.otimes(sxt,iden)+h[5]*uni10.otimes(syt,iden))
     
 
@@ -591,10 +592,9 @@ def threebody_U1(h,d_phys):
     
     ham= ham +  h[6]*B 
 
-
-    C=2.0*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
+    C=(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))*(h[3]*uni10.otimes(sz,sztt)+h[4]*uni10.otimes(sx,sxtt)+h[5]*uni10.otimes(sy,sytt))
     
-    ham= ham +  h[7]*C 
+    ham= ham +  h[7]*2.0*C 
 
     H.setRawElem(ham)
     #print ham, H
@@ -616,6 +616,9 @@ def Heisenberg0_U1(h, d_phys):
     iden = matIden()
 
     ham =(h[0])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+    A=(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+    ham= ham +  h[6]*A 
+
     H.setRawElem(ham)
     #print H, ham
 
@@ -632,42 +635,16 @@ def Heisenberg00_U1(h, d_phys):
     iden=matIden()
 
     ham =(h[1])*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+
+    A=(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))*(h[3]*uni10.otimes(sz,sz)+h[4]*uni10.otimes(sx,sx)+h[5]*(-1.0)*uni10.otimes(sy,sy))
+    
+
+    ham= ham +  h[6]*A 
+
     H.setRawElem(ham)
     #print H, ham
 
     return H
-
-
-#def threebody_U1_help(h,d_phys):
-#    bdi = uni10.Bond(uni10.BD_IN, d_phys)
-#    bdo = uni10.Bond(uni10.BD_OUT, d_phys)
-
-#    H = uni10.UniTensor([bdi, bdi,bdi, bdo, bdo,bdo], "Heisenberg")
-#    sx = matSx()
-#    sy = matSy()
-#    sz = matSz()
-#    szt=uni10.otimes(sz,sz)
-#    sxt=uni10.otimes(sx,sx)
-#    syt=(-1.0)*uni10.otimes(sy,sy)
-#    #ident=uni10.otimes(iden,iden)
-#    iden = matIden()
-
-#    sztt=uni10.otimes(iden,sz)
-#    sxtt=uni10.otimes(iden,sx)
-#    sytt=(-1.0)*uni10.otimes(iden,sy)
-
-
-#    ham =(0.25*h[1])*(h[0]*uni10.otimes(szt,iden)+uni10.otimes(sxt,iden)+uni10.otimes(syt,iden))
-#    ham =ham + 0.25*h[1]*(h[0]*uni10.otimes(iden,szt)+uni10.otimes(iden,sxt)+uni10.otimes(iden,syt))
-#    ham =ham + 0.25*2*h*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+uni10.otimes(sy,sytt))
-
-#    #ham = 0.25*2.00*h*(uni10.otimes(sz,sztt)+uni10.otimes(sx,sxtt)+uni10.otimes(sy,sytt))
-
-#    H.setRawElem(ham)
-#    #print ham, H
-#    #print sx, sy, sz
-#    return H
-
 
 
 def threebody_Z2(h,d_phys):
@@ -1553,7 +1530,7 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   print 'ave_H', sum(max_list)/4.00 
   print 'max', max(max_list) 
   print 'min', min(max_list) 
-  H=Heisenberg0(h,d_phys)
+  H=Heisenberg00(h,d_phys)
   E_5=M_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
   E_6=M_v(d_u,b_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model,H)
   E_7=M_v(a_u,c_u,c,d,a,b,Env2,D,h,d_phys,chi,Corner_method,Model,H)
@@ -1565,8 +1542,8 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   print 'max', max(max_list1) 
   print 'min', min(max_list1) 
 
-  D_x=max(max_list) - min(max_list)
-  D_y=max(max_list1) - min(max_list1)
+  D_x=max(max_list)-min(max_list)
+  D_y=max(max_list1)-min(max_list1)
   D_R=max(max_list1)-min(max_list)
   print   'D_x=', D_x
   print   'D_y=', D_y
@@ -1585,7 +1562,7 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   print 'ave_H', sum(max_list)/4.00 
   print 'max', max(max_list) 
   print 'min', min(max_list) 
-  H=Heisenberg0_U1(h,d_phys)
+  H=Heisenberg00_U1(h,d_phys)
 
   E_5=M_v(c_u,a_u,a,b,c,d,Env,D,h,d_phys,chi,Corner_method,Model,H)
   E_6=M_v(d_u,b_u,b,a,d,c,Env1,D,h,d_phys,chi,Corner_method,Model,H)
@@ -1598,8 +1575,8 @@ def Translational_sym(a_u,b_u,c_u,d_u,a,b,c,d,Env,Env1,Env2,Env3,D,h,d_phys,chi,
   print 'max', max(max_list1) 
   print 'min', min(max_list1) 
 
-  D_x=max(max_list) - min(max_list)
-  D_y=max(max_list1) - min(max_list1)
+  D_x=max(max_list)-min(max_list)
+  D_y=max(max_list1)-min(max_list1)
   D_R=max(max_list1)-min(max_list)
 
   print  'D_x=', D_x
