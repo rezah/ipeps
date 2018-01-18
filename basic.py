@@ -435,7 +435,7 @@ def corner_transfer_matrix_twosite(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta
     E1=abs(norm1[0])
     if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
    if (count > 20 ): print 'break! CTM'; break;
-   print E1, abs((E0-E1)/E1),Truncation[0],  count
+   #print E1, abs((E0-E1)/E1),Truncation[0],  count
    #print E1, Truncation[0], abs((E0-E1)/E1)
    #print a.norm(), b.norm(), c.norm(), d.norm()
  
@@ -467,20 +467,20 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
   c3_f=copy.copy(c3)
   c4_f=copy.copy(c4)
 
-  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveCorbz.add_left(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D)
+  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveCorboz.add_left(c1,c2,c3,c4,Ta1,Ta2,Ta3,Ta4,Tb1,Tb2,Tb3,Tb4,a,b,c,d,chi,D)
   
   
-  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveCorbz.add_left (c1,c2,c3,c4,Tb1,Ta2,Tb3,Ta4,Ta1,Tb2,Ta3,Tb4,b,a,d,c,chi,D)
+  c1, Ta4, Tb4, c4, c2, Ta2, Tb2, c3=MoveCorboz.add_left (c1,c2,c3,c4,Tb1,Ta2,Tb3,Ta4,Ta1,Tb2,Ta3,Tb4,b,a,d,c,chi,D)
 
-  MoveCorbz.permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+  MoveCorboz.permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
 
-  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveCorbz.add_left(c1,c4,c3,c2,Ta4,Ta3,Ta2,Ta1,Tb4,Tb3,Tb2,Tb1,a,c,b,d,chi,D)
+  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveCorboz.add_left(c1,c4,c3,c2,Ta4,Ta3,Ta2,Ta1,Tb4,Tb3,Tb2,Tb1,a,c,b,d,chi,D)
   
   
-  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveCorbz.add_left (c1,c4,c3,c2,Tb4,Ta3,Tb2,Ta1,Ta4,Tb3,Ta2,Tb1,c,a,d,b,chi,D)
+  c1, Ta1, Tb1, c2, c4, Ta3, Tb3, c3=MoveCorboz.add_left (c1,c4,c3,c2,Tb4,Ta3,Tb2,Ta1,Ta4,Tb3,Ta2,Tb1,c,a,d,b,chi,D)
 
-  MoveCorbz.permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
+  MoveCorboz.permute(a, b,c,d ,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4)
 
   c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4=Move.test_env_Ten(c1,c2,c3,c4,Ta1,Tb1,Ta2,Tb2,Ta3,Tb3,Ta4,Tb4)
   criteria_val=Move.distance(c1, c2, c3, c4, c1_f, c2_f, c3_f, c4_f)
@@ -497,7 +497,7 @@ def corner_transfer_matrix_twosite_CTMRG(a,b,c,d,chi,c1, c2,c3,c4,Ta1, Tb1,Ta2, 
    if (abs((E0-E1)) < Accuracy) : print 'Warning: norm~0', E1; Loop_iter=1;
   count+=1
   if (count > 20 ): print 'break! CTM'; break;
-  print E1, abs((E0-E1)/E1)#,criteria_val, count
+  #print E1, abs((E0-E1)/E1)#,criteria_val, count
   #print E1, Truncation[0], abs((E0-E1)/E1)
   #print a.norm(), b.norm(), c.norm(), d.norm()
  
@@ -631,7 +631,7 @@ def E_total_conv(a_u,b_u,c_u,d_u,a,b,c,d,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3
  #print '\n','\n','\n'  
  #print E_ca,E_ac,E_db, E_bd, (E_ca+E_ac+E_db+E_bd) / 4.00
 
- return ((E_ca) / 2.00) + ((E_ab) / 2.00)
+ return ((E_ca) / 1.00) + ((E_ab) / 1.00)
 
 
 

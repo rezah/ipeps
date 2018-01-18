@@ -14,14 +14,14 @@ import Fullupdate
 import Move
 ###################### Initialize parameters ###########################
 Model="Heisenberg"         #Heisenberg, Ising
-D=3
+D=2
 chi=20
 d_phys=2
 N_iteritebd=100
 N_iterF=2
-Gauge='Non-Fixed'
+Gauge='Fixed'
 Positive='Restrict'
-Corner_method='CTM'   #CTM, CTMRG, CTMFull
+Corner_method='CTMRG'   #CTM, CTMRG, CTMFull
 Acc_E=1.00e-6
 Steps=[1.0e-1,1.0e-2,1.0e-3,1.0e-4,1.0e-5,6.0e-6] #,[Start,steps,End] 
 delta=0.001
@@ -115,7 +115,7 @@ for h in hlist:
 #########################################################################################
 
 ############################################################################
- Gauge='Non-Fixed'
+ #Gauge='Fixed'
  #basic.Store_Full(a_u,b_u,c_u,d_u,a,b,c,d)
  #a_u,b_u,c_u,d_u,a,b,c,d=basic.Reload_Full()
 
@@ -131,32 +131,32 @@ for h in hlist:
 
 
 ###########################################################################################
- ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp=basic.Reload_Fullp()
- basic.Store_Fullp(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp)
+# ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp=basic.Reload_Fullp()
+# basic.Store_Fullp(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp)
 
  print 'E_toal=', E_value
  print 'z_value=', z_value
  Gauge='Non-Fixed'
 
- ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp,Env=Fullupdate.Full_Update(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E,Steps,Model)
+ #ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp,Env=Fullupdate.Full_Update(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp,chi,d_phys,D,delta,h,Env,Gauge,Positive,Corner_method,N_iterF,Acc_E,Steps,Model)
 
  E_value=basic.E_total(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,D,h,d_phys,chi,Corner_method,Model)
  z_value=basic.z_value(ap,bp,cp,dp,ap_u,bp_u,cp_u,dp_u,chi,D*D,c1, c2,c3,c4,Ta1, Tb1,Ta2, Tb2,Ta3, Tb3,Ta4, Tb4,Corner_method)
 
- print 'E_toal=', E_value
- print 'z_value=', z_value
+# print 'E_toal=', E_value
+# print 'z_value=', z_value
 
- zlist2.append(z_value)
- Elist2.append(E_value)
- basic.Store_Fullp(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp)
+# zlist2.append(z_value)
+# Elist2.append(E_value)
+# basic.Store_Fullp(ap_u,bp_u,cp_u,dp_u,ap,bp,cp,dp)
 
- basic.Store(hlist,zlist1, zlist1,zlist2,Elist1, Elist1 , Elist2 , file)
+# basic.Store(hlist,zlist1, zlist1,zlist2,Elist1, Elist1 , Elist2 , file)
 
 ##########################################################################################
 
 #plt.plot( hlist, zlist,'b*',label='Ising, D=2, simple',markersize=np.sqrt(200.))
 plt.plot( hlist, zlist1,'g>',label='Ising, D=2, FU',markersize=np.sqrt(200.))
-plt.plot( hlist, zlist2,'r<',label='Ising, D=2, FU, Guage',markersize=np.sqrt(200.))
+#plt.plot( hlist, zlist2,'r<',label='Ising, D=2, FU, Guage',markersize=np.sqrt(200.))
 #plt.plot( hlist, zlist4,'m^',label='Ising, D=5',markersize=np.sqrt(200.))
 
 plt.xlabel('h', fontsize=25)
@@ -168,7 +168,7 @@ plt.clf()
 
 #plt.plot( hlist, Elist,'b*',label='Ising, D=2, simple',markersize=np.sqrt(200.))
 plt.plot( hlist, Elist1,'g>',label='Ising, D=2, FU',markersize=np.sqrt(200.))
-plt.plot( hlist, Elist2,'r<',label='Ising, D=2, FU, Guage',markersize=np.sqrt(200.))
+#plt.plot( hlist, Elist2,'r<',label='Ising, D=2, FU, Guage',markersize=np.sqrt(200.))
 #plt.plot( hlist, Elist4,'m^',label='Ising, D=5',markersize=np.sqrt(200.))
 plt.xlabel('h', fontsize=25)
 plt.ylabel('E', fontsize=25)
